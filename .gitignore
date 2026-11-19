@@ -1,0 +1,37 @@
+# Private environment variables & credentials
+free-models.env
+free-models.fish
+*.env
+!.env.example
+*.key
+*.pem
+*.token
+
+# Local databases & user session storage
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+storage/
+upgraded_memory/*.db
+state/reviewer-ranking.json
+
+# Logs & temp files
+*.log
+log/
+logs/
+.omniroute/
+
+# Dependencies & runtime caches
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+Thumbs.db
+
+# Backups & archives
+*.bak
+*.bak.*
+*.backup
+archive/

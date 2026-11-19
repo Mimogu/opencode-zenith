@@ -1,0 +1,15 @@
+[Unit]
+Description=OpenCode Model Sentinel (Auto-Failover and Auto-Failback)
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/env python3 %h/.config/opencode/sentinel.py
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+EnvironmentFile=-%h/.config/opencode/free-models.env
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,326 @@
+{
+  "_doc": "Trigger patterns for plugins/skill-router. Each skill maps to case-insensitive JS regexes matched against the user's prompt. A pattern hit outranks description keyword matches. Skills without an entry are still matched by their SKILL.md description. 'never' lists skills the router must not suggest (they still load if the model or user asks).",
+  "settings": {
+    "max_suggestions": 3,
+    "min_keyword_cover": 0.8,
+    "skip_agents": [
+      "title",
+      "summary",
+      "compaction"
+    ],
+    "opt_out_token": "#noskills",
+    "strong_model_skills": [
+      "lemo-opuscar"
+    ],
+    "_strong_model_skills": "skills that need a strong model: injecting one switches a build session to the strongest measured model (context-engine strongStart)"
+  },
+  "never": [
+    "agentskills",
+    "output-skill",
+    "subagent-driven-development"
+  ],
+  "routes": {
+    "modern-web-guidance": [
+      "\\b(css|html|tailwind|flexbox|frontend|front-end|stylesheet|responsive (design|layout)|landing page|web ?page|ui components?|dark mode)\\b"
+    ],
+    "design-quality": [
+      "\\b(design|ui|ux|layout|typography|visual polish|looks? (bad|ugly|off)|spacing|color palette)\\b.*\\b(improve|review|polish|redesign|better)\\b",
+      "\\b(redesign|polish the ui|make it look)\\b"
+    ],
+    "anti-sycophancy": [
+      "\\b(review|audit|verify|double[- ]check|sanity[- ]check|critique)\\b(\\W+\\w+){0,5}\\W+(code|diff|pr|changes?|logic|implementation|fix|patch|commit|function|my work)\\b",
+      "\\bis (this|my) (code|fix|logic|implementation) (correct|right)\\b",
+      "\\b(just|only) agreeing with me\\b",
+      "\\b(rubber[- ]?stamp(ing)?|yes[- ]man|devil'?s advocate)\\b",
+      "\\bchallenge (the|my|this) (fix|reasoning|assumptions?|conclusion|plan)\\b"
+    ],
+    "code-review": [
+      "\\b(code review|review (my|the|this) (code|pr|diff|changes|branch)|pull request|\\bpr\\b ?#?\\d+)",
+      "\\breview\\b.*\\b(diff|commit|changes)\\b"
+    ],
+    "owasp-security": [
+      "\\b(authentication|authorization|login (page|flow|form|endpoint)|sign[- ]?in flow|jwt|oauth|csrf|xss|sql injection|sanitiz\\w*|input validation|cors|vulnerab\\w*|rbac|session (token|fixation|hijack))\\b",
+      "\\bsecurity (review|audit|issues?|holes?|hardening|checks?|scan)\\b",
+      "\\b(secure|harden) (the |my |this )?(api|endpoint|server|app|auth)\\b",
+      "\\b(hash(ing)?|store|storing) passwords?\\b"
+    ],
+    "docker-infra": [
+      "\\b(docker|dockerfile|compose|container|podman|image size)\\b"
+    ],
+    "deployment-patterns": [
+      "\\b(deploy|deployment|ci/cd|github actions|kubernetes|k8s|helm|nginx|systemd unit|blue[- ]green|rollback)\\b"
+    ],
+    "database-migrations": [
+      "\\b(schema|database|db|sql) migrations?\\b",
+      "\\b(write|create|add|run|generate) (a |the )?migrations?\\b",
+      "\\bmigrat\\w*\\b(\\W+\\w+){0,5}\\W+(database|schema|postgres(ql)?|mysql|sqlite|tables?)\\b",
+      "\\b(alter table|add (a )?column|drop column|prisma|drizzle|alembic|knex|sequelize|flyway|liquibase)\\b"
+    ],
+    "git-conflict-resolver": [
+      "\\b(merge conflict|rebase (conflict|halt|stopped)|cherry[- ]pick|conflict markers?|<<<<<<<)"
+    ],
+    "git-workflow": [
+      "\\b(git (branch|commit|history|log)|branching strategy|commit message|squash|interactive rebase|gitflow)\\b"
+    ],
+    "using-git-worktrees": [
+      "\\bworktrees?\\b"
+    ],
+    "performance-profiling": [
+      "\\b(memory leak|oom|out of memory|cpu (usage|spike)|event loop (lag|block)|bottleneck|profil(e|er|ing)|flame ?graph|heap (dump|snapshot))\\b",
+      "\\b(performance|perf) (issue|problem|regression|bug|tuning)\\b",
+      "\\b(optimi[sz]e|speed up|improve)\\b(\\W+\\w+){0,3}\\W+(performance|query|queries|load time|startup|render(ing)?|fps)\\b",
+      "\\b(app|game|page|query|code|script|server|build|site|function|endpoint|ui|scroll(ing)?|animation) (is|runs|got|feels|seems) (so |too |really |kind of |a bit )?(slow|laggy|sluggish|janky|choppy|stuttery)\\b",
+      "\\b(godot|unity|scene|shader|render(er|ing)?|draw calls?|frame ?time|my code|the code|script|react|vue|svelte|angular|component|dom|canvas|webgl|three\\\\.js|table|list view|_process|physics_process)\\b.*\\b(janky|stutter\\w*|choppy|frame drops?|(low|bad|dropping) fps)\\b|\\b(janky|stutter\\w*|choppy|frame drops?|(low|bad|dropping) fps)\\b.*\\b(godot|unity|scene|shader|render(er|ing)?|draw calls?|frame ?time|my code|the code|script|react|vue|svelte|angular|component|dom|canvas|webgl|three\\\\.js|table|list view)\\b"
+    ],
+    "test-quality": [
+      "\\b(unit|integration|e2e|end[- ]to[- ]end|regression) tests?\\b",
+      "\\b(write|add|run|fix|improve) (the |some |more )?tests\\b",
+      "\\b(test suite|test coverage|coverage report|pytest|jest|vitest|flaky tests?|failing tests?|tdd)\\b",
+      "\\btests? (are |is |keep )?(failing|broken|red|flaky)\\b"
+    ],
+    "systematic-debugging": [
+      "\\b(bug|error|exception|traceback|stack ?trace|crash(ed|es|ing)?|fails?|failed|failing|broken|regression|segfault|freez(es|ing)|hangs?)\\b",
+      "\\b(doesn'?t|does not|still (not|doesn'?t)|won'?t|isn'?t) (work|start|load|run|launch|compile|build|open)",
+      "\\bdoes nothing\\b",
+      "\\b(sometimes|randomly|intermittently|occasionally) (returns?|fails?|crash(es)?|hangs?|throws?)\\b",
+      "\\bflaky\\b(?!\\W+tests?\\b)"
+    ],
+    "deep-research": [
+      "\\b(literature review|lit review|systematic review|meta[- ]analysis|prisma|state of the art|scoping review|evidence synthesis)\\b",
+      "\\b(academic|scholarly|peer[- ]reviewed) (research|papers|sources|literature)\\b",
+      "\\bresearch\\b(\\W+\\w+){0,6}\\W+(with|cite|citing) (citations|references)\\b"
+    ],
+    "academic-paper": [
+      "\\b(paper|manuscript|thesis|dissertation|journal article|abstract|rebuttal|camera[- ]ready)\\b"
+    ],
+    "academic-paper-reviewer": [
+      "\\b(peer review|review (my|this|the) (paper|manuscript)|referee report|reviewer comments)\\b"
+    ],
+    "academic-pipeline": [
+      "\\b(full (academic|research) pipeline|research to (paper|publication))\\b"
+    ],
+    "sr-screener": [
+      "\\b(systematic review|scoping review|prisma|prospero|title(/| and )abstract screening|inclusion criteria)\\b"
+    ],
+    "ponytail": [
+      "\\b(consolidat|dedup(licate)?|dead code|unused (code|exports|files)|clean ?up the (code|repo))\\b"
+    ],
+    "ponytail-debt": [
+      "\\b(tech(nical)? debt|debt (audit|inventory))\\b"
+    ],
+    "godot4-dev": [
+      "\\b(godot|gdscript|\\.tscn|\\.gd\\b|autoload)"
+    ],
+    "voxel-craft-cad": [
+      "\\b(voxel|three\\.js|threejs|webgl|3d model(ing)?|parametric)\\b"
+    ],
+    "mcfunction-builder": [
+      "\\b(minecraft|mcfunction|datapack|command blocks?)\\b"
+    ],
+    "dual-viewport-ui": [
+      "\\b(dual[- ]viewport|2d and 3d|blueprint (view|canvas)|layer slic)"
+    ],
+    "image-gen": [
+      "\\b(generate|create|make|draw|design|render)\\b(\\W+(?!(?:container|docker|disk|iso|base|vm|os|system)\\b)\\w+){0,4}\\W+(?<!(?:container|docker|disk|iso|base) )(image|picture|photo|illustration|logo|icon|wallpaper|artwork)s?\\b(?!\\W+(?:size|smaller|layer|build))"
+    ],
+    "video-gen": [
+      "\\b(generate|create|make|render)\\b(\\W+\\w+){0,6}\\W+clips?\\b",
+      "\\b(veo|seedance|text[- ]to[- ]video|image[- ]to[- ]video|ai[- ]generated video|video (model|placeholder|mockup))\\b"
+    ],
+    "lemo-opuscar": [
+      "\\b(make|create|produce|direct|render|generate|build|animate)\\b(\\W+[\\w'-]+){0,6}\\W+(film|movie|short film|explainer|promo|teaser|trailer|documentary|newsreel|animation(?=\\W+(about|explaining|showing|telling|on (the )?(history|story|life)|in (a|an|the)?\\W*[\\w-]+(\\W+[\\w-]+)?\\W+(style|look)))|animated (video|short|explainer|film)|video(?!\\W+(clip|player|component|element|file|tag|upload|stream|call|chat|codec|editor)))s?\\b(?!\\W+(player|component|element|tag))",
+      "\\b(film|video|animation|explainer)s? styles?\\b",
+      "\\bopuscar\\b"
+    ],
+    "canvas-design": [
+      "\\b(poster|flyer|banner|infographic|cover art)\\b"
+    ],
+    "algorithmic-art": [
+      "\\b(generative art|algorithmic art|p5\\.?js|flow field|creative coding)\\b"
+    ],
+    "docx": [
+      "\\b(\\.docx|\\.dotx|word (document|file|doc)s?)\\b(?!.*\\b(laptop|pc|computer)\\b)"
+    ],
+    "pdf": [
+      "\\b(\\.pdf|pdf (file|form|document)|merge pdfs?|extract .* from (a |the )?pdf)\\b",
+      "\\bpdf\\b"
+    ],
+    "pptx": [
+      "\\b(\\.pptx|\\.potx|powerpoint|power point|slide ?decks?|pitch decks?)\\b",
+      "\\b(make|create|build|edit|design|generate)\\b(\\W+\\w+){0,4}\\W+(presentation|slides)\\b"
+    ],
+    "xlsx": [
+      "\\b(\\.xlsx|\\.xlsm|spreadsheet|excel|workbook)\\b",
+      "\\b(edit|clean|fix|convert|merge|dedupe|deduplicate|sort|filter)\\b(\\W+\\w+){0,4}\\W+\\w*\\.csv\\b"
+    ],
+    "documentation-lookup": [
+      "\\b(docs for|documentation|api reference|how do i use|latest version of)\\b"
+    ],
+    "graphify": [
+      "\\b(architecture of|how does (this|the) (codebase|repo|project)|where is .* (defined|implemented)|call graph|dependency graph)\\b",
+      "graphify"
+    ],
+    "codebase-onboarding": [
+      "\\b(onboard|unfamiliar (codebase|repo)|explain (this|the) (codebase|repo|project)|get me up to speed)\\b"
+    ],
+    "codebase-design": [
+      "\\b(module (design|interface|boundary)|seam|deep module|refactor (the )?architecture|api design)\\b"
+    ],
+    "plans": [
+      "\\b(make|write|create) (a |an )?(implementation )?plan\\b",
+      "\\bplan (out|this|the)\\b"
+    ],
+    "brainstorming": [
+      "\\b(brainstorm|ideas for|help me think|explore options|what should i build)\\b"
+    ],
+    "schema-to-type": [
+      "\\b(typescript (types?|interfaces?)|zod|json schema|type(s)? (for|from) (this|the) (json|response|payload|schema))\\b"
+    ],
+    "mcp-builder": [
+      "\\b(mcp server|model context protocol|build an? mcp)\\b"
+    ],
+    "skill-creator": [
+      "\\b(create|write|make|improve) (a |an )?skill\\b",
+      "SKILL\\.md"
+    ],
+    "publishing-release": [
+      "\\b(cut|tag|prepare|ship) (a |the )?(new )?release\\b",
+      "\\brelease (notes|v?\\d)",
+      "\\b(version bump|bump (the )?version|changelog|semver|npm publish|publish (it |this )?to (npm|pypi|crates))\\b"
+    ],
+    "production-hardening": [
+      "\\b(production[- ]ready|harden|hardening|go[- ]live|observability|rate limit(ing)?|graceful shutdown)\\b"
+    ],
+    "rea": [
+      "\\b(reverse engineer|decompile|disassembl|binary analysis|electron app internals|asar|apk|ghidra)\\b"
+    ],
+    "ruflo": [
+      "\\b(swarm|multi[- ]agent orchestration|vector memory|ruflo)\\b"
+    ],
+    "geo-sleuth": [
+      "\\b(geolocat|where was this (photo|picture) taken|chronolocat|geoguess)\\b"
+    ],
+    "create-design-md": [
+      "\\bdesign\\.md\\b",
+      "\\bdesign system (doc|documentation)\\b"
+    ],
+    "web-artifacts-builder": [
+      "\\b(html artifact|single[- ]file (app|html)|react artifact)\\b"
+    ],
+    "context-budget": [
+      "\\b(context (budget|overhead|bloat)|token (cost|usage) of (my|the) (setup|config|agents))\\b"
+    ],
+    "chisle": [
+      "\\bchisle\\b"
+    ],
+    "browser-automation": [
+      "\\b(open|go to|visit|browse|log ?in to|sign ?in to|fill (out|in)|click|scrape)\\b(\\W+\\w+){0,6}\\W+(website|site|page|web ?app|url|form|link)s?\\b",
+      "\\b(use|open) (the |a )?browser\\b",
+      "\\bhttps?://\\S+\\b.*\\b(click|log ?in|fill|book|buy|order|check)\\b",
+      "\\b(playwright|camofox|headless browser)\\b",
+      "\\b(core web vitals|lcp|cls|inp|lighthouse|performance trace|page ?speed|waterfall)\\b",
+      "\\b(logged[- ]in|log ?in to|sign ?in to)\\b(\\W+\\w+){0,4}\\W+(site|website|account|page|portal)\\b",
+      "\\bscrap(e|ing|er)\\b",
+      "\\b(javascript|js)[- ]heavy\\b",
+      "\\b(my|own|real|the user'?s) (web ?)?browsers?\\b",
+      "\\b(automate|control|drive|take over|operate)\\b(\\W+\\w+){0,4}\\W+(the |a )?browser\\b"
+    ],
+    "desktop-control": [
+      "\\b(click|open|press|type)\\b(\\W+\\w+){0,5}\\W+(on (my|the) (screen|desktop)|in the app|window|button|menu|taskbar)\\b",
+      "\\b(take|grab) a screenshot\\b",
+      "\\b(my|the) (screen|desktop)\\b(\\W+\\w+){0,6}\\W+(click|control|operate|look|see|read)\\b",
+      "\\b(control|operate|use) (my|the) (computer|desktop|pc|mouse|keyboard)\\b",
+      "\\bcomputer use\\b"
+    ],
+    "memory-import": [
+      "\\b(import|migrate|transfer|bring over|move)\\b(\\W+\\w+){0,6}\\W+(memor(y|ies)|saved info)\\b",
+      "\\b(chatgpt|gemini|copilot|claude)('s)? (memory|memories|saved info)\\b",
+      "\\bmemory export\\b"
+    ],
+    "thermos": [
+      "\\bthermos\\b",
+      "\\b(double|both) thermo",
+      "\\b(full|complete|combined|everything) (branch |pr |diff )?(audit|review)\\b.*\\b(bugs?|security)\\b.*\\b(quality|maintainab)"
+    ],
+    "thermo-nuclear-review": [
+      "\\bthermo[- ]?nuclear\\b(?!\\W+(code\\W+)?quality)",
+      "\\b(security|correctness) (and (correctness|security) )?audit of (my |this |the )?(branch|diff|pr|changes)\\b"
+    ],
+    "thermo-nuclear-code-quality-review": [
+      "\\bthermo[- ]?nuclear\\W+(code\\W+)?quality\\b",
+      "\\b(harsh|strict|brutal|ruthless)\\b(\\W+\\w+){0,2}\\W+(maintainability|code quality|quality) (review|audit)\\b"
+    ],
+    "deslop": [
+      "\\b(de-?slop|unslop|ai[- ]slop|debloat|de-?bloat|bloated (code|diff|module|file)s?)\\b",
+      "\\bclean (up|out)\\b(\\W+\\w+){0,3}\\W+(slop|bloat)\\b"
+    ],
+    "no-comments": [
+      "\\bno[- ]comments\\b",
+      "\\b(strip|remove|delete|kill|drop)\\b(\\W+\\w+){0,3}\\W+comments\\b"
+    ],
+    "blast-radius": [
+      "\\bblast[- ]radius\\b",
+      "\\bwhat (could|might|would|will) (this|the|my) (change|pr|diff|refactor|commit) break\\b",
+      "\\bwhat (else )?(could|might|would|will) (it |this |that )?break\\b",
+      "\\bbreak (anything|something) (else|elsewhere)\\b",
+      "\\b(downstream|knock-on) (effects?|impact)\\b"
+    ],
+    "correct": [
+      "\\b(agents?|the (ai|model)) keeps? (making|repeating|doing) (the same|this)\\b",
+      "\\bmake (this|that) (mistake|bug|error) impossible\\b"
+    ],
+    "benchmark-checklist": [
+      "\\b(vet|validate|sanity[- ]check|double[- ]check|can i trust)\\b(\\W+\\w+){0,3}\\W+(benchmark|measurement|perf(ormance)? numbers?|speedup)s?\\b"
+    ],
+    "typescript-best-practices": [
+      "\\btypescript\\b",
+      "\\b\\w+\\.tsx?\\b"
+    ],
+    "sharpen": [
+      "(^|\\s)/sharpen\\b",
+      "\\bsharpen (this|the|my) (prompt|task|request)\\b"
+    ],
+    "engineering-principles": [
+      "\\b(yagni|over-?engineer(ed|ing)?|too many (abstractions|layers)|subtract before|first principles|idempoten(t|cy)|reader load)\\b"
+    ],
+    "verification-before-completion": [
+      "\\b(make sure|verify|confirm|double[- ]check|check)\\b(\\W+\\w+){0,6}\\W+(it |that |this )?(works?|is fixed|fixed|is done|done|passes|passing|complete|finished)\\b",
+      "\\bbefore (we |i |you )?(commit|push|merge|open (a |the )?pr|ship|release|deploy)\\b",
+      "\\b(is it|is this|are we) (really )?(done|fixed|finished|working)\\b"
+    ],
+    "web-research": [
+      "\\b(deep research|research (on|into|about)|market (analysis|research|sizing)|fact[- ]check|deep dive|deep scan|due diligence)\\b",
+      "\\bcompare\\b(\\W+\\w+){0,6}\\W+(options|approaches|tools|libraries|frameworks|alternatives|platforms|services)\\b",
+      "\\b(list|directory) of (all|every)\\b",
+      "\\b(with|cite|citing) sources\\b"
+    ],
+    "experiment-and-inference": [
+      "\\b(statistically significant|significance test|p[- ]values?|a/b tests?|ab tests?|hypothesis tests?|confidence intervals?|t[- ]tests?|chi[- ]square|anova|mann[- ]whitney|sample size|statistical power|effect sizes?)\\b",
+      "\\b(is|are) (the|this|that|these) (difference|change|uplift|increase|drop)s? (real|significant)\\b",
+      "\\bdifference between\\b(\\W+\\w+){0,6}\\W+significant\\b"
+    ],
+    "data-build-dashboard": [
+      "\\b(kpi|data|sales|metrics?|analytics|executive|html) dashboards?\\b",
+      "\\bdashboards?\\b(\\W+\\w+){0,5}\\W+(\\.csv|\\.xlsx|csv|data|dataset|kpis?|metrics|sales|query results)\\b"
+    ],
+    "data-explore-data": [
+      "\\b(profile|explore|eda on|exploratory (data )?analysis (of|on)|data quality (of|in|check))\\b(\\W+\\w+){0,4}\\W+(data|dataset|csv|table|file|columns)\\b"
+    ],
+    "data-validate-data": [
+      "\\b(validate|qa|sanity[- ]check|double[- ]check|audit)\\b(\\W+\\w+){0,3}\\W+(analysis|numbers|figures|query results|calculations)\\b"
+    ],
+    "data-science-tutor": [
+      "\\b(teach me|quiz me|lesson|explain|help me understand|i want to learn|study)\\b(\\W+\\w+){0,8}\\W+(statistic\\w*|regression|p[- ]values?|probability|distributions?|hypothes\\w+|pandas|numpy|sql|power bi|dax|machine learning|ml|data scien\\w*|data analy\\w*|scikit[- ]learn|sklearn)\\b",
+      "\\b(roadmap|path|plan) to (become )?(a )?data scientist\\b",
+      "\\bwhat should i (learn|study) next\\b"
+    ],
+    "portfolio-project-builder": [
+      "\\bportfolio (projects?|piece)\\b",
+      "\\bproject for my (portfolio|github)\\b"
+    ],
+    "ml-workflow": [
+      "\\b(train|build|tune|evaluate)\\b(\\W+\\w+){0,4}\\W+(model|classifier|regressor)\\b(?!.*\\b(3d|blender|godot|mesh)\\b)",
+      "\\b(xgboost|lightgbm|scikit[- ]learn|sklearn|cross[- ]validation|data leakage|feature importance|shap)\\b"
+    ]
+  }
+}

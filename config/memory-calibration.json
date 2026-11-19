@@ -1,0 +1,69 @@
+{
+ "_active": "embeddinggemma",
+ "nomic-embed-text": {
+  "fact_min": 0.58,
+  "episode_min": 0.58,
+  "rel_gap": 0.03,
+  "duplicate": 0.895,
+  "related": 0.643,
+  "measured": {
+   "hit1": 0.9555555555555556,
+   "precision": 0.9555555555555556,
+   "recall": 0.9555555555555556,
+   "item_precision": 0.903,
+   "items_per_query": 1.38,
+   "query_ms_p50": 58,
+   "skill_top1": 0.7333333333333333,
+   "skill_top3": 0.8333333333333334
+  },
+  "skill_hint": 0.65,
+  "skill_only_hint": 0.67,
+  "skill_inject": 0.67,
+  "skill_margin": 0.033,
+  "calibrated": "2026-11-03"
+ },
+ "embeddinggemma": {
+  "fact_min": 0.425,
+  "episode_min": 0.425,
+  "rel_gap": 0.15,
+  "duplicate": 0.856,
+  "related": 0.511,
+  "measured": {
+   "hit1": 0.9777777777777777,
+   "precision": 0.9772727272727273,
+   "recall": 0.9555555555555556,
+   "item_precision": 0.902,
+   "items_per_query": 1.36,
+   "query_ms_p50": 56,
+   "skill_top1": 0.8,
+   "skill_top3": 0.8666666666666667
+  },
+  "skill_hint": 0.185,
+  "skill_only_hint": 0.266,
+  "skill_inject": 0.26,
+  "skill_margin": 0.044,
+  "calibrated": "2026-11-03",
+  "kw_relief": 0.08,
+  "measured_e2e": {
+   "found": "46/48",
+   "item_precision": 0.84,
+   "negative_injections": "1/25",
+   "skills": "30/30",
+   "date": "2026-11-03"
+  },
+  "kw_cover": 0.6
+ },
+ "_keyword": {
+  "kw_only_cover": 0.55,
+  "kw_only_rel": 0.9,
+  "skill_min_cover": 0.8,
+  "calibrated": "2026-11-03",
+  "measured_e2e": {
+   "memory_found": "28/48",
+   "item_precision": 0.7,
+   "negative_injections": "2/25",
+   "skills": "29/30",
+   "skill_false": "1/18"
+  }
+ }
+}

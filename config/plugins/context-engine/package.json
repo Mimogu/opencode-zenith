@@ -1,0 +1,7 @@
+{
+  "name": "opencode-context-engine",
+  "version": "1.0.0",
+  "description": "Per-turn memory recall, automatic skill loading and skill-catalog compaction",
+  "main": "index.js",
+  "type": "module"
+}

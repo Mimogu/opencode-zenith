@@ -1,0 +1,313 @@
+{
+  "_doc": "Task playbooks for plugins/context-engine/playbooks.mjs. The free models skip steps a top model takes unprompted (look before answering, verify, root-cause). For each user message the engine picks the matching playbook(s) by regex route, plus the single most similar playbook when its similarity to the examples clears 'threshold', and appends the checklist right after the user's message in the request (recency is what weak models obey). 'always' is appended on every turn. Keep checklists short: every line costs tokens on every matching turn. 'skip': requests matching any of these regexes get no playbook (acknowledgements, memory requests); semantic picks also need at least 4 words. 'strong': true on a playbook starts build sessions that match it on the strong model (judgement over speed). A playbook's own 'threshold' overrides the global one for its semantic pick (measure: 0.5, it starts on the strong model).",
+  "threshold": 0.34,
+  "max": 2,
+  "agents": [
+    "build",
+    "quick",
+    "local",
+    "plan",
+    "browser",
+    "general"
+  ],
+  "always": "Before your final answer: re-read the user's message and make sure every part is answered. Every claim, number, part number and command must come from something you observed this session; if not, say it is unverified. Never write \"verified\" or \"confirmed\" for something you did not read yourself this session. Save to memory only what the user said or you verified, never prices, stock or your own recommendation.",
+  "playbooks": {
+    "own-machine": {
+      "title": "Question about the user's own computer or setup",
+      "routes": [
+        "\\b(my|this|our) (laptop|pc|computer|machine|device|system|setup|desktop|install(ation)?|wifi|network|gpu|cpu|ram|memory|disk|ssd|battery|screen|monitor|keyboard|mouse|printer|bluetooth|audio|sound|mic|camera)\\b",
+        "\\b(games?|steam|minecraft|discord|vesktop|labwc|wayland|cachyos|arch|kernel|driver|swap|zram|fps|stutter\\w*|lag\\w*|overheat\\w*|boot\\w*)\\b.*\\b(slow|stutter\\w*|lag\\w*|crash\\w*|freez\\w*|broken|not working|won'?t|can'?t|only (lets|shows|allows|works)|fail\\w*|should i|what should|optimi[sz]e|improve|faster|better)\\b",
+        "\\bwhat (kind|type|model|brand) of \\w+( \\w+)? (do i have|have i got|is (in|on) (my|this))\\b",
+        "\\b(dot ?files?|ricing|(hyprland|linux|desktop|my|this) rice)\\b",
+        "\\b(set ?up|install|configure|apply|launch|start|run|switch to|uninstall|remove)\\b.{0,80}\\b(hyprland|quickshell|waybar|labwc|sway|niri|plasma|gnome|compositor|window manager|display manager|sddm|greetd|desktop shell|bootloader|grub)\\b",
+        "\\b(emergency|rescue|safe) mode\\b|\\bfrom (the |a )?tty\\b|\\bafter (the |a )?(reboot|restart|update)\\b.{0,60}\\b(not|n'?t|no longer|black|stuck|fail\\w*)\\b|\\b(not|n'?t)\\b.{0,30}\\bafter (the |a )?(reboot|restart|update)\\b"
+      ],
+      "examples": [
+        "my laptop has 8GB of RAM and games stutter, should I use zram or swap",
+        "why is my wifi so slow",
+        "bluetooth headphones keep disconnecting",
+        "is my cpu overheating",
+        "how much disk space do I have left",
+        "steam games run badly on my machine, what can I do",
+        "my screen flickers after the update",
+        "which driver am I using for the gpu",
+        "the fan is really loud all the time",
+        "my battery drains fast",
+        "can my laptop run this game",
+        "what is using all my memory",
+        "my system feels slow lately",
+        "how hot is my cpu getting",
+        "setup for me this dotfile https://github.com/someone/dots and tell me how to launch it from the tty",
+        "install this hyprland rice and make sure it works",
+        "after the reboot the bar did not load",
+        "i am currently in emergency mode",
+        "the keybinds are not working in hyprland"
+      ],
+      "checklist": [
+        "Look before answering: run read-only commands to see the actual state (e.g. free -h, swapon --show, lsblk, df -h, lspci -k, sensors, systemctl status <unit>, the relevant config file). Do this even when the user says \"just explain\": looking changes nothing.",
+        "Identify hardware from what the machine reports (dmidecode, decode-dimms, lspci, /sys/class/dmi), decoding vendor IDs rather than guessing. If recalled memory disagrees with what the machine reports, the machine wins: say so and fix the memory with memory_supersede.",
+        "When you break a total down (disk, RAM, CPU, battery use), make the parts add up: if they explain much less than the total (home is 181 GB of 315 GB used), look where the rest is (e.g. `du -xh -d1 /`, a part you cannot read needs root, snapshots) before answering, and say what is still unexplained.",
+        "Answer for what is actually there, naming the real values you saw (\"you already have 7.6 GB of zram\"), not generic \"if you have...\" branches.",
+        "Before giving any command, confirm it exists and its syntax on this system (`<cmd> --help`, `man <cmd>`, `pacman -Qi <pkg>`). Never give a command you have not confirmed.",
+        "Respect the user's constraints from recalled memory (for example, background apps stay open while gaming).",
+        "Smallest fix first: a config change beats a package change. Do not rebuild, downgrade, replace or install system packages from source, and do not kill or restart apps the user has open, unless the user asked or agreed: propose it and stop.",
+        "If your own probe (dbus-send, a test script) crashes something, suspect the probe first: reproduce with what the user actually uses (the real app, a well-formed client) before blaming the software.",
+        "Done means shown working: re-read what you changed, check the service/state, and test it the way the user will use it.",
+        "Anything visual (a menu, dialog, theme, picker): test with the real input, not sample lines you made up (e.g. trigger the real portal request), take a screenshot (`grim`) and read it with `see <png> \"question\"`, then compare what is on screen with every point the user asked for. Fix and look again until it matches.",
+        "When the request names several apps, take one quick look at each (its running process flags or config: which backend it uses) and test the fix for each. Do not unpack app archives, read app source or run strings/objdump on binaries unless the quick checks and the man pages leave the cause unknown.",
+        "A service managed by systemd is restarted with `systemctl --user restart <unit>` (or without --user for system units); never kill it and start your own copy with nohup.",
+        "You are ON the user's machine: your shell is their system, as their user. Never say you cannot access it. Read the logs yourself (`journalctl -b -1` for the previous boot, the program's own log) and screenshot the running session with `grim`.",
+        "A message the user sees (\"emergency mode\", an error banner): get its exact text and find which program prints it (its log, `strings` on its binary, its docs) before diagnosing. The same words mean different things in different programs; a guess (\"disk full\") is not a cause until an output shows it.",
+        "Never `rm` a config, dotfile or app folder you did not create this session: move it to a dated backup (`mv x x.bak-$(date +%F)`) or `trash-put`, and first check who else uses it (`grep -rl <name> ~/.config`). \"Start from scratch\" means the app's own files, not files other programs read.",
+        "After writing a config file, make the program check it (`Hyprland --verify-config`, `sway -C`, `systemd-analyze verify`, `fish -n`, `jq empty`…) and write only options and functions seen in the installed example or docs (`/usr/share/<prog>/`, `--help`), never from memory.",
+        "Installing someone's project (dotfiles, a theme, a shell): follow its README step by step, including what it says must be installed first. Use its own config files; do not replace them with ones you write yourself. If a required part is a big system change, say so and ask."
+      ],
+      "strong": true
+    },
+    "fix-bug": {
+      "title": "Bug, error, crash or something not working",
+      "routes": [
+        "\\b(error|exception|traceback|stack ?trace|crash\\w*|segfault|bug|broken|fails?|failing|failed|not working|doesn'?t work|won'?t (start|run|load|open|build)|exit code|panic|hangs?|hanging|stopped working|blank (page|screen)|invalid call|permission denied|eacces|enoent|undefined is not)\\b",
+        "\\b(is |was |gets? )?rejected\\b|\\bexit(s|ed)? (immediately|with (code|status))\\b|\\b(isn'?t|aren'?t|not) (detected|recogni[sz]ed|showing|loading|responding)\\b|\\b(renders?|runs?|fires?) twice\\b|\\bno matching\\b",
+        "\\b(is|are|was|were|gives?|shows?|returns?|getting|got|prints?|calculates?) (the |a )?(wrong|incorrect|bad|off|broken)\\b|\\bwrong (result|output|answer|total|value|price|number)s?\\b"
+      ],
+      "examples": [
+        "the build fails with a type error",
+        "it crashes when I click save",
+        "this script throws an exception on startup",
+        "the tests are failing after my change",
+        "the service won't start anymore",
+        "I get permission denied when running it",
+        "the page is blank after I deploy",
+        "my script hangs and never finishes",
+        "it says invalid call nonexistent function",
+        "the sound stopped working",
+        "npm install fails with EACCES",
+        "it worked yesterday and now it doesn't"
+      ],
+      "checklist": [
+        "List every symptom the user reported (\"X is wrong, and Y looks off too\" is two) and check each one before and after the fix; fixing one is not fixing the report.",
+        "Reproduce first: run the failing command or test and read the full, real error. Do not guess from the description.",
+        "Find the root cause (why it happens), not just where; check logs, versions and recent changes. Fix the cause, not the symptom.",
+        "Make the smallest fix, then run the same reproduction again and show that it now passes; run the related tests.",
+        "Report: what was wrong, what you changed, how you verified it. If you could not verify, say so."
+      ]
+    },
+    "change-code": {
+      "title": "Writing or changing code",
+      "routes": [
+        "\\b(implement|refactor|add (a |an |the )?(feature|function|endpoint|option|flag|test|button|page)|write (a |an |the )?(function|script|class|module|test|program)|rewrite|optimi[sz]e (the |this |my )?(code|function|query))\\b",
+        "\\b(create|make|build|write|code) (me )?(a |an )?(\\w+ ){0,3}(script|app|bot|tool|program|website|game|cli|extension|plugin|function)\\b",
+        "\\badd (unit |integration |e2e )?tests?\\b",
+        "\\badd (a |an )?\\w+ (bar|button|screen|menu|page|field|option|setting|dialog|panel|endpoint)\\b|\\b(port|convert|translate) (this|my|the) \\w+( \\w+)? (to|into) (python|rust|go|typescript|javascript|c\\+\\+|c#|java|gdscript)\\b|\\bturn (this|my|the) .{0,30} into (a |an )?(reusable|function|helper|class|module|component)\\b",
+        "\\b(add|implement|make|create|write|change|update)\\b.{0,40}\\b(script|function|class|method|scene|node|component|animation|shader|endpoint|module|level|enemy|player|ui)\\b"
+      ],
+      "examples": [
+        "add a dark mode toggle to the settings page",
+        "write a python script that renames my photos by date",
+        "refactor this module into smaller functions",
+        "implement pagination for the api",
+        "add a --verbose flag to the cli",
+        "create a bash script that backs up my files",
+        "make the form validate the email field",
+        "add unit tests for this function",
+        "split this file into smaller components",
+        "build a small web app that tracks my habits",
+        "convert this script to typescript"
+      ],
+      "checklist": [
+        "Read the code you will touch and how it is called before editing; match the existing style and patterns.",
+        "Plan in 2-4 short steps, then make the smallest change that does it. No unrequested extras.",
+        "Run it: tests, type checks or the program itself. A change you have not run is not done.",
+        "For anything visual (a game, UI, chart, page): run it and look at the result (a screenshot read with `see`), not only the code.",
+        "Work with 3 or more steps: write the numbered steps first, and tick a step off only after its check passed.",
+        "Re-read your own diff for mistakes (edge cases, error paths, leftovers) before reporting."
+      ]
+    },
+    "research": {
+      "title": "Research, comparison, recommendation or shopping",
+      "routes": [
+        "\\b(which|what) (is|are|one is|would be) (the )?(best|better|top|fastest|cheapest|lightest)\\b",
+        "\\b(compare|comparison|vs\\.?|versus|recommend|alternatives? to|should i (buy|get|use|switch))\\b",
+        "\\b(latest|newest|current) (version|release|price|news)\\b",
+        "\\b(cheapest|best|top) \\w+",
+        "\\bis \\w+( \\w+)? or \\w+( \\w+)? better\\b",
+        "\\b(buy|buying|purchase|in stock|out of stock|for sale|deals?|egp|where (can|to|should) i (buy|get|order))\\b|\\bprices? (of|for|in|at)\\b|\\bhow much (does|do|is|are|would|will) .{0,40}\\bcost\\b"
+      ],
+      "examples": [
+        "what's the best lightweight browser for linux",
+        "compare these two laptops for gaming",
+        "should I buy an ssd or more ram",
+        "recommend a free tool to edit videos",
+        "what is the latest version of godot",
+        "is fedora or mint better for an old laptop",
+        "find me the cheapest ram stick",
+        "which free ai model is best for coding now",
+        "what are good free alternatives to photoshop",
+        "which game engine should I learn",
+        "is it worth upgrading to 16gb"
+      ],
+      "checklist": [
+        "A part or upgrade for the user's own device (SSD, RAM, battery, charger, GPU): first confirm what the device takes (slot type, interface, size, max capacity) from the recalled device fact or by checking the machine (`lsblk -d -o NAME,TRAN,MODEL`, `lspci`, `dmidecode`), and lead with it when what they asked for will not fit.",
+        "Facts that change (prices, stock, versions, rankings) must come from pages you fetched this session, not memory or search snippets; give the store/source and today's date for each.",
+        "Stock and price: read them from the product page itself (its availability field, e.g. schema.org InStock/OutOfStock, or the buy button text). Write \"in stock\" only if that page says so; otherwise write \"listed, stock not confirmed\". A price far below every other seller is usually stale or a placeholder: drop it unless its own page confirms it.",
+        "Match the exact product: copy part numbers character by character from the page, never merge two models into one, and check the type fits (e.g. laptop SODIMM vs desktop UDIMM).",
+        "A subagent's \"verified\" is not proof: before you recommend a link, open it yourself or say it is unverified. A \"[harness link check\" note means the harness opened that link: never give a link it marks DOES NOT EXIST.",
+        "Fit the answer to the user's situation and constraints (budget, their hardware, their OS) from recalled memory or by checking.",
+        "Compare in a small table, give one clear recommendation and why, and say what you are unsure about."
+      ],
+      "strong": true
+    },
+    "browser-task": {
+      "title": "Doing something in a browser (open, click, play, fill, log in)",
+      "routes": [
+        "\\b(open|go to|navigate to|visit|click|log ?in|sign ?in|fill( in| out)?|play|watch|scroll|download|subscribe|search for)\\b.{0,60}\\b(browser|website|web ?site|web ?page|tab|youtube|chrome|brave|firefox|opera|helium)\\b",
+        "\\b(use|using|open|with|in|on) (my |the )?(browser|chrome|brave|firefox|opera|helium|qutebrowser)\\b"
+      ],
+      "examples": [
+        "open youtube and play the first video about lofi music",
+        "go to example.com in my browser and tell me the heading",
+        "log in to my account on the website and download the invoice",
+        "fill out the contact form on that site with my details",
+        "open brave and search for warframe patch notes",
+        "take over the browser and subscribe to that channel",
+        "click the download button on the page and save the file"
+      ],
+      "checklist": [
+        "Shortest path: go straight to the URL that shows the result (search and result pages: youtube.com/results?search_query=…, google.com/search?q=…, a shop's search URL, the product page) instead of clicking through menus or typing into a box and pressing Enter.",
+        "Read data, not pixels: get facts from the page in one call — a function that returns the titles, lengths, prices or links as JSON, or the page text — and answer from that. Use a screenshot with `see` only to check how something looks.",
+        "Use the exact tool names and fields from the tool list next to this request: each browser server names them differently (Playwright browser_click({target}), Firefox click_by_uid({uid}), camofox camofox_click({tabId, ref})). One snapshot, then act by its refs/uids; after any navigation take a new snapshot. Do several steps in one execute script.",
+        "A failed call: read the error and fix the name or fields from that list; never send the same call again unchanged, and never call a background subagent twice for the same thing.",
+        "Act, then look: after each action that changes the page, confirm with a snapshot or the page data that it did what you intended before the next action.",
+        "Done means you saw the final state yourself (the video playing, the form sent, the file on disk). Report what you actually saw: page title, URL, the value you read.",
+        "If a login, captcha, cookie wall, paywall or autoplay block stops you, say exactly that and what the user must do. Never type passwords, payment details or 2FA codes.",
+        "Tidy up: close the tabs you opened; leave the user's own tabs as they were."
+      ]
+    },
+    "documents": {
+      "title": "Creating or editing a document, deck, spreadsheet or PDF",
+      "routes": [
+        "\\b(make|create|convert|write|generate|build|design|prepare|edit|update|fix)\\b.{0,60}\\b(docx|word (doc|document|file)|pptx|power ?point|presentation|slides|slide ?deck|deck|xlsx|excel|spreadsheet|pdf|poster|brochure|flyer|cv|resume)\\b"
+      ],
+      "examples": [
+        "create a professional word document about data analysis from these files",
+        "make a powerpoint presentation from this report",
+        "build an excel spreadsheet that tracks my expenses with charts",
+        "turn this markdown into a nicely designed pdf",
+        "edit my resume docx and make it look modern",
+        "design a poster for the event as a pdf"
+      ],
+      "checklist": [
+        "Use the matching skill (docx, pptx, xlsx, pdf) and follow its own quality-check steps.",
+        "Content first: a document that reports data is only as good as its figures. Every number must trace to the user's files or a computation you printed; run `doc-audit <file> --sources <their folder>` before handing it over and fix every untraced figure.",
+        "Check the file the way the user will see it: convert to PDF (the skill's `scripts/office/soffice.py --headless --convert-to pdf`, or `soffice --headless`), render pages with `pdftoppm -png -r 60`, and look at every page with `see` for cut-off or overlapping text, empty slides, broken images and the page count.",
+        "Fix what you find and check again, then give the file path and a short summary of what is in it."
+      ]
+    },
+    "data-analysis": {
+      "title": "Analysing the user's data (files, exports, dashboards) or writing up findings from it",
+      "threshold": 0.6,
+      "strong": true,
+      "routes": [
+        "^(?=[\\s\\S]*\\b(data|dataset|csv|xlsx|excel|spreadsheet|power ?bi|dax|tableau|dashboard|kpis?|statistic\\w*|figures|numbers|survey|sales|metrics)\\b)(?=[\\s\\S]*\\b(analy[sz]\\w*|report|research|insights?|findings|summar\\w+|interpret\\w*|explain|presentation|deck|slides|paper)\\b)",
+        "\\bdata analysis\\b|\\banaly[sz]e (this|these|my|the) (data|dataset|csv|file|files|folder|numbers|results|sales|survey)\\b"
+      ],
+      "examples": [
+        "create a professional data analysis research report using the files in this folder",
+        "analyze my sales csv and tell me what changed this year",
+        "write up the findings from my power bi dashboard exports",
+        "make a presentation of the key insights from this dataset",
+        "what do these survey results show, give me the main statistics",
+        "turn the numbers in this spreadsheet into a report for my manager"
+      ],
+      "checklist": [
+        "List every file first and read the definitions (DAX/SQL/M/code, data dictionaries, notes) before interpreting any number. Never say a formula or definition is missing without searching the files for it.",
+        "Compute every figure you will write with a script from the raw files and print it; copy numbers from that output, never from memory. Other people's notes, summaries and pitch texts in the folder are claims to check, not sources.",
+        "Find the context of each exported number: dashboard cards and exports are often taken under a filter (one product, one year, a slicer). Test which single item reproduces a value before calling it an average or total, and label it.",
+        "When two numbers that should agree do not, reproduce both under each definition and state the cause you found; never invent one (\"weighted\", \"different grain\", \"rendering\").",
+        "Sanity-check units and magnitude (per kg vs per tonne, per piece vs per kg, \"$\" on local-currency exports), signs, and that parts add up to totals; an implausible magnitude is a unit or reading error until shown otherwise.",
+        "Write only what the files or pages you fetched this session show. No invented metadata (authors, revision history, document numbers, classification) and no outside history or causes unless you cite where you read them.",
+        "Before delivering: run `doc-audit <file> --sources <the data folder> --extra <your printed computations>` and fix every untraced figure; make the same figure identical everywhere, and keep definitions and glossaries consistent with the code you quoted. Say which figures were read from images."
+      ]
+    },
+    "measure": {
+      "title": "Test, benchmark or measure programs on this machine",
+      "threshold": 0.5,
+      "routes": [
+        "\\b(benchmark\\w*|stress[- ]?test\\w*)\\b",
+        "\\b(test|tests|testing|measure|measuring|compare|rank|ranking|profile)\\b.{0,80}\\b(resources?|ram|memory|cpu|battery|power|startup|start-?up time|boot time|usage|lightest|heaviest)\\b",
+        "\\b(uses?|using|consum\\w*|takes?) (the )?(least|most|less|more|fewest) (resources?|ram|memory|cpu|battery|power)\\b",
+        "\\b(lightest|heaviest|most efficient|least demanding)\\b.{0,60}\\b(on|for|in) (my|this) (pc|laptop|system|machine|computer|device)\\b|\\b(on|for|in) (my|this) (pc|laptop|system|machine|computer|device)\\b.{0,60}\\b(lightest|heaviest|most efficient|least demanding)\\b"
+      ],
+      "examples": [
+        "conduct a test on all the installed browsers on my system and rank them by the one that uses the least resources",
+        "which of my terminal emulators uses the least ram",
+        "benchmark the startup time of my code editors",
+        "test how much battery each video player uses",
+        "measure the cpu usage of discord vs vesktop",
+        "how much memory does firefox use with 10 tabs open compared to brave",
+        "rank my installed apps by memory usage when idle"
+      ],
+      "checklist": [
+        "Measure, never estimate: run every program under the same workload (same pages/files, same duration, same kind of profile) and read the numbers yourself.",
+        "Count the whole program, not the launcher PID: start each in its own `systemd-run --user --scope --unit=<name>` and sum every process in that cgroup (/proc/<pid>/cgroup). Flatpaks run in `app-flatpak-<appid>-*.scope` (systemd writes '-' as \\x2d); native Chromium browsers (Brave, Helium, Chrome...) move their MAIN process out to `app-org.chromium.Chromium-*.scope`: find it by its --user-data-dir and ADD it to the scope's processes (scope OR cmdline misses it; it holds ~150-200 MB).",
+        "Memory = sum of PSS (/proc/<pid>/smaps_rollup), not summed %MEM/RSS (shared memory counted many times). CPU = change in utime+stime over a fixed window, not `ps %cpu` (average since the process started).",
+        "Let it settle, sample over a 20-60 s window, run each test at least twice and report the spread. Budget the whole test to ~20-30 min: an idle case plus one realistic multi-page workload beats many near-identical scenarios. A fresh profile does first-run work: warm it up or say so.",
+        "Sanity-check before ranking: 0 memory or ~0% CPU for a running program, identical figures, or a number your own method distorts means the measurement is wrong. Fix the method and re-measure; never rank on it.",
+        "Stop only what you started: `systemctl --user stop <unit>.scope` or `flatpak kill <appid>`. Never `pkill -f <word>`: it also hits the user's own windows, OpenCode's MCP servers and your own shell. If the user has the program open, ask before closing it.",
+        "Report the method (workload, duration, runs, what was counted) next to the numbers, and what could not be measured fairly."
+      ],
+      "strong": true
+    },
+    "capture-pages": {
+      "title": "Capturing pages one by one (book viewer, slides, long document) into images or a PDF",
+      "routes": [
+        "\\b(screenshots?|screen ?shots?|capture|grab|save|scan)\\b.{0,60}\\b(each|every|all( the)?|1 by 1|one by one|page by page)\\b.{0,30}\\b(pages?|slides?|chapters?)\\b",
+        "\\b(screenshots?|captures?|page images)\\b.{0,60}\\b(to|into|as) (a |one )?pdf\\b"
+      ],
+      "examples": [
+        "take screenshots of every page of the book open in my browser and make a pdf",
+        "capture all 200 pages of this online workbook one by one",
+        "save each slide of this presentation viewer as an image",
+        "the book is open fullscreen in brave, screenshot it page by page and turn it into a pdf",
+        "go through the pages of this flipbook and save them all"
+      ],
+      "checklist": [
+        "Measure before looping: take one capture of the screen (`grim`), look at it with `see`, and crop to exactly the page area (`grim -g \"x,y wxh\"`). Re-measure when the book or zoom changes: page sizes differ by a few pixels between books.",
+        "Turn pages with the viewer's own control (`ydotool` click/key, `wtype`), then wait until the page is stable before saving: the same image hash 3 checks in a row and different from the previous page. A blank page must stay blank ~10 s before you accept it (slow loads look blank). On a timeout stop and report the page number; never skip a page.",
+        "Script the loop (one shell script, numbered files 001.png…) instead of one tool call per page, and run a short test (3 pages) first.",
+        "Before assembling, check the set: count equals the page count, no two consecutive images identical (hash), no blank or cut-off pages (`magick <img> -fuzz 1% -format '%@' info:`). Re-capture any failure.",
+        "Assemble with `magick 0*.png out.pdf`, render one page of the finished PDF (`pdftoppm -f N -l N -png`) and look at it with `see`: text must be sharp.",
+        "Put back everything you changed (cursor, virtual monitor, window dimming, fullscreen), delete the temporary images, and report the path, page count and file size."
+      ],
+      "threshold": 0.65
+    },
+    "contact-list": {
+      "title": "Compiling a complete list of organisations or people with contact details",
+      "routes": [
+        "\\b(list|directory|table|spreadsheet) of (all|every)\\b.{0,80}\\b(emails?|e-mails?|contacts?|phone|addresses|websites?)\\b",
+        "\\b(emails?|e-mails?|contact (details|info)|phone numbers?)\\b.{0,20}\\b(of|for) (all|every|each)\\b",
+        "\\b(all|every)\\b.{0,60}\\bwith (their|its) (respective )?(emails?|e-mails?|contacts?|contact (details|info)|phone numbers?|websites?)\\b"
+      ],
+      "examples": [
+        "make a list of all the embassies in egypt with their emails",
+        "find the contact emails of every university in Cairo",
+        "compile a spreadsheet of all software companies in Alexandria with phone numbers",
+        "get me the emails of all the ministries",
+        "list every hospital in Giza with its website and phone"
+      ],
+      "checklist": [
+        "First build the full set of entities from one authoritative list (official registry, government page, Wikipedia list) and count it. The final table has one row per entity, also where nothing was found (\"not found\"), so the user sees the gaps.",
+        "Source tiers: the entity's own site or its government/organisation = official; directory sites (embassies.net, 123embassy…) copy each other, so the same address on five directories is one unconfirmed source. Label every row: official / directory only / not found, and give the source URL.",
+        "Prefer official over directory when they disagree; old addresses on ISP domains (link.net, tedata, idsc.gov.eg…) and retired government domains are likely outdated: flag them.",
+        "Save the pages you read, then `email-check --extract <saved pages>` to pull addresses (it decodes Cloudflare-protected and \"name [at] host [dot] com\" forms) and `email-check -f <your list>` to check every domain accepts mail. Drop or flag `no-mail`; copy addresses exactly, never retype them.",
+        "Before delivering: spell names as in the authoritative list, script a check for duplicate rows and duplicate addresses, and say how many rows are official, directory-only and not found."
+      ],
+      "threshold": 0.5
+    }
+  },
+  "skip": [
+    "^\\s*(thanks|thank you|thx|ok|okay|cool|great|nice|perfect|got it|yes|no|yep|nope)\\b[\\s\\S]{0,40}$",
+    "\\b(remember|store|save|note|memori[sz]e)\\b (this|that|it)\\b|\\b(in|to) (your )?memory\\b"
+  ]
+}

@@ -1,0 +1,20 @@
+[Unit]
+Description=Camofox Browser (Stealth browser service for background AI agents)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/.local/opt/camofox-browser
+Environment=NODE_ENV=production
+Environment=CAMOFOX_PORT=9377
+ExecStart=/usr/bin/env node %h/.local/opt/camofox-browser/server.js
+Restart=on-failure
+RestartSec=5
+TimeoutStartSec=120
+TimeoutStopSec=30
+KillMode=mixed
+MemoryMax=4G
+
+[Install]
+WantedBy=default.target

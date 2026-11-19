@@ -1,0 +1,12 @@
+[Unit]
+Description=Run OpenCode Zenith Daily Model Benchmark once a day
+RefuseManualStart=no
+RefuseManualStop=no
+
+[Timer]
+# Run daily at 04:00 AM local time (catches up if the PC was turned off)
+OnCalendar=*-*-* 04:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
