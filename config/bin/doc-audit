@@ -1,0 +1,335 @@
+#!/usr/bin/env python3
+"""doc-audit: trace every figure in a finished document back to the data it came from.
+
+    doc-audit REPORT.docx --sources ~/Desktop/work [--extra computed.txt ...] [--json] [--max 25]
+
+Why (2026-11-10): a 45-page "100% accurate" data report written by a free model passed both
+reviewers ("verified against source data") while it contained figures that exist nowhere: a
+"129.9% Max Import Volume" card, global cost "$1.0525 -> $0.9803" (the data says 1.0573 -> 0.9864),
+plus single-product numbers presented as national averages. The reviewers only ever saw the chat
+reply, never the document. This tool reads the document itself.
+
+A figure is audited when it has >= 3 significant digits (63.57%, 1.0525, 2.257bn, 7.35x); small
+counts, years, section/figure/table numbers and dates are skipped. Each audited figure is:
+  source   found in a source file at some scale/rounding (0.6357 -> 63.57%, 2257252624 -> 2.257bn)
+  computed found in --extra (the agent's own printed computations / tool outputs)
+  derived  reproducible from two traced figures of the same paragraph or table row
+           (ratio, % change, difference, sum), e.g. "16.23bn -> 119.20bn (7.35x)"
+  UNTRACED none of the above: invented, mistyped, or computed without ever being printed.
+Exit status: 0 always (it reports; the caller decides). Supported documents: .docx .pptx .pdf .md
+.txt .html. Sources may be folders or files (csv, txt, json, md, py, m, dax, sql, docx, pptx, pdf,
+xlsx); the audited document and other files with its name stem are excluded automatically.
+"""
+import argparse, bisect, html, json, math, os, re, subprocess, sys, zipfile
+
+TEXT_EXT = {".csv", ".tsv", ".txt", ".json", ".md", ".py", ".m", ".pq", ".dax", ".sql", ".r", ".js",
+            ".mjs", ".ts", ".yaml", ".yml", ".xml", ".html", ".htm", ".log", ".tex", ".ipynb"}
+DOC_EXT = {".docx", ".pptx", ".pdf", ".xlsx"}
+MAX_FILE = 25 * 1024 * 1024
+
+# a number as people write it: sign, currency, thousands separators, decimals, scale/percent suffix
+NUM = re.compile(
+    r"(?<![\w.])(?P<sign>[-+−–]?)\s?(?P<cur>[$€£]|EGP\s?|USD\s?)?"
+    r"(?P<num>\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)"
+    r"(?P<suf>\s?(?:%|pp\b|×|x\b|bn\b|billion\b|tn\b|trillion\b|[MK]\b|million\b|thousand\b|k\b))?",
+    re.I)
+# a label word right before the number (Figure 3, Q4, row 12); whole words only: without the boundary every
+# word ending in r/q/w/v ("grew", "over", "for", "per", "year") hid its figure from the audit (2026-11-18 review)
+SKIP_BEFORE = re.compile(
+    r"(?<![\w])(figure|fig\.|table|section|chapter|page|pages|appendix|step|round|slide|version|v|§|#|no\.|"
+    r"insight|action|q|w|week|item|row|column|line|r)\s*$", re.I)
+DATE = re.compile(r"\b\d{4}-\d{2}-\d{2}\b|\b\d{1,2}/\d{1,2}/\d{2,4}\b|\b\d{1,2}:\d{2}(?::\d{2})?\b")
+SCALE = {"bn": 1e9, "billion": 1e9, "tn": 1e12, "trillion": 1e12, "m": 1e6, "million": 1e6,
+         "k": 1e3, "thousand": 1e3}
+# document metadata a model tends to invent (2026-11-10: revision history v0.7 Sep / v0.9 Oct, a
+# document number, "Confidential"): flagged when the sources never mention it
+METADATA = [r"revision history", r"document (?:number|no\.?|id)\b", r"\bclassification\b\W{0,3}(?:confidential|internal|restricted|secret|public)",
+            r"\bconfidential\b", r"\bprepared by\b", r"\bapproved by\b"]
+
+
+def xml_text(xml, para_tag, text_tag):
+    """Paragraph-ish blocks from Office XML: table rows become one block (a row is one record)."""
+    blocks = []
+    # a table row's cells are read together so a derived cell sees its inputs
+    def pieces(chunk):
+        return [html.unescape("".join(re.findall(rf"<{text_tag}(?:\s[^>]*)?>([^<]*)</{text_tag}>", p)))
+                for p in re.split(rf"</{para_tag}>", chunk)]
+    for chunk in re.split(r"(<w:tr[ >].*?</w:tr>|<a:tr[ >].*?</a:tr>)", xml, flags=re.S):
+        if chunk.startswith("<w:tr") or chunk.startswith("<a:tr"):
+            blocks.append(" | ".join(t.strip() for t in pieces(chunk) if t.strip()))
+        else:
+            blocks.extend(t for t in pieces(chunk) if t.strip())
+    return blocks
+
+
+def extract(path):
+    """List of text blocks (paragraphs / table rows / pdf lines) of a document or text file."""
+    ext = os.path.splitext(path)[1].lower()
+    try:
+        if ext == ".docx":
+            with zipfile.ZipFile(path) as z:
+                names = [n for n in z.namelist() if re.match(r"word/(document|footnotes|endnotes)\d*\.xml$", n)]
+                out = []
+                for n in names:
+                    out += xml_text(z.read(n).decode("utf-8", "replace"), "w:p", "w:t")
+                return out
+        if ext == ".pptx":
+            with zipfile.ZipFile(path) as z:
+                out = []
+                slides = sorted((n for n in z.namelist() if re.match(r"ppt/(slides/slide|notesSlides/notesSlide)\d+\.xml$", n)),
+                                key=lambda n: int(re.findall(r"\d+", n)[-1]))
+                for n in slides:
+                    out += xml_text(z.read(n).decode("utf-8", "replace"), "a:p", "a:t")
+                for n in z.namelist():  # chart data: the numbers behind native charts
+                    if re.match(r"ppt/charts/chart\d+\.xml$", n):
+                        vals = re.findall(r"<c:v>([^<]*)</c:v>", z.read(n).decode("utf-8", "replace"))
+                        out.append(f"[chart {n.split('/')[-1]}] " + " ".join(vals))
+                return out
+        if ext == ".xlsx":
+            with zipfile.ZipFile(path) as z:
+                out = []
+                for n in z.namelist():
+                    if re.match(r"xl/(sharedStrings|worksheets/sheet\d+)\.xml$", n):
+                        x = z.read(n).decode("utf-8", "replace")
+                        out += [html.unescape(v) for v in re.findall(r"<(?:v|t)(?:\s[^>]*)?>([^<]*)</(?:v|t)>", x)]
+                return out
+        if ext == ".pdf":
+            r = subprocess.run(["pdftotext", "-layout", path, "-"], capture_output=True, text=True, timeout=120)
+            return [l for l in r.stdout.splitlines() if l.strip()]
+        if ext == ".ipynb":
+            nb = json.load(open(path, encoding="utf-8", errors="replace"))
+            return ["".join(c.get("source", [])) for c in nb.get("cells", [])] + \
+                   ["".join(o.get("text", [])) for c in nb.get("cells", []) for o in c.get("outputs", []) if "text" in o]
+        with open(path, encoding="utf-8", errors="replace") as f:
+            t = f.read()
+        if ext in (".html", ".htm"):
+            t = html.unescape(re.sub(r"<[^>]+>", " ", t))
+        return t.splitlines()
+    except Exception as e:  # unreadable source: say so, never crash the audit
+        print(f"doc-audit: could not read {path}: {e}", file=sys.stderr)
+        return []
+
+
+def numbers(text, audited_only=True):
+    """(value, decimals, raw, start) for each number in text; value already scaled (%, bn, ...)."""
+    out = []
+    masked = DATE.sub(lambda m: " " * len(m.group()), text)
+    for m in NUM.finditer(masked):
+        raw = m.group("num").replace(",", "")
+        suf = (m.group("suf") or "").strip().lower()
+        if audited_only:
+            before = masked[max(0, m.start() - 14):m.start()]
+            if SKIP_BEFORE.search(before.rstrip()):
+                continue
+            digits = raw.replace(".", "").lstrip("0")
+            dec = len(raw.split(".")[1]) if "." in raw else 0
+            if len(digits) < 3:
+                continue
+            # a section heading's number ("11.1 Fiscal hedge", "10.7 Insights") opens its block
+            if not masked[:m.start()].strip() and re.match(r"\s+[A-Z]", masked[m.end():m.end() + 2]) and not m.group("suf"):
+                continue
+            if dec == 0 and suf in ("", "x", "×") and (1900 <= float(raw) <= 2100 or float(raw) < 100):
+                continue  # years, counts
+            # a cross-reference "(see 11.1)" / "(§12.4)" is not a figure
+            if not m.group("suf") and re.fullmatch(r"\d{1,2}\.\d{1,2}", raw) and \
+                    masked[max(0, m.start() - 1):m.start()] == "(" and masked[m.end():m.end() + 1] == ")":
+                continue
+            # a dotted run (1.2.3, an IP, a version) is not a figure
+            if re.match(r"\.\d", masked[m.end():m.end() + 2]):
+                continue
+        try:
+            v = float(raw)
+        except ValueError:
+            continue
+        dec = len(raw.split(".")[1]) if "." in raw else 0
+        out.append((v, dec, m.group(0).strip(), m.start(), suf))
+    return out
+
+
+class Corpus:
+    def __init__(self):
+        self.vals = []
+
+    def add_text(self, text):
+        for v, *_ in numbers(text, audited_only=False):
+            self.vals.append(abs(v))
+
+    def freeze(self):
+        self.vals = sorted(set(self.vals))
+        return self
+
+    def has(self, v, dec, suf):
+        """Some value in the corpus displays as v at the document's precision, at a plausible scale."""
+        half = 0.5 * 10 ** -dec + 1e-9
+        target = abs(v)
+        scales = [1, 100, 0.01, 1e-3, 1e-6, 1e-9, 1e3, 1e6, 1e9]
+        if suf in SCALE:  # "2.257bn": the source holds 2257252624, or 2257.25 (millions), or 2.257
+            scales = [SCALE[suf] ** -1 * s for s in (1, 1e3, 1e6, 1e9)] + [1]
+        for s in scales:
+            lo, hi = (target - half) / s, (target + half) / s
+            if lo > hi:
+                lo, hi = hi, lo
+            i = bisect.bisect_left(self.vals, lo)
+            if i < len(self.vals) and self.vals[i] <= hi:
+                return True
+        return False
+
+
+def norm_words(t):
+    return re.sub(r"[^\w.%-]+", " ", t.lower()).split()
+
+
+def derivable(v, dec, others):
+    """v follows from two figures of the same block: ratio, % change, difference or sum."""
+    t = abs(v)
+    # inputs are themselves rounded (2.63 / 1.03 = 2.553 is written 2.56 from 2.6314 / 1.0296)
+    half = max(0.5 * 10 ** -dec, 0.004 * t) + 1e-9
+    for i, a in enumerate(others):
+        for b in others[i + 1:]:
+            for x, y in ((a, b), (b, a)):
+                # each operation only at the scale people write it: a ratio as 2.56x or 256%, a
+                # change in % ("37.7% below"); a change of ~100% (one input tiny next to the other)
+                # is not evidence, it matches anything near 1 or 100
+                cands = [x + y, abs(x - y)]
+                if y:
+                    r = x / y
+                    cands += [r, r * 100]
+                    if 0.02 < r < 50:
+                        cands.append(abs(r - 1) * 100)
+                if any(abs(c - t) <= half for c in cands):
+                    return True
+    return False
+
+
+def main():
+    ap = argparse.ArgumentParser(description="Trace every figure in a document to its source data.")
+    ap.add_argument("document")
+    ap.add_argument("--sources", nargs="+", default=[], help="folders/files the document is based on")
+    ap.add_argument("--extra", nargs="*", default=[], help="files with the agent's own computation output")
+    ap.add_argument("--exclude", nargs="*", default=[], help="source paths to ignore (drafts of this document)")
+    ap.add_argument("--json", action="store_true")
+    ap.add_argument("--max", type=int, default=25, help="untraced figures to list")
+    a = ap.parse_args()
+
+    doc = os.path.abspath(os.path.expanduser(a.document))
+    stem = os.path.splitext(os.path.basename(doc))[0].lower()
+    excl = {os.path.abspath(os.path.expanduser(p)) for p in a.exclude}
+
+    def files(paths):
+        for p in paths:
+            p = os.path.abspath(os.path.expanduser(p))
+            if os.path.isfile(p):
+                yield p
+                continue
+            for root, dirs, fs in os.walk(p):
+                dirs[:] = [d for d in dirs if not d.startswith(".") and d not in ("node_modules", "venv", ".venv", "__pycache__")]
+                for f in fs:
+                    yield os.path.join(root, f)
+
+    MAX_SOURCES = 3000  # a folder that big is not one report's data; read the first ones
+    src, used = Corpus(), []
+    src_text = []
+    for f in files(a.sources):
+        ext = os.path.splitext(f)[1].lower()
+        if f == doc or f in excl or os.path.splitext(os.path.basename(f))[0].lower() == stem:
+            continue
+        if ext not in TEXT_EXT | DOC_EXT:
+            continue
+        if len(used) >= MAX_SOURCES:
+            print(f"doc-audit: stopped reading sources after {MAX_SOURCES} files", file=sys.stderr)
+            break
+        try:
+            if os.path.getsize(f) > MAX_FILE:
+                continue
+        except OSError:
+            continue
+        t = "\n".join(extract(f))
+        src.add_text(t)
+        src_text.append(t.lower())
+        used.append(f)
+    src.freeze()
+    blocks = extract(doc)
+    if not blocks:
+        print(f"doc-audit: no text found in {doc}", file=sys.stderr)
+        sys.exit(0)
+    # computation output must not be the document read back (pdftotext/cat of the report itself, a
+    # draft): those lines would trace every figure to itself. A line whose word 5-grams mostly occur
+    # in the document is an echo; short result lines ("2023  -34.58") are kept.
+    # n-grams over the whole text: a sentence wraps across pdf lines and table cells
+    w = norm_words(" ".join(blocks))
+    grams = {tuple(w[i:i + 5]) for i in range(len(w) - 4)}
+    comp, echoed = Corpus(), 0
+    for f in files(a.extra):
+        for line in extract(f):
+            w = norm_words(line)
+            g = [tuple(w[i:i + 5]) for i in range(len(w) - 4)]
+            if g and sum(x in grams for x in g) >= 0.5 * len(g):
+                echoed += 1
+                continue
+            comp.add_text(line)
+    comp.freeze()
+    stats = {"audited": 0, "source": 0, "computed": 0, "derived": 0, "untraced": 0}
+    untraced = []
+    seen = {}
+    for bi, b in enumerate(blocks):
+        nums = numbers(b)
+        # inputs for derivation: every number of this block and its neighbours (pdf rows wrap)
+        ctx = " ".join(blocks[max(0, bi - 1):bi + 2])
+        pool = [abs(x[0]) * (SCALE.get(x[4], 1)) for x in numbers(ctx, audited_only=False)
+                if not (x[1] == 0 and not x[4] and 1900 <= x[0] <= 2100)]  # years are labels, not inputs
+        pool = list(dict.fromkeys(pool))[:40]
+        for v, dec, raw, start, suf in nums:
+            key = (round(abs(v), dec), dec, suf)
+            if key in seen:
+                stats[seen[key]] += 1
+                stats["audited"] += 1
+                continue
+            stats["audited"] += 1
+            if src.has(v, dec, suf):
+                kind = "source"
+            elif comp.vals and comp.has(v, dec, suf):
+                kind = "computed"
+            elif derivable(v * SCALE.get(suf, 1), dec if suf not in SCALE else max(0, dec - int(math.log10(SCALE[suf]))), pool):
+                kind = "derived"
+            else:
+                kind = "untraced"
+                ctxt = re.sub(r"\s+", " ", b).strip()
+                lo = max(0, start - 90)
+                untraced.append({"figure": raw, "context": ("…" if lo else "") + ctxt[lo:start + 110] + ("…" if start + 110 < len(ctxt) else "")})
+            seen[key] = kind
+            stats[kind] += 1
+
+    joined = "\n".join(src_text)
+    meta = []
+    whole = "\n".join(blocks)
+    for pat in METADATA:
+        m = re.search(pat, whole, re.I)
+        if m and not re.search(pat, joined, re.I):
+            line = next((b for b in blocks if re.search(pat, b, re.I)), m.group(0))
+            line = re.sub(r"\s+", " ", line).strip()[:160]
+            if line not in meta:
+                meta.append(line)
+
+    res = {"document": doc, "sources": len(used), **stats, "untraced_figures": untraced[: a.max],
+           "untraced_total": len(untraced), "metadata_not_in_sources": meta}
+    if a.json:
+        print(json.dumps(res, ensure_ascii=False, indent=1))
+        return
+    print(f"doc-audit {doc}")
+    print(f"  {len(used)} source files; {stats['audited']} figures audited: {stats['source']} in sources, "
+          f"{stats['computed']} in computations, {stats['derived']} derived, {stats['untraced']} UNTRACED")
+    if untraced:
+        print(f"\nUntraced figures ({len(untraced)} distinct; first {min(a.max, len(untraced))}): find each in the data or a "
+              f"printed computation, correct it, or remove it.")
+        for u in untraced[: a.max]:
+            print(f"  {u['figure']:>14}  {u['context']}")
+    if meta:
+        print("\nDocument metadata the sources never mention (invented? remove unless the user gave it):")
+        for m in meta:
+            print(f"  - {m}")
+    if not untraced and not meta:
+        print("  every audited figure traces to the data")
+
+
+if __name__ == "__main__":
+    main()

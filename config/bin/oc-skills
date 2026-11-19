@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+# oc-skills: the vercel-labs `skills` CLI (skills.sh), wired into this harness.
+#
+#   oc-skills find <query>                 search skills.sh (non-interactive)
+#   oc-skills list-remote <repo>           list the skills in a repo without installing
+#   oc-skills add <repo> <skill> [skill…]  install named skills globally for OpenCode,
+#                                          security-scan them, make them routable
+#   oc-skills remove <skill> [skill…]
+#   oc-skills update | check | list
+#
+# Why a wrapper: plain `npx skills add` asks interactive questions (an agent's shell
+# hangs), installs into the current project by default, and the context engine needs
+# example prompts (skill-examples.json) to inject a new skill automatically.
+# Skills land in ~/.agents/skills (OpenCode reads it; the lock file
+# ~/.agents/.skill-lock.json makes `update` work). Each skill costs ~1 catalog line per
+# request, so install the few you will use, never a whole repo.
+set -euo pipefail
+CFG="$HOME/.config/opencode"
+SKILLS_BIN="${SKILLS_BIN:-$HOME/.npm-global/bin/skills}" # pinned: npm i -g skills@<version ≥2 weeks old>
+AG="$HOME/.agents/skills"
+export DISABLE_TELEMETRY=1 DO_NOT_TRACK=1
+# strip every terminal control sequence (colours, cursor moves, spinner redraws), then keep the last
+# redraw of each line: the spinner prints hundreds of frames separated by cursor codes, not newlines
+run() { "$SKILLS_BIN" "$@" </dev/null 2>&1 | sed -E 's/\x1b\[[0-9;]*m//g; s/\x1b\[\?[0-9;]*[hl]//g; s/\x1b\[[0-9;]*[A-Za-z]/\r/g' | tr -s '\r' | awk -F'\r' '$NF ~ /[^[:space:]]/ { print $NF }'; }
+
+# `skills remove -a opencode` only drops OpenCode's link and leaves the canonical copy in
+# ~/.agents/skills, which OpenCode reads: the skill stayed loaded (2026-11-04). Remove it for every
+# agent, then verify it is really gone.
+remove_skills() {
+	run remove -g -y "$@" | tail -3
+	local s left=0
+	for s in "$@"; do
+		if [ -e "$AG/$s" ]; then echo "!! $s is still in $AG after removal"; left=1; fi
+	done
+	return $left
+}
+
+refresh_examples() {
+	# 6 example prompts per new/changed skill via the OmniRoute gateway (not the free tier)
+	(cd "$CFG" && timeout 300 python3 tools/skill_examples.py 2>&1 | tail -3) || echo "skill_examples.py failed; run it by hand" >&2
+}
+
+scan() {
+	local s=$1 dir="$AG/$1" out
+	[ -d "$dir" ] || dir="$CFG/skills/$1"
+	[ -d "$dir" ] || { echo "scan: $s not found"; return 0; }
+	command -v skillspector >/dev/null || { echo "scan: skillspector missing, $s NOT scanned"; return 0; }
+	out=$(timeout 300 skillspector scan "$dir" 2>&1 | sed -E 's/\x1b\[[0-9;?]*[A-Za-z]//g' || true)
+	if grep -qiE '\b(critical|high)\b' <<<"$out"; then
+		echo "!! $s: skillspector reports HIGH/CRITICAL findings. Review before use:"
+		grep -iE '\b(critical|high)\b' <<<"$out" | head -15
+		return 1
+	fi
+	echo "scan: $s clean ($(grep -ciE 'medium|low' <<<"$out" || true) low/medium notes)"
+}
+
+cmd=${1:-}
+shift || true
+case "$cmd" in
+find) run find "$@" | grep -vE '^\s*$' | head -40 ;;
+list-remote) run add "$1" --list | grep -vE '^\s*[│└┌◇◆]?\s*$' | head -80 ;;
+add)
+	repo=${1:?repo}
+	shift
+	[ $# -gt 0 ] || { echo "name the skills to install (oc-skills list-remote $repo); never install a whole repo" >&2; exit 2; }
+	args=()
+	for s in "$@"; do args+=(--skill "$s"); done
+	run add "$repo" -g -a opencode -y "${args[@]}" | tail -15
+	bad=0
+	for s in "$@"; do
+		if ! scan "$s"; then
+			bad=1
+			# automatic installs (context engine) never keep a flagged skill
+			[ "${OC_SKILLS_AUTO:-0}" = 1 ] && { remove_skills "$s"; echo "removed $s (flagged)"; }
+		fi
+	done
+	if [ "${OC_SKILLS_AUTO:-0}" = 1 ]; then
+		# the skill is usable at once (injected this turn); routing examples follow in the background
+		setsid -f bash -c "cd '$CFG' && timeout 300 python3 tools/skill_examples.py >/dev/null 2>&1" </dev/null >/dev/null 2>&1
+	else
+		refresh_examples
+	fi
+	[ $bad -eq 0 ] || { echo "Flagged skills were reported above. Review or remove: oc-skills remove <name>"; exit 1; }
+	;;
+remove)
+	remove_skills "$@"
+	refresh_examples
+	;;
+update) run update -g -y | tail -15; refresh_examples ;;
+check) run check | tail -20 ;;
+list) run list -g | grep -vE '^\s*$' ;;
+*) sed -n '2,17p' "$0"; exit 2 ;;
+esac
