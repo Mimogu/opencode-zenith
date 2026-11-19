@@ -1,0 +1,10 @@
+{
+  "name": "opencode-mcp-servers",
+  "private": true,
+  "description": "Pinned MCP servers for ~/.config/opencode/opencode.json (bump only to releases at least two weeks old, then npm ci).",
+  "dependencies": {
+    "@playwright/mcp": "0.0.83",
+    "chrome-devtools-mcp": "1.11.0",
+    "@mozilla/firefox-devtools-mcp": "0.10.6"
+  }
+}

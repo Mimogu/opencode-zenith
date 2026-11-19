@@ -1,0 +1,971 @@
+{
+ "academic-paper": {
+  "hash": "f7faafaf6e8e582a",
+  "examples": [
+   "Hey, me and my labmates are trying to get our journal submission in shape before the deadline next month. Can you help us structure the lit review and make sure our LaTeX export doesn't break?",
+   "Reviewer 2 was brutal on our methodology section and wants us to run three new baseline experiments. How should we structure this rebuttal without sounding defensive?",
+   "check my refs",
+   "我們這篇關於量子計算的論文快寫完了，但中文摘要和英文摘要的專業術語需要對齊，順便幫我檢查一下 APA 格式的文獻引用有沒有漏掉的。",
+   "심사위원 의견서 받았는데 수정 방향을 어떻게 잡아야 할지 모르겠어요. 답변서 초안 작성하는 것 좀 도와주실래요?",
+   "Need to draft a grant panel response for our NIH submission. Our previous approach was criticized for having a small sample size, and we need a solid revision roadmap."
+  ]
+ },
+ "academic-paper-reviewer": {
+  "hash": "9698d2c6e712a9fa",
+  "examples": [
+   "Can you read through this draft and act like a strict journal editor deciding whether to send it out or reject it outright?",
+   "need a peer review for my latest preprint before submission, focus heavily on whether the baseline comparisons hold up",
+   "幫我看一下這篇傳過去會不會直接被刷掉",
+   "Can you simulate a tough referee report for my CS paper? Really want to find the weak spots in our evaluation section before the deadline.",
+   "revisa mi artículo por favor, siento que la sección de metodología tiene baches que los revisores van a atacar",
+   "Our last submission got brutal feedback on the novelty aspect. Can we run a mock panel to see why the reviewers tore it apart?"
+  ]
+ },
+ "academic-pipeline": {
+  "hash": "fe7c595bef4569f1",
+  "examples": [
+   "I have a rough research idea about LLM alignment. Can you take it all the way from the initial literature review to the final polished manuscript, including peer review simulations and integrity audits?",
+   "연구 주제 하나 던져줄 테니까, 자료 조사부터 초안 작성, 자체 심사, 그리고 최종 제출용 논문 완성될 때까지 전체 과정 알아서 쭉 돌려줘.",
+   "run full paper workflow",
+   "We need to go from our raw experimental results to a publication-ready PDF. Make sure it passes rigorous integrity checks and goes through multiple rounds of peer review before we finalize.",
+   "El proyecto de investigación está estancado en la fase de escritura. Necesito que ejecutes todo el flujo de trabajo de principio a fin: investiga lo que falta, redacta los capítulos, simula revisiones por pares y entrégame el artículo listo y verificado.",
+   "My co-authors and I have a hypothesis, but we don't have time to manually coordinate the drafting, fact-checking, critique, and revision cycles. Can you handle the entire research-to-publication pipeline automatically?"
+  ]
+ },
+ "agentskills": {
+  "hash": "6000b7703697deb8",
+  "examples": [
+   "Hey, can you help me build a brand new REST API from scratch and guide me through the whole thing?",
+   "fix this bug",
+   "I'm staring at a blank repository for a microservice architecture. Where do I even start, and how do we progress through design, implementation, and getting it deployed?",
+   "The login button is throwing a 500 internal server error when users with special characters try to authenticate, need to figure out what's breaking and patch it up.",
+   "Let's review the requirements for the payment gateway integration, write the tests, code it up, and prep it for the release pipeline.",
+   "audit my project structure"
+  ]
+ },
+ "algorithmic-art": {
+  "hash": "0dcfd7df3ab1f05e",
+  "examples": [
+   "Can you whip up some generative art with particles that swirl around based on a random seed?",
+   "make cool code art",
+   "I want to build an interactive browser sketch using p5.js where I can tweak sliders to change the flow field dynamics in real-time.",
+   "My canvas looks too static and boring, I need a dynamic system of glowing nodes that wander organically and react when I click the mouse.",
+   "Generate a complex geometric pattern using procedural algorithms, ensuring it's completely unique and reproducible with a specific seed value.",
+   "code sketch generative"
+  ]
+ },
+ "anti-sycophancy": {
+  "hash": "96ed8afa28c11aec",
+  "examples": [
+   "Can you double-check this PR diff before I merge it? Make sure there are no stupid bugs or edge cases I missed.",
+   "lgtm? check this out",
+   "We keep getting intermittent memory leaks under high load in the new caching service. I need you to audit the async locking logic and error handling in this module to find out where things are hanging.",
+   "Review my implementation of the token bucket rate limiter. Look closely at potential race conditions or unhandled rejections when multiple requests hit concurrently.",
+   "Here is the patch for the auth flow refactor. Don't just tell me it looks good—tear it apart, find the silent failures, and check if any promises are floating without catches.",
+   "Does this code actually handle network drops gracefully, or is it going to swallow exceptions and leave the db connection open?"
+  ]
+ },
+ "benchmark-checklist": {
+  "hash": "e9fdf4a0722d8ff7",
+  "examples": [
+   "I just ran the query engine benchmark and it's showing a 20% speedup after our latest caching changes. Can you check these numbers?",
+   "bench results look weird, throughput doubled overnight but CPU usage didn't budge. did the work actually happen or is the test just warm?",
+   "Verify my perf test data before we push this patch.",
+   "Hey, I optimized the JSON parser and ran a quick test. It's going from 50ms down to 10ms per batch. Let's make sure our methodology is solid before I drop this into the PR description.",
+   "Why is the latency dropping so much under load? Make sure we aren't hitting cached results or artificial limits in the harness.",
+   "run the perf check"
+  ]
+ },
+ "blast-radius": {
+  "hash": "cc66825cd4c0ecab",
+  "examples": [
+   "blast radius of changing UserRole to an enum",
+   "Hey, if I rename this database column, what else is gonna blow up across the repo?",
+   "Check if making AuthProvider public breaks any downstream consumers before I push this.",
+   "Quick sanity check: does our current error handler really catch timeouts like the ticket says, or is that gonna crash production?",
+   "Can you verify if this method is actually safe to delete or if some obscure background worker still relies on it?",
+   "What could this break?"
+  ]
+ },
+ "brainstorming": {
+  "hash": "9361424bd11c1fdd",
+  "examples": [
+   "I have a vague idea for a new recommendation engine, but I'm not sure how it should work or what tech stack to use. Can we figure this out?",
+   "let's design the auth flow before we touch any code",
+   "Users are complaining that the checkout process is too confusing and drop-offs are high. We need a complete overhaul of the UX, let's look at options.",
+   "Roast my architecture proposal for the real-time chat service. I want to find all the flaws before I start building.",
+   "Building a plugin system from scratch.",
+   "How should we handle multi-tenancy in our database? Let's weigh the pros and cons of separate DBs vs shared schemas."
+  ]
+ },
+ "canvas-design": {
+  "hash": "79995acc267a3a5d",
+  "examples": [
+   "Can you whip up a striking poster for our upcoming indie music festival next weekend?",
+   "I need a professional, eye-catching PDF flyer to promote our new downtown coffee shop grand opening, maybe using warm earthy tones.",
+   "My presentation looks super boring and text-heavy. I need a gorgeous visual summary page exported as a high-res PDF that people will actually want to look at.",
+   "Generate a unique piece of digital art representing 'cyberpunk solitude' as a PNG file.",
+   "Make something that looks really aesthetic and artistic for my phone's lock screen, centered around geometric shapes and gradients."
+  ]
+ },
+ "chisle": {
+  "hash": "8c6a4dad776ebe48",
+  "examples": [
+   "chisle on",
+   "We need to audit this codebase for security bottlenecks and clean up the tech debt before the release.",
+   "Can you do a deep review of these changes and strip out all the redundant boilerplate?",
+   "my context window is getting way too cluttered, let's condense everything down and optimize for maximum efficiency moving forward",
+   "review my latest PR please",
+   "Things are running super slow and the logic is getting tangled. I need maximum focus, a thorough audit of what's broken, and a streamlined game plan."
+  ]
+ },
+ "code-review": {
+  "hash": "c79a6f280e857ea6",
+  "examples": [
+   "Can you double-check my changes before I merge this PR?",
+   "I just finished refactoring the auth module, but I want to make sure I didn't introduce any security flaws or weird edge cases. Take a look?",
+   "Hey, why is this test failing intermittently after my last commit? Can you examine the diff and see what might be causing the race condition?",
+   "Before we push this live, I need a second pair of eyes on the database migration script to ensure it won't lock up production.",
+   "Look over my code"
+  ]
+ },
+ "codebase-design": {
+  "hash": "1cb9c12c03c8b317",
+  "examples": [
+   "Hey, can you help me figure out where to draw the boundary between our data ingestion service and the storage layer? Right now everything is coupled and it's a nightmare to write unit tests.",
+   "make this class less bloated",
+   "We have a massive service class that handles user authentication, profile updates, and email notifications all in one giant API. I want to refactor it so the interface is simpler for other developers to use, even though the internal logic is complex. How should we structure this?",
+   "Every time I change the database schema, half the frontend components break because they're importing types straight from the ORM models. Need advice on putting a proper abstraction barrier in place.",
+   "The AI keeps getting confused by our codebase because business logic is spread across twenty different utility files with overlapping responsibilities. How can we consolidate this into cleaner, self-contained modules?",
+   "redesign component interface"
+  ]
+ },
+ "codebase-onboarding": {
+  "hash": "e96429ca5052b48b",
+  "examples": [
+   "I just joined the team and I'm totally lost in this repo. Can you scan everything and give me a high-level architectural overview plus a breakdown of where the main entry points are?",
+   "We need to set up an AI agent for this repository, but it keeps getting confused by the project structure. Can you generate an AGENTS.md and map out the core conventions and directory layout so it knows how to navigate?",
+   "Hey, I'm auditing this legacy codebase today. Could you put together a comprehensive onboarding guide detailing the tech stack, data flow, and standard coding patterns used here?",
+   "I have no idea where anything is in this project. Where do requests actually enter the system, and is there a summary document I can read to get up to speed quickly?",
+   "Analyze the workspace layout and generate a quick orientation guide for a new developer."
+  ]
+ },
+ "context-budget": {
+  "hash": "80b30ba097e39b2a",
+  "examples": [
+   "Why is my context window filling up so fast today? Audit what we have loaded and tell me what to cut.",
+   "check token overhead",
+   "We're burning through tokens way too quickly. Can you inspect all the active AGENTS.md files, skills, and MCP servers to see what's eating up the budget and recommend some trims?",
+   "optimize prompt size",
+   "My model keeps forgetting things halfway through the session because the system prompt and loaded tools are massive. Figure out where the bloat is coming from.",
+   "Audit the system components for token waste"
+  ]
+ },
+ "correct": {
+  "hash": "7ba9ac1634f1c45d",
+  "examples": [
+   "Hey, we keep making the exact same silly mistakes in our PRs. Can you run /correct and set up some guardrails so nobody can repeat them?",
+   "Users keep running into that null pointer crash in the auth module because people forget to check the session state. Let's make that architectural flaw impossible to write.",
+   "Fix our recurring linter blind spots using the correct protocol.",
+   "We need to stop regression bugs around database connections once and for all. Audit the past few screw-ups and lock down the types and architecture so they can't happen again.",
+   "every time I review your code I see the same async race condition. Make it structurally impossible for this codebase to compile or run with that bug present."
+  ]
+ },
+ "create-design-md": {
+  "hash": "4226b0dc8ea5d430",
+  "examples": [
+   "Can you scan our frontend repo and generate a DESIGN.md file so the coding agents stop guessing our color palette and spacing?",
+   "Extract all the design tokens from this codebase and put them into a clean markdown doc.",
+   "The UI is a total mess because nobody follows a consistent system. Look through our components and document our actual design language in a DESIGN.md please.",
+   "reconstruct visual system",
+   "We need persistent UI context for our AI agents working on the frontend. Can you reverse-engineer our design tokens and guidelines from the current codebase?",
+   "The buttons and fonts look slightly different on every page. We need to document what our actual design standards are based on what's currently built."
+  ]
+ },
+ "database-migrations": {
+  "hash": "59a7298966221e15",
+  "examples": [
+   "Add a new email column to the users table in Prisma without breaking production.",
+   "fix postgres migration locking up the table when adding index",
+   "We need to rename the `user_id` column to `account_id` in our Drizzle schema, make sure it's backward compatible.",
+   "our app keeps timing out after I ran the latest sql migration to drop that old column",
+   "Modify the SQLite schema to include a JSON metadata field on the orders table.",
+   "Safe way to drop a nullable column across multiple deployment phases?"
+  ]
+ },
+ "deep-research": {
+  "hash": "85e290f89cc2b7a7",
+  "examples": [
+   "Can you do a comprehensive literature review and meta-analysis on the cognitive impacts of bilingualism following PRISMA guidelines?",
+   "幫我想想，我最近對再生能源的經濟效益有點興趣，但還不確定具體的論文研究主題和切入點是什麼，可以引導我一下嗎？",
+   "Run a fast cited web search to give me a competitive analysis of the top three open-source LLM agent frameworks right now using Exa.",
+   "I keep running into conflicting results when trying to assess the risk of bias in my sources for this systematic review. Can we run the 13-agent pipeline to sort this out?",
+   "문헌 조사부터 APA 7.0 형식의 최종 보고서 작성까지 전 과정을 도와줄 수 있는 체계적 문헌고찰 파이프ライン을 실행해 줘.",
+   "Need to fact-check several claims about carbon capture technologies and run a devil's advocate challenge on my methodology before submission."
+  ]
+ },
+ "deployment-patterns": {
+  "hash": "e8664e2bc91f3cc3",
+  "examples": [
+   "How do I write a multi-stage Dockerfile for my Node.js app and set up a GitHub Actions workflow to deploy it to AWS?",
+   "Containers keep crashing in production with OOM errors and I need help adding proper health checks and resource limits.",
+   "Can you review my docker-compose.yml and make sure the volumes and networking are configured correctly for local development?",
+   "Need to set up a zero-downtime rolling update strategy for our Kubernetes cluster, what's the best way to handle rollbacks?",
+   "fix my ci/cd pipeline",
+   "We are getting ready to ship our microservices to production next week. Can you do a complete readiness audit covering security vulnerabilities, secrets management, and container hardening?"
+  ]
+ },
+ "design-quality": {
+  "hash": "8a28ccff73667a78",
+  "examples": [
+   "Make this dashboard look less like a generic bootstrap template and give it some actual visual personality.",
+   "audit my landing page for accessibility flaws and fix the contrast issues",
+   "We need a complete brandkit and dark mode theme for our new crypto app.",
+   "Fix this ugly UI. The buttons are misaligned, the typography is all over the place, and it feels super cheap.",
+   "Generate a high-end editorial theme for our portfolio site following modern web design guidelines.",
+   "redesign"
+  ]
+ },
+ "desktop-control": {
+  "hash": "20043fb610865632",
+  "examples": [
+   "Hey, can you open the settings app in the taskbar and switch my dark mode off?",
+   "take a screenshot and click the save button on that popup",
+   "My VPN client got disconnected and the reconnect button isn't responding to my mouse clicks, can you click it for me?",
+   "Open LibreOffice Writer and type up a quick shopping list.",
+   "The GUI updater is stuck on 'checking for updates' and I need you to hit cancel on that window.",
+   "Can you check what's currently displayed on my desktop and click the icon in the top right corner?"
+  ]
+ },
+ "deslop": {
+  "hash": "2d099deecc0e824b",
+  "examples": [
+   "Can you clean up this file? It's full of that verbose, over-commented boilerplate that LLMs always spit out, complete with unnecessary try-catch blocks and redundant interfaces.",
+   "fix this garbage",
+   "This function is way too long and has weird variable names like `dataContainerInstance` everywhere. Please refactor it to look like it was written by a human.",
+   "Strip out all the redundant type assertions and excessive null checks. The AI that generated this went completely overboard and added defensive code for things that can never be null.",
+   "Clean up the styling on these components. They're bloated with unnecessary abstraction layers, factory patterns for simple objects, and markdown-style explanations left inside the code comments.",
+   "Why are there so many useless wrappers and generic type gymnastics here? Simplify this module so it's actually readable."
+  ]
+ },
+ "docker-infra": {
+  "hash": "0f097f02c5165f5f",
+  "examples": [
+   "can you make this container build faster and securely please",
+   "Fix my docker-compose.yml, the web service keeps crashing and health checks aren't working right.",
+   "optimize Dockerfile",
+   "My production container is running as root and the image size is way too big at over 2GB. How do I fix this?",
+   "Set up a multi-container environment for our Django app and Postgres database with proper security hardening.",
+   "why is my node app taking ten minutes to rebuild every time I change a single line of code?"
+  ]
+ },
+ "documentation-lookup": {
+  "hash": "f30520a80ce999fe",
+  "examples": [
+   "How do I set up the latest version of Next.js with App Router and Tailwind?",
+   "Prisma schema gives a foreign key constraint violation on migration, what's the correct syntax for onDelete cascade?",
+   "react hooks api ref",
+   "I'm trying to configure authentication in my new project using Supabase, but the client keeps throwing an initialization error on startup.",
+   "FastAPI background tasks example",
+   "My Tailwind classes aren't applying properly after updating to v4, how does the new CSS-first configuration work?"
+  ]
+ },
+ "docx": {
+  "hash": "da099ad57a405f98",
+  "examples": [
+   "Can you put together a professional report in a format I can open with Microsoft Word, including our quarterly metrics and a cover page?",
+   "fix formatting in this file.docx",
+   "I need to send an official employment offer letter to a candidate, but HR requires it as an editable text document (.docx) with our corporate letterhead template.",
+   "The client sent over the project proposal, but all the section headings are messed up and the images are floating everywhere. Can you clean up the layout so it looks polished and ready to print?",
+   "Extract all the customer feedback comments from the review draft we worked on yesterday.",
+   "Necesito generar un contrato formal para mis clientes que se pueda descargar en formato de Microsoft Word."
+  ]
+ },
+ "dual-viewport-ui": {
+  "hash": "661110557305296e",
+  "examples": [
+   "Make an architectural viewer where I can see both the floor plan blueprint and the 3D building model at the same time, and let me slice through floors.",
+   "need a spatial CAD tool for the browser with dual screens: one for 2D drafting and another for 3D rendering so I can measure distances between points.",
+   "build a web app that links a Three.js scene with a 2D grid, complete with ghosting effects for hidden layers.",
+   "My users keep complaining they can't accurately place furniture in the 3D room because they lack a top-down 2D grid reference with measurement tools. Can we build a synchronized dual-view setup to fix this?",
+   "WebGL CAD editor with floor slicing",
+   "I'm working on a virtual greenhouse planner. I want growers to draw beds on a 2D grid layout on the left, and instantly see the 3D greenhouse visualization update on the right with tape measure rulers to check plant spacing."
+  ]
+ },
+ "engineering-principles": {
+  "hash": "5a6a664e77875c88",
+  "examples": [
+   "This file is getting bloated. Let's clean it up and remove any unnecessary abstractions before we add the new feature.",
+   "We keep patching this null pointer exception every week, but it keeps coming back. Can we actually find the root cause and fix it properly instead of adding more checks?",
+   "Hey, can you look over this PR? It feels like way too many lines of code for such a simple change. Let's make it simpler and easier to read.",
+   "I'm designing a caching layer for our API client. I want to make sure the types are strict, the operations are idempotent, and we don't over-engineer it. Help me sketch the minimal required interface.",
+   "The bundle size is huge because of all these utility helpers we imported. Let's strip out what we don't strictly need and enforce better boundaries.",
+   "Make this code simpler and prove it actually works with a solid test."
+  ]
+ },
+ "geo-sleuth": {
+  "hash": "78ad780895d0986b",
+  "examples": [
+   "帮我定位这张照片",
+   "Where in the world was this taken? Can you figure out the exact coordinates from the background mountains and road signs?",
+   "Found this old family photo, any idea what city or street this building is on? Here's the image.",
+   "Can you check the shadows and sun angle in this pic to figure out roughly what time of day it was captured?"
+  ]
+ },
+ "git-conflict-resolver": {
+  "hash": "e67dcdbbc9b03be0",
+  "examples": [
+   "Hey, I tried to merge the feature branch into main and now my terminal is full of <<<<<<< HEAD stuff, can you fix this mess?",
+   "rebase failed halfway through",
+   "I'm trying to pull the latest changes from origin/main, but git is stopping me and saying I have overlapping modifications in auth.js that need manual intervention.",
+   "merge conflict",
+   "Everything broke when I ran git cherry-pick and it keeps stopping on every commit because of overlapping edits in the package.json file. Can you sort out what both sides were trying to do and make it work?",
+   "Help, my workspace is covered in conflict markers and I don't want to mess up the codebase trying to resolve them manually."
+  ]
+ },
+ "git-workflow": {
+  "hash": "0e43233e444937b6",
+  "examples": [
+   "How do I clean up my commit history and squash a bunch of messy commits before opening a pull request?",
+   "merge or rebase?",
+   "I'm working on two features at the exact same time without wanting to stash or switch branches constantly. Is there a way to isolate my workspace?",
+   "Hey, I've got a massive merge conflict in three different files after pulling from main, can you walk me through fixing this cleanly?",
+   "What's the best way to structure our feature branches and write commit messages so the team history stays readable?",
+   "My feature is fully merged upstream, but my local repo and remote still have the old branch hanging around. What's the proper way to clean all that up?"
+  ]
+ },
+ "godot4-dev": {
+  "hash": "d1eebd6f5aed7a67",
+  "examples": [
+   "Why is my integer division returning zero in GDScript 2.0, and how do I fix it?",
+   "help setting up headless testing in CI for godot 4",
+   "I'm getting weird errors about node signal shadowing in my custom button class, can you take a look?",
+   "What's the best way to handle global state in Godot 4? Should I use Autoloads or standard singletons?",
+   "My UI theme property overrides are not applying correctly to child controls in the scene tree.",
+   "Fix my script callback functions not connecting properly to the built-in physics ticks."
+  ]
+ },
+ "graphify": {
+  "hash": "e0b98894ad4d15b0",
+  "examples": [
+   "How does the authentication module connect to the database layer in this repo?",
+   "graphify-out/ check where user sessions are handled",
+   "I'm completely lost in this codebase. Can you map out how all the service classes relate to each other and find the main entry points?",
+   "Why does updating a profile picture sometimes crash the background worker? Trace the data flow for me.",
+   "Show me the high-level architecture of this project, highlighting the core god nodes and community clusters.",
+   "Explain this mess"
+  ]
+ },
+ "image-gen": {
+  "hash": "1c6e8b6b94e6576a",
+  "examples": [
+   "Hey, can you whip up a quick placeholder graphic for the landing page header?",
+   "Need a logo for this pet care app.",
+   "We are building a dashboard for a crypto trading platform. I need a cool hero banner illustration for the README that shows data charts and futuristic elements.",
+   "The UI for the login screen looks super boring and grey right now, can we make some kind of abstract geometric background art to spice it up?",
+   "Mock up what a modern fitness tracking dashboard would look like.",
+   "I'm testing the user avatar component and I'm tired of using boring stock placeholders. Generate a distinct user portrait so I can see how the grid layout handles it."
+  ]
+ },
+ "mcfunction-builder": {
+  "hash": "52b06157882dbc23",
+  "examples": [
+   "Hey, can you figure out how many shulker boxes of deepslate I need for my base perimeter and write the command pack to build the walls automatically?",
+   "Need to convert a 32x32x32 schematic of a giant skull into a function file I can load into my world, plus a materials list for survival mode.",
+   "Inventory math for 45722 cobblestone",
+   "Generate a datapack that builds a pyramid block by block every time I type a custom command.",
+   "I have a massive pile of voxel data from an export tool and I need a way to execute it inside Minecraft without lagging the server to death. What's the best approach to turn it into function commands?"
+  ]
+ },
+ "mcp-builder": {
+  "hash": "1f4304b5ac59f4ff",
+  "examples": [
+   "Build an MCP server for GitHub.",
+   "Hey, can you help me hook up my local database so Claude can query it via the Model Context Protocol?",
+   "I need to expose our internal REST API as an MCP server using Python and FastMCP so our agents can interact with it.",
+   "Claude can't access my custom weather service tool directly. How do I wrap this API into a protocol that LLMs understand?",
+   "Set up a TypeScript MCP server using the official SDK to let AI assistants search through our Jira issues.",
+   "Write a Model Context Protocol server in Python that lets an LLM check server health metrics and restart services."
+  ]
+ },
+ "modern-web-guidance": {
+  "hash": "7bdea8330a2eaf9c",
+  "examples": [
+   "Can you make this card component responsive to its container's width instead of the whole viewport?",
+   "fix my modal backdrop, it keeps getting hidden behind other elements and lacks smooth opening animations",
+   "How do I style a parent container based on whether it has a specific active child element?",
+   "Build a modern multi-column layout where the rows inside nested grids perfectly align with each other.",
+   "Make the page transition smoothly when I click this link to load the next view.",
+   "clean up this messy CSS file and use modern layout techniques instead of old float and flex hacks"
+  ]
+ },
+ "no-comments": {
+  "hash": "1a1d5f271062c527",
+  "examples": [
+   "Clean out all the junk comments in this file and run the comment-sicko checker on it.",
+   "strip documentation",
+   "My codebase is drowning in outdated inline notes and block quotes. Can you unleash the sicko subagent to sweep them away and make sure all constraints are properly encoded?",
+   "rm all comments please",
+   "The linter is complaining about dead text and redundant explanations everywhere, and I need someone to purge the noise and verify our encoding constraints.",
+   "Hey, can you deal with the comment-sicko thing? There's too much prose in the source files and I need it cleaned up."
+  ]
+ },
+ "output-skill": {
+  "hash": "c08af2a21694ffa5",
+  "examples": [
+   "Write the entire backend service for user authentication. Do not use any comments like '// rest of the code here' or placeholders, I need every single line implemented fully.",
+   "give me the full python script. stop cutting it off halfway through the classes.",
+   "I'm trying to migrate our legacy database schema, but whenever I ask for the migration script, the generator stops halfway through the table definitions and leaves out half the columns. I need the complete SQL file from start to finish without truncation.",
+   "Generate the complete React component tree for the dashboard. Make sure every single child component, style object, and helper function is fully written out—no skipping boilerplate or using stub functions.",
+   "Fix this concurrency bug in my Go worker pool. Provide the full, working main.go file without omitting any helper methods or structs.",
+   "Dump everything."
+  ]
+ },
+ "owasp-security": {
+  "hash": "9b0ea1bd7836e5e1",
+  "examples": [
+   "Hey, can you quickly check this login route? I'm worried someone might try to bypass the password check.",
+   "implement jwt auth",
+   "Users are reporting that if they change the ID in the URL path, they can view other people's account details and invoices. How do I lock this down?",
+   "Need to write a secure password hashing function using bcrypt and make sure the session tokens are handled properly.",
+   "Can you audit this SQL query builder function? I'm taking raw input from a search bar and passing it straight into the database query.",
+   "We need to fetch profile pictures from arbitrary URLs provided by users, but I want to make sure people can't use this to scan our internal network or hit cloud metadata endpoints."
+  ]
+ },
+ "pdf": {
+  "hash": "0e05965815a6e68f",
+  "examples": [
+   "Can you grab all the text out of my tax return document so I can paste it into notes?",
+   "merge these three scanned invoices into a single file please",
+   "This quarterly report file is upside down, can you fix the orientation on pages 4 through 10?",
+   "Need to password protect my bank statement before emailing it to my accountant.",
+   "The pages in this scan are totally unsearchable, I need to run OCR on it so I can highlight the text.",
+   "Hey, I have a bunch of separate chapter files ending in .pdf that need to be stapled together into one complete ebook."
+  ]
+ },
+ "performance-profiling": {
+  "hash": "cc6b447473c0c0d6",
+  "examples": [
+   "Hey, our Node API container keeps getting killed by Kubernetes with an OOMKilled status every few hours under heavy load. Can you take a look?",
+   "Why is this Python script taking forever to process a standard CSV file? It feels like the CPU is pegging at 100% and just hanging.",
+   "server lagging bad",
+   "We're seeing a massive memory leak in our Bun production service where heap usage creeps up steadily until it crashes. Need help tracking down the retained objects.",
+   "My Go microservice is experiencing severe latency spikes and event loop starvation during peak traffic hours, and I'm not sure where the bottleneck is.",
+   "The database queries are timing out and the whole application response time has dropped off a cliff since the last deploy."
+  ]
+ },
+ "plans": {
+  "hash": "d35b3e0d746d6fc5",
+  "examples": [
+   "Hey, I need to refactor our entire authentication system to use JWT instead of sessions. Can you break down the steps and start working through them?",
+   "fix the memory leak in the data ingestion pipeline",
+   "We have a detailed PRD for adding Stripe billing support attached here. Please review the requirements, outline the file structure changes, and execute the plan step-by-step with my approval.",
+   "The app keeps crashing whenever a user uploads a large profile picture and navigates away immediately. We need a robust fix across the frontend uploader and backend router—let's make a solid checklist and knock it out.",
+   "migrate postgres to mongodb",
+   "I want to add a dark mode toggle to the dashboard. Here are the specs: it needs to persist in localStorage, update Tailwind classes dynamically, and respect system preferences by default. Write up a plan and run it."
+  ]
+ },
+ "ponytail": {
+  "hash": "b5f19bd927cf5a08",
+  "examples": [
+   "Why are we importing lodash just to check if an array is empty? Fix that.",
+   "This pagination helper is 200 lines of custom junk. Isn't there a built-in way or can we just drop it?",
+   "Keep it super simple",
+   "We need a caching layer for user profiles. But honestly do we even need this complexity right now or can we just hit the DB directly?",
+   "Stop over-engineering this component. Cut out the boilerplate and make it fit in one file.",
+   "lazy mode"
+  ]
+ },
+ "ponytail-debt": {
+  "hash": "84c966e3f4742601",
+  "examples": [
+   "can you check what we marked to do later",
+   "ponytail ledger",
+   "find all those little shortcuts we left lying around in the comments before this tech debt gets out of hand",
+   "what did ponytail defer",
+   "we need to audit all those temporary workarounds we tagged in the codebase",
+   "/ponytail-debt"
+  ]
+ },
+ "pptx": {
+  "hash": "571970ddbaa74030",
+  "examples": [
+   "make me a 10-slide presentation about my sales analysis",
+   "turn this report into a PowerPoint deck",
+   "edit the slides in deck.pptx and fix the fonts on slide 4",
+   "extract all the text from this .pptx file",
+   "I need a pitch deck for my freelance data services",
+   "add a chart slide with the quarterly numbers to my presentation"
+  ]
+ },
+ "production-hardening": {
+  "hash": "6d6798c12f9a62b7",
+  "examples": [
+   "run production-hardening security",
+   "Hey, we're getting ready to push this app to live users, can you do a complete pass on security holes, missing error boundaries, screen reader support, and page titles?",
+   "fix accessibility and error handling",
+   "The site is crashing silently when API calls fail, and none of our pages have proper meta tags or alt text for images. Can you clean this up for release?",
+   "Audit this component for production readiness. Make sure it's secure against injections, handles all edge cases gracefully, and passes WCAG guidelines.",
+   "prep for launch: check SEO metadata and security flaws"
+  ]
+ },
+ "publishing-release": {
+  "hash": "260ada24bda151bd",
+  "examples": [
+   "Time to ship v1.2.0, can you handle the release checklist?",
+   "Push to prod and tag it.",
+   "All tests are passing on main, the PR is merged, and we're ready to cut the next patch release, bump the version, and push to npm.",
+   "The new features are sitting on the branch and QA signed off—we need to get this build out to the registry and create a GitHub release.",
+   "Generate the changelog, tag the commit as v2.0.0-rc1, and upload the crate to crates.io.",
+   "Let's cut a new release."
+  ]
+ },
+ "rea": {
+  "hash": "4b4429539b887cec",
+  "examples": [
+   "Can you figure out how the auth token is being generated in this new desktop client update? Here's the unpacked app dir: /app/dist",
+   "apk reverse engineering",
+   "Why does this weird proprietary CLI tool keep crashing when I pass it a custom license key? Check the binary at /usr/bin/valkey-pro and tell me how it validates the signature.",
+   "Hey, I need to know how the competitor's iOS app encrypts its local SQLite database. I dumped the binary from the IPA here: /workspace/Payload/App.app/App",
+   "Take a look at this capture file and figure out what undocumented API endpoints the desktop app is hitting behind the scenes.",
+   "We lost the source code for our legacy payment service daemon, but we have the compiled .NET assembly. Can you decompile it and show me how the webhook HMAC is computed?"
+  ]
+ },
+ "schema-to-type": {
+  "hash": "d4e8833de1175d2d",
+  "examples": [
+   "Can you turn this JSON response from the Stripe API into some TypeScript types and a Zod schema so I can validate it?",
+   "fix this: Property 'user_id' does not exist on type 'unknown' when I parse the curl output below:\n\n{\"id\": 42, \"profile\": {\"name\": \"Alice\", \"roles\": [\"admin\"]}}",
+   "need types for this db table",
+   "I keep getting type errors when trying to read the payload returned by our legacy webhook endpoint. Here is a sample payload, can you map it out properly with runtime validation?",
+   "generate ts interfaces for these sql create table statements",
+   "parse this json"
+  ]
+ },
+ "skill-creator": {
+  "hash": "cbc61c5ab03bbbb9",
+  "examples": [
+   "create a new skill that teaches the agent how to deploy my Godot game",
+   "improve this skill's description so it triggers more reliably",
+   "run evals on my data-cleaning skill and benchmark it",
+   "turn what we just did into a reusable skill",
+   "my skill never gets picked up, help me fix its trigger",
+   "write a SKILL.md for converting scanned books to PDF"
+  ]
+ },
+ "sr-screener": {
+  "hash": "c535df35b1402679",
+  "examples": [
+   "Can you run title/abstract screening on these 500 references using our inclusion criteria?",
+   "غبرالگری مقالات رو با دو داور هوش مصنوعی انجام بده و گزارش PRISMA بگیر",
+   "We have a bunch of conflicting screening decisions between our two reviewers that need adjudication.",
+   "Help me generate a PRISMA flow diagram and Excel log from our systematic review export.",
+   "We need to audit our recent exclusions to check for any near-misses and calculate kappa.",
+   "Check these abstracts against the PROSPERO protocol we set up yesterday."
+  ]
+ },
+ "subagent-driven-development": {
+  "hash": "b88bc1b38037b71b",
+  "examples": [
+   "Execute the implementation plan we just made using parallel subagents for each independent task.",
+   "run the plan",
+   "We have a detailed migration plan with 4 separate steps outlined in plan.md. Spin up multiple agents to knock these out concurrently since they don't depend on each other.",
+   "All the tests are failing because half the refactoring steps in our task list weren't applied in parallel. Can you distribute these remaining independent items to separate worker agents and bring it all together?",
+   "Hey, I need you to implement the rest of the spec. Break down the remaining tasks, assign them to individual subagents to run simultaneously, and then aggregate the results.",
+   "The backend API endpoints and frontend components in our task document are totally decoupled. Fire up concurrent workers to implement them at the same time."
+  ]
+ },
+ "systematic-debugging": {
+  "hash": "4a97960fe50cf556",
+  "examples": [
+   "Tests are failing on the main branch again, can we figure out why before touching anything?",
+   "fix this bug",
+   "Every time I submit the form, the page refreshes instead of saving, and I have no idea what's causing it. Let's trace it carefully.",
+   "Nullpointer exception in production logs after the latest deploy. Need to investigate root cause.",
+   "Wait, why is this returning undefined instead of the user object? Let's check what's going wrong step by step.",
+   "The pagination component jumps back to page 1 whenever I click the filter button, which is super annoying. Let's look into the state logic."
+  ]
+ },
+ "test-quality": {
+  "hash": "4193c3ab4af0a0af",
+  "examples": [
+   "Run through our strict six-phase verification loop to make sure this new auth module is completely solid before we merge.",
+   "fix the failing checkout flow, make sure you write a failing test first and follow red-green-refactor",
+   "Can you spin up Playwright and check why the user dashboard tests are flaking out on the profile page?",
+   "We need to build this feature using eval-driven development, set up the evaluation harness first.",
+   "verify everything works end-to-end and provide solid evidence before you claim this is done",
+   "tests are all over the place, let's clean up the suite and make sure we adhere to the Iron Law of TDD for these bug fixes"
+  ]
+ },
+ "thermo-nuclear-code-quality-review": {
+  "hash": "940715cf00f1aeba",
+  "examples": [
+   "Run a thermo-nuclear code quality review on the backend service, it's getting totally out of hand.",
+   "Do a deep code quality audit for /src/core. We have massive files and completely unreadable spaghetti logic everywhere.",
+   "This codebase is a total disaster. Needs an extremely strict maintainability review before we merge any more tech debt.",
+   "Can you do a thermonuclear review on these modules? Abstractions are totally broken.",
+   "We have 3000-line files with nested if statements nested 6 levels deep. Help me audit this mess.",
+   "harsh maintainability review"
+  ]
+ },
+ "thermo-nuclear-review": {
+  "hash": "c4dc0dd30e2b3b03",
+  "examples": [
+   "Run a thermo nuclear review on this PR before we merge it into main, I need to make sure nothing is broken.",
+   "Do a deep review of all changes in the current branch. Let's find any nasty security holes or breaking changes.",
+   "Can you audit this branch diff? We're about to push to production and I'm paranoid about feature-gate leaks and subtle bugs.",
+   "pr audit",
+   "Something in this branch is causing weird regressions and I can't figure out where. Can you check every single changed line for correctness and security issues?",
+   "Perform a thermonuclear check on the last three commits, focusing heavily on developer experience regressions and API breakages."
+  ]
+ },
+ "thermos": {
+  "hash": "85aac859749b83dc",
+  "examples": [
+   "Run a double thermo review on this pull request before we merge it to main.",
+   "Perform a combined bug/security and code-quality branch audit on the auth service.",
+   "Do that dual review thing on the payment gateway changes, need both eyes on it.",
+   "Can you launch the parallel thermo-nuclear review subagents to check my latest commits?",
+   "We keep getting intermittent memory leaks in production, and I want a deep code-quality and security sweep done simultaneously."
+  ]
+ },
+ "typescript-best-practices": {
+  "hash": "8743958c600856ad",
+  "examples": [
+   "Can you check why this component is throwing a type error when I pass null?",
+   "refactor utils.ts",
+   "I keep running into 'any' type issues in my React props and need help cleaning up the definitions so they follow strict modern patterns.",
+   "Fix types in App.tsx",
+   "Why is my generic constraint not working correctly here?",
+   "Optimize this codebase for better type safety and cleaner interfaces"
+  ]
+ },
+ "using-git-worktrees": {
+  "hash": "4982864b793922b0",
+  "examples": [
+   "I need a clean workspace to start building the new user authentication feature without messing up my current uncommitted changes.",
+   "set up a worktree for this task",
+   "Working on this bug fix is going to touch a lot of files. Can you spin up a separate sandbox or isolated branch directory so I don't disrupt what I'm currently testing?",
+   "git worktree add ../feature-branch main",
+   "Before we dive into executing this implementation plan, let's make sure we're working in a fresh, isolated copy of the repo so we don't conflict with my local edits.",
+   "My current directory is too messy with half-done experiments, need a pristine environment to start coding the payment gateway."
+  ]
+ },
+ "video-gen": {
+  "hash": "d58be6a0c9ed53bf",
+  "examples": [
+   "can you whip up a quick mp4 showing a smooth fade-in and slide transition for our new landing page hero section",
+   "render an animation",
+   "I need a short background loop for the sign-up page to make it feel less static, maybe something with floating abstract shapes",
+   "generate a video clip",
+   "The client says the loading state feels too boring and lifeless. Can we get some kind of spinning loader mockup going?",
+   "Need a 5-second placeholder of a drone shot over a city skyline for the hero video component"
+  ]
+ },
+ "voxel-craft-cad": {
+  "hash": "ea9f089723a8e664",
+  "examples": [
+   "Can you generate a procedural medieval castle using voxels and render it in a Three.js scene?",
+   "build a glowing cyberpunk skyscraper out of blocks",
+   "I'm trying to design a complex architectural dome with parametric math curves, but my Three.js viewport keeps clipping the geometry when I zoom out too far.",
+   "Minecraft pagoda blueprint",
+   "Generate a massive underground dwarven city with intricate pillar structures and archways using procedural voxels.",
+   "How do I code a script that places blocks in a 3D grid following a mathematical sine wave pattern?"
+  ]
+ },
+ "web-artifacts-builder": {
+  "hash": "3681f36483735478",
+  "examples": [
+   "Build a full-featured dashboard with Tailwind and React that lets users manage projects, switch between tabs with client-side routing, and includes interactive data tables using shadcn components.",
+   "make a multi-step checkout flow app using react and shadcn/ui. needs local state management for cart items, shipping address form validation, and a summary step.",
+   "I need a complex kanban board app with drag-and-drop columns, modal dialogs for task details, and state management for filtering and tagging items. Please use modern frontend tools like React and Tailwind.",
+   "Fix my app's navigation—when I click between the analytics view and user settings, the sub-components lose their state. Can you build a proper routed dashboard layout with sidebar navigation and multiple interactive panels?",
+   "Create a rich interactive crypto portfolio tracker with live-updating charts, dark mode toggle, modal forms for adding transactions, and a polished UI using shadcn components.",
+   "Build a collaborative whiteboard companion app with floating toolbars, multiple workspace views, settings drawers, and robust state handling for all the UI elements."
+  ]
+ },
+ "xlsx": {
+  "hash": "18d8d3980762a555",
+  "examples": [
+   "Can you take a look at the budget file in my downloads? The totals on the summary sheet aren't adding up right and some of the columns got shifted over.",
+   "merge Q1 and Q2 sales reports.csv into a single master workbook and add a pivot table for regional breakdown",
+   "generate a tracker",
+   "I have this messy export from our legacy CRM where all the names and phone numbers are lumped into a single column. Can you parse them out into separate proper columns and save it as an Excel file?",
+   "Need to convert pricing_data.tsv into an formatted spreadsheet, apply currency formatting to column D, and highlight any rows where the margin is below 15%.",
+   "Hey, my inventory sheet keeps throwing #VALUE! errors in the reorder column whenever we have zero stock. Fix the formula so it handles blanks gracefully."
+  ]
+ },
+ "find-skills": {
+  "hash": "294d7a1a9af83de9",
+  "examples": [
+   "how do I do PDF text extraction in this environment?",
+   "is there a skill that can connect to my Jira board?",
+   "find a skill for analyzing memory leaks in nodejs",
+   "I need something to automatically format my git commit messages correctly.",
+   "Can you check if we have a tool to parse CSV files easily?",
+   "Every time I try to query the database, it times out. Is there a helper for optimizing SQL?"
+  ]
+ },
+ "memory-import": {
+  "hash": "04c43ed86f88b67d",
+  "examples": [
+   "Can you take this JSON file of everything ChatGPT stored about me and put it into your memory system?",
+   "migrate claude export",
+   "Here is a big text dump of memories I exported from my old AI assistant. I want you to go through them, filter out the junk, and save the useful facts into your local store.",
+   "I switched over from Copilot and saved my profile data. How do I get you to read this and remember it?",
+   "Hey, I have this file containing all the preferences and context Gemini learned about me over the last year. Can we import all of that so I don't have to re-explain everything?",
+   "process my chatgpt data export"
+  ]
+ },
+ "ruflo": {
+  "hash": "262c3333d476329b",
+  "examples": [
+   "Hey, can you spin up a multi-agent swarm to refactor this massive legacy codebase across multiple microservices simultaneously?",
+   "Need vector memory recall to search past neural patterns and figure out why this consensus coordination protocol keeps deadlocking.",
+   "Fix sync lag between nodes",
+   "Our distributed agents are failing to reach consensus on the state vector, and standard single-agent context isn't cutting it. We need a coordinated swarm approach to debug the neural memory logs.",
+   "Run a multi-agent analysis using our historical vector embeddings to find out where the architecture optimization loop broke down last Tuesday.",
+   "swarm them"
+  ]
+ },
+ "sharpen": {
+  "hash": "aaa44ae9db0757bb",
+  "examples": [
+   "Can you make this prompt more rigorous and focused before we send it to the model?",
+   "I feel like my request is too surface-level. Help me dig into the core mechanics of what I actually want to achieve here, rather than just adding more features.",
+   "The tests are passing, but the implementation feels brittle. Refine the core logic instructions so the agent builds a robust solution instead of a quick hack.",
+   "Make it deeper, not bigger.",
+   "My initial idea is a bit vague and hand-wavy. Can you tighten the requirements and focus on the architectural depth of the problem?"
+  ]
+ },
+ "browser-automation": {
+  "hash": "b854183ca9fb6aae",
+  "examples": [
+   "Can you open up my dashboard on the staging site, click the export button, and download the PDF report for me?",
+   "Check if the login button on our homepage actually works by running a quick click test in a real browser session.",
+   "The checkout page is hanging when I try to submit payment, can you inspect the network tab and console logs while reproducing the click?",
+   "go to https://news.ycombinator.com and grab the top 5 titles",
+   "I need to capture a performance trace and Core Web Vitals for our main landing page to see why it's loading so slow on mobile.",
+   "Fill out the registration form at app.example.com/signup using a burner email and submit it."
+  ]
+ },
+ "web-design-guidelines": {
+  "hash": "7f57a837e91d07bc",
+  "examples": [
+   "can you review my UI and let me know if anything looks off?",
+   "check accessibility",
+   "Hey, do a quick design audit on this dashboard for me",
+   "My users are complaining they can't read the text on mobile and the buttons feel cramped, can you check my site against best practices?",
+   "review UX",
+   "Could you take a look at these React components to see if they meet standard web accessibility and usability guidelines?"
+  ]
+ },
+ "supabase": {
+  "hash": "a9e32596aa62f2be",
+  "examples": [
+   "How do I set up SSR cookie handling in Next.js with `@supabase/ssr` so the user session persists properly?",
+   "Getting a 403 permission denied error on my Postgres table even though the JWT looks correct, can you help fix my RLS policies?",
+   "Write a migration to add a pgvector column and create an embedding similarity search function.",
+   "my app keeps logging users out randomly on mobile web after refreshing the page",
+   "Deploy a Deno edge function that connects to the database and processes webhook payloads from Stripe.",
+   "Table data isn't showing up in the UI and the browser console says schema cache out of date or something similar."
+  ]
+ },
+ "verification-before-completion": {
+  "hash": "56af9ac12fd45df9",
+  "examples": [
+   "Looks like all tests are passing now, go ahead and push these changes to main.",
+   "fix the login bug",
+   "I've updated the database schema and migrated everything successfully. Can you double check and open a PR?",
+   "All the unit tests for the payment gateway are finally green, let's wrap this up and commit.",
+   "The memory leak is gone, I monitored the profiler for 10 minutes and usage is flat. We're good to merge."
+  ]
+ },
+ "lemo-opuscar": {
+  "hash": "b133b5b4c3013624",
+  "examples": [
+   "Can you make a short animated promo about our new coffee machine that looks like an oil painting?",
+   "Generate an explainer video breaking down how a jet engine works using that CAD-style teardown look.",
+   "I need a cinematic 30-second animation for a sci-fi teaser, but I have no idea which aesthetic would fit best—can we pick one?",
+   "帮我用浮世绘的风格做一个关于东京樱花季的短片。",
+   "Make a satellite briefing style data visualization showing global migration patterns over the last decade.",
+   "I want to build a completely custom visual style for our brand's announcement video from scratch."
+  ]
+ },
+ "data-analyze": {
+  "hash": "9307f5fca5d66f1b",
+  "examples": [
+   "Can you quickly check what our churn rate was for enterprise accounts last month?",
+   "mrr dropped 15% in EMEA over the last two weeks, need a breakdown of why ASAP",
+   "Compare retention cohorts between the old onboarding flow and the redesigned one we launched in Q3.",
+   "Hey, pull the numbers for daily active users over the weekend, something looks off with the notification push.",
+   "Necesito un reporte completo sobre el rendimiento de las campañas de marketing de la semana pasada para la reunión con la junta.",
+   "What's the average time-to-resolution for priority 1 support tickets this quarter?"
+  ]
+ },
+ "data-build-dashboard": {
+  "hash": "abcd7e7112a37c5a",
+  "examples": [
+   "Can you make a nice single-file HTML report with some interactive charts and a data table for my boss?",
+   "build-dashboard",
+   "I need to put together an executive overview page with KPI cards and filters so the team can monitor our weekly metrics in the browser.",
+   "My stakeholders want to slice and dice our latest query results themselves without installing any BI tools. Can we generate a self-contained web page with graphs and a searchable table?",
+   "necesito un reporte interactivo en HTML con varias gráficas y filtros para ver el estado del proyecto",
+   "The executive team is complaining they can't easily explore the sales numbers we pull every Monday. Can you code up a neat little browser-based dashboard with charts and filters?"
+  ]
+ },
+ "data-context-extractor": {
+  "hash": "6f28bd8410e4fd6c",
+  "examples": [
+   "Hey, can you help me set up our data warehouse context so the queries stop messing up our custom metrics?",
+   "Create a data context skill",
+   "We keep having to explain what our churn rate actually means to the AI. Can we build a reference file for our database terms?",
+   "Set up data analysis for our warehouse",
+   "add context about our subscription billing tables",
+   "our analytics queries are totally missing the business logic for the user segments, need to fix how the assistant reads our schema"
+  ]
+ },
+ "data-create-viz": {
+  "hash": "65747a16c5653579",
+  "examples": [
+   "Can you make a nice-looking bar chart out of these sales numbers for my quarterly report?",
+   "plot this dataframe",
+   "I need to show the upward trend in our user signups over the last year in a way that looks professional enough for the board of directors.",
+   "The client wants a scatter plot comparing response time vs server load, make it interactive so they can zoom in on the outliers.",
+   "Turn this query output into a heatmap, it's too hard to spot the correlation just looking at the raw numbers.",
+   "Necesito generar un gráfico de líneas elegante con estos datos mensuales para la presentación."
+  ]
+ },
+ "data-explore-data": {
+  "hash": "43f2832eaf12a061",
+  "examples": [
+   "can you take a look at this new CSV file I just dropped in the workspace and tell me what's in it?",
+   "Check nulls and value distributions for the customer_churn table.",
+   "Why are my metrics looking weird? Something might be wrong with the data quality in the transactions log.",
+   "profile sales_2023.parquet",
+   "I need to figure out what columns are available and if there are duplicate rows before I start building a dashboard on this dataset.",
+   "¿Me ayudas a revisar la forma y la calidad de este dataset nuevo antes de hacer queries?"
+  ]
+ },
+ "data-science-tutor": {
+  "hash": "4b9d94aef03598e0",
+  "examples": [
+   "Hey, can you explain how random forests work under the hood? I keep getting confused by bootstrapping.",
+   "teach me SQL joins",
+   "I'm feeling totally lost trying to figure out what skills I actually need to get my first job as a data scientist. Can we map out a study plan?",
+   "Give me a quick 5-question pop quiz on pandas DataFrame manipulation to test if I'm ready for my interview tomorrow.",
+   "My logistic regression model keeps overfitting and I have no idea why or how regularization fixes it. Can we go over this concept?",
+   "چطور می‌تونم یادگیری ماشین رو از صفر شروع کنم؟ یه نقشه راه بهم بده"
+  ]
+ },
+ "data-sql-queries": {
+  "hash": "1081835418e40f39",
+  "examples": [
+   "Can you help me convert this complex Postgres query so it runs properly in Snowflake without syntax errors?",
+   "optimize this bigquery sql, it's scanning way too many bytes and timing out during our morning dashboard refresh",
+   "Write a recursive CTE to find all hierarchical manager-employee relationships across our org chart.",
+   "Need a window function to calculate rolling 30-day active users partitioned by region in Databricks Spark SQL.",
+   "My aggregations are returning duplicate rows because of a bad join, how should I restructure this with proper grouping?",
+   "Necesito una query eficiente para calcular el lifetime value (LTV) de los clientes usando percentiles y cohortes."
+  ]
+ },
+ "data-statistical-analysis": {
+  "hash": "1e96e0c11aa2bad8",
+  "examples": [
+   "Can you check if the spike in yesterday's server traffic is statistically significant or just random noise?",
+   "run a quick trend analysis on our user churn rates over the last four quarters",
+   "Find outliers in this dataset",
+   "Why are these two marketing campaigns showing such different conversion rates? Need to run some stats to see if the uplift is real or if we don't have enough data yet.",
+   "Could you calculate the mean, median, standard deviation, and check for any skewed distributions in the latest survey results?",
+   "¿Puedes hacer un análisis estadístico completo de estas métricas de rendimiento para ver si hay correlación?"
+  ]
+ },
+ "data-validate-data": {
+  "hash": "0c68233ce0fef11d",
+  "examples": [
+   "can you double check this SQL query output before I show it to the VP tomorrow?",
+   "sanity check my numbers",
+   "I just finished pulling the churn metrics for the quarterly review, but I'm paranoid that my aggregation logic messed up the percentages. Can you review my methodology and make sure my conclusions actually match what the tables are saying?",
+   "does this user growth trend actually make sense or am I seeing things?",
+   "Reviewing my cohort analysis script for potential bias and accuracy issues before sending it to product.",
+   "Revisa si este análisis tiene sentido estadístico o si hay sesgo en la muestra antes de la reunión."
+  ]
+ },
+ "data-visualization": {
+  "hash": "45bfc2186e229b69",
+  "examples": [
+   "Can you help me make this matplotlib scatter plot look publication-ready? The labels overlap and the colors are hard to read for colorblind users.",
+   "plot sales data",
+   "I have a dataframe with monthly user growth and churn rates. What's the best way to visualize these two metrics together in Python without cluttering the axes?",
+   "My seaborn heatmap looks super messy and the font sizes are all over the place. How do I fix the styling so I can drop it into my report?",
+   "Need to build an interactive dashboard component in plotly for time-series anomaly detection, but I'm stuck on how to handle dual axes properly.",
+   "Genera un gráfico de dispersión con seaborn que tenga buena combinación de colores para un paper académico."
+  ]
+ },
+ "data-write-query": {
+  "hash": "979f517c5c072c9e",
+  "examples": [
+   "can you help me turn this plain English request into a solid Postgres query?",
+   "Write a complex query joining three tables with multiple CTEs and make sure it's optimized for BigQuery.",
+   "My dashboard query is timing out on this huge partitioned table. How should I rewrite it to scan less data?",
+   "Need Snowflake syntax for a window function with an unbounded preceding frame, any ideas?",
+   "Need to aggregate user events by month and join with the subscription table efficiently.",
+   "Necesito optimizar esta consulta SQL para que corra más rápido en nuestro Snowflake."
+  ]
+ },
+ "experiment-and-inference": {
+  "hash": "601a5ee1ad22b43d",
+  "examples": [
+   "Can you check if the conversion rate bump in our latest checkout flow experiment is actually statistically significant or just random noise?",
+   "running an A/B test with 3 variants, how do I avoid false positives from multiple testing?",
+   "my regression coefficients have low p-values, but I'm not sure if heteroscedasticity is messing up the standard errors in statsmodels",
+   "How many users do we need to sample per group to detect a 2% lift with 80% power?",
+   "p-value vs effect size",
+   "¿Cómo sé si la diferencia entre estas dos medias es real o pura casualidad, y qué supuestos tengo que verificar?"
+  ]
+ },
+ "frontend-design": {
+  "hash": "38b081f345c6acb6",
+  "examples": [
+   "Make this dashboard look less like a generic bootstrap template and give it some real visual personality.",
+   "fix UI ugly",
+   "I'm building a landing page for a boutique coffee brand, and I need help picking a striking typography pairing and a sophisticated color palette that feels artisanal rather than corporate.",
+   "Our current app views feel super flat and uninspired. Can we overhaul the design system implementation to make the components pop with better spacing, depth, and micro-interactions?",
+   "Por favor, Rediseña esta interfaz para que se vea moderna y elegante, no me convence cómo quedaron los colores actuales.",
+   "The user profile page is functional but it completely lacks visual hierarchy. Users are missing the main call to action because everything blends together into a boring wall of gray cards."
+  ]
+ },
+ "ml-workflow": {
+  "hash": "91e685e68daeb499",
+  "examples": [
+   "Can you help me build a complete churn prediction pipeline using XGBoost, making sure I avoid data leakage during cross-validation?",
+   "my model metrics look way too good on train and terrible on test, need help fixing this workflow",
+   "Build a robust housing price regression model with scikit-learn. Include proper feature engineering, hyperparameter tuning, and SHAP values for explainability.",
+   "¿Me ayudas a armar un flujo de machine learning completo para clasificación con validación cruzada y métricas de evaluación?",
+   "need to forecast monthly product demand using tabular data, let's do proper baselines and model comparison",
+   "Review my Jupyter notebook for this customer segmentation and scoring task; I want to ensure my train-test splits and feature scaling are done correctly without leakage."
+  ]
+ },
+ "web-research": {
+  "hash": "b2e178c20c0253fa",
+  "examples": [
+   "research the best budget 1440p monitors available in Egypt right now and compare them",
+   "what's the current state of open-source local LLMs that run on CPU only? give me a full report",
+   "compare Mostaql, Kafil and Nafezly for a data analyst freelancer: fees, demand, payment methods",
+   "make a list of all the embassies in Cairo with their official emails",
+   "I need a deep dive on how the EU AI Act affects small startups",
+   "find every free data-visualization course with a certificate and rank them"
+  ]
+ },
+ "portfolio-project-builder": {
+  "hash": "e6a16d397db84efd",
+  "examples": [
+   "build me a new data analyst portfolio project with a public dataset",
+   "I want a project for my GitHub that shows I can do machine learning",
+   "pick a dataset and make an end-to-end analysis with a dashboard and README for my portfolio",
+   "make a churn prediction project I can show clients on Mostaql",
+   "add another project to my portfolio site",
+   "what portfolio project should I do next to look like a data scientist?"
+  ]
+ }
+}

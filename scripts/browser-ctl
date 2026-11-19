@@ -1,0 +1,609 @@
+#!/usr/bin/env python3
+"""browser-ctl: find the browsers installed right now and open one of them for automation.
+
+Nothing is hardcoded: every call re-reads the desktop entries (system, ~/.local, Flatpak)
+with Categories=WebBrowser, so installing or removing a browser changes the list at once.
+The engine is detected from the browser's own `--version` (cached per desktop file + mtime).
+
+  browser-ctl list [--json]        installed browsers: id, name, engine, how it is driven, state
+  browser-ctl status [ID]          which browser holds the automation port (exit 0 ready)
+  browser-ctl start ID [URL]       open ID with its automation port (no-op if already ready)
+  browser-ctl restart ID [URL]     close ID gracefully (tabs restore) and reopen it with the port
+  browser-ctl stop ID              close ID gracefully
+  browser-ctl release              undo render_unfocused on windows `start` marked (opencode-stack runs it at shutdown)
+  browser-ctl match "TEXT"         ids of installed browsers named in TEXT (for the context engine)
+
+Exit codes: 0 ready/ok, 1 not running/not found, 3 running WITHOUT the port (restart needs
+the user's OK), 4 another browser holds the port, 5 engine cannot be automated (use the
+desktop-control skill: real cursor + `see`).
+
+Engines and MCP servers:
+  chromium (Brave, Chrome, Chromium, Edge, Opera, Vivaldi, Helium, ...) -> CDP on 127.0.0.1:9222 -> `my-browser`
+  gecko    (Firefox, LibreWolf, Zen, Floorp, Waterfox, ...)            -> Marionette 127.0.0.1:2828 -> `my-firefox`
+  qtwebengine (qutebrowser)                                            -> CDP 9222, experimental -> `my-browser`
+The ports are bound to 127.0.0.1 and opened only on demand: while open, any local process
+can control that profile.
+"""
+from __future__ import annotations
+
+import configparser, glob, json, os, re, shlex, shutil, signal, socket, subprocess, sys, time, urllib.request
+from pathlib import Path
+
+CDP_PORT = int(os.environ.get("BROWSER_CDP_PORT", "9222"))
+MARIONETTE_PORT = int(os.environ.get("BROWSER_MARIONETTE_PORT", "2828"))
+BIDI_PORT = int(os.environ.get("BROWSER_BIDI_PORT", "9223"))  # Firefox's default 9222 would collide with CDP
+CACHE = Path.home() / ".config/opencode/state/browsers.json"
+LOG = Path("/var/tmp/pip-scratch/opencode/browser-ctl.log")
+GENERIC = {"web", "browser", "google", "mozilla", "microsoft", "the", "internet", "-", "(flatpak)"}
+MCP = {"chromium": "my-browser", "qtwebengine": "my-browser", "gecko": "my-firefox"}
+
+
+# ------------------------------------------------------------------ discovery
+
+def app_dirs() -> list[Path]:
+    data = [os.environ.get("XDG_DATA_HOME", str(Path.home() / ".local/share"))]
+    data += os.environ.get("XDG_DATA_DIRS", "/usr/local/share:/usr/share").split(":")
+    data += [str(Path.home() / ".local/share/flatpak/exports/share"), "/var/lib/flatpak/exports/share"]
+    seen, out = set(), []
+    for d in data:
+        p = Path(d) / "applications"
+        if p.is_dir() and p.resolve() not in seen:
+            seen.add(p.resolve())
+            out.append(p)
+    return out
+
+
+def read_desktop(path: Path) -> dict | None:
+    cp = configparser.ConfigParser(interpolation=None, strict=False)
+    try:
+        cp.read(path, encoding="utf-8")
+        e = cp["Desktop Entry"]
+    except Exception:
+        return None
+    if "WebBrowser" not in e.get("Categories", "").split(";"):
+        return None
+    if e.get("Hidden", "false").lower() == "true" or e.get("Type", "Application") != "Application":
+        return None
+    return {"name": e.get("Name", path.stem), "exec": e.get("Exec", ""), "wmclass": e.get("StartupWMClass", ""), "file": str(path)}
+
+
+def parse_exec(exec_line: str) -> tuple[list[str], str | None]:
+    """Launch argv without field codes, and the Flatpak app id if it is one."""
+    try:
+        argv = shlex.split(exec_line)
+    except ValueError:
+        argv = exec_line.split()
+    argv = [a for a in argv if not re.fullmatch(r"%[a-zA-Z]|@@u?", a)]
+    while argv and (argv[0] == "env" or re.fullmatch(r"\w+=.*", argv[0])):
+        argv.pop(0)
+    if argv and os.path.basename(argv[0]) == "flatpak" and "run" in argv:
+        rest = [a for a in argv[argv.index("run") + 1:] if not a.startswith("-")]
+        if rest:
+            return ["flatpak", "run", rest[0]], rest[0]
+    # keep the program, drop trailing default args such as --new-window? keep them: they are the user's
+    return argv, None
+
+
+def probe_version(argv: list[str]) -> str:
+    try:
+        r = subprocess.run(argv + ["--version"], capture_output=True, text=True, timeout=20, stdin=subprocess.DEVNULL)
+        return (r.stdout + r.stderr).strip()[:400]
+    except Exception as e:
+        return f"probe failed: {e}"
+
+
+def classify(version: str, argv: list[str], name: str) -> str:
+    v = f"{version} {name} {' '.join(argv)}".lower()
+    if "winapps" in v or "freerdp" in v:
+        return "remote"  # a Windows app over RDP: only the desktop can drive it
+    if "qtwebengine" in v or "qutebrowser" in v:
+        return "qtwebengine"
+    if re.search(r"mozilla|firefox|gecko|librewolf|waterfox|floorp|zen browser|icecat|seamonkey", v):
+        return "gecko"
+    if re.search(r"chrom|brave|opera|vivaldi|edge|helium|thorium|yandex|cromite|ungoogled|supermium", v):
+        return "chromium"
+    return "unknown"
+
+
+def slug_words(name: str) -> list[str]:
+    words = [w for w in re.split(r"[^a-z0-9+]+", name.lower()) if w and w not in GENERIC]
+    return words or [name.lower()]
+
+
+def discover() -> list[dict]:
+    try:
+        cache = json.loads(CACHE.read_text())
+    except Exception:
+        cache = {}
+    found: dict[str, dict] = {}
+    seen_ids: set[str] = set()
+    for d in app_dirs():
+        for f in sorted(d.glob("*.desktop")):
+            if f.name in seen_ids:  # earlier dirs (user) shadow later ones, like the spec says
+                continue
+            seen_ids.add(f.name)
+            e = read_desktop(f)
+            if not e:
+                continue
+            argv, flatpak = parse_exec(e["exec"])
+            if not argv or (not flatpak and not (os.path.isabs(argv[0]) and os.path.exists(argv[0])) and not shutil_which(argv[0])):
+                continue  # stale entry: program gone
+            key = f"{f}:{f.stat().st_mtime}"
+            if key not in cache:
+                cache[key] = probe_version(argv)
+            version = cache[key]
+            engine = classify(version, argv, e["name"])
+            words = slug_words(e["name"])
+            bid = words[0]
+            n = 2
+            while bid in found:
+                bid = f"{words[0]}-{n}"
+                n += 1
+            aliases = sorted({words[0], " ".join(words), *(w for w in words if len(w) > 2)} | ({flatpak.split(".")[-1].lower()} if flatpak else set()))
+            found[bid] = {"id": bid, "name": e["name"], "engine": engine, "version": version.splitlines()[0] if version else "",
+                          "argv": argv, "flatpak": flatpak, "aliases": aliases, "desktop": e["file"],
+                          "mcp": MCP.get(engine), "automatable": engine in MCP}
+    # drop cache entries for files that no longer exist
+    live = {f"{b['desktop']}:{Path(b['desktop']).stat().st_mtime}" for b in found.values()}
+    cache = {k: v for k, v in cache.items() if k in live}
+    try:
+        CACHE.parent.mkdir(parents=True, exist_ok=True)
+        CACHE.write_text(json.dumps(cache, indent=1))
+    except Exception:
+        pass
+    return list(found.values())
+
+
+def shutil_which(p: str) -> str | None:
+    import shutil
+    return shutil.which(p)
+
+
+# ------------------------------------------------------------------ process / port state
+
+def _proc_table() -> dict[int, tuple[int, str]]:
+    """pid -> (ppid, cmdline) for every process."""
+    t = {}
+    for d in glob.glob("/proc/[0-9]*"):
+        try:
+            stat = Path(d, "stat").read_text()
+            ppid = int(stat.rsplit(")", 1)[1].split()[1])
+            cmd = Path(d, "cmdline").read_bytes().replace(b"\0", b" ").decode(errors="replace").strip()
+            t[int(d.rsplit("/", 1)[1])] = (ppid, cmd)
+        except Exception:
+            continue
+    return t
+
+
+# the harness's own headless/automation browsers run the same binaries (playwright, browser-profile,
+# chrome-devtools use /opt/helium-browser-bin/helium): they are not the user's browser being open
+AUTOMATION = re.compile(r"--headless\b|--remote-debugging-pipe\b|ms-playwright|playwright[_-]|chrome-devtools-mcp|opencode/browser-profile")
+
+
+def real_names(prog: str) -> list[str]:
+    """Process names a launcher really runs as: itself, its symlink target, and the binary a wrapper script
+    execs (helium-browser -> helium-wrapper -> .../helium, google-chrome-stable -> .../chrome). 2026-11-18
+    review: browsers started through a wrapper showed as "closed" while running."""
+    names, seen = [], set()
+    def add(p: str, depth: int = 0) -> None:
+        if not p or p in seen or depth > 3:
+            return
+        seen.add(p)
+        names.append(os.path.basename(p))
+        full = p if os.path.isabs(p) else shutil.which(p) or ""
+        if not full:
+            return
+        real = os.path.realpath(full)
+        if real != full:
+            add(real, depth + 1)
+        try:
+            with open(real, "rb") as f:
+                head = f.read(65536)
+        except OSError:
+            return
+        if head.startswith(b"#!"):
+            # `exec /opt/brave-bin/brave …`, `exec "$HERE/helium" …`; not redirections (`exec < /dev/null`)
+            for m in re.finditer(rb'^\s*exec\s+(?:-a\s+\S+\s+)?"?(?:\$\{?\w+\}?/)?([\w.+-][\w./+-]*)', head, re.M):
+                tok = m.group(1).decode(errors="ignore")
+                if tok not in ("cat",) and not tok.isdigit():
+                    names.append(os.path.basename(tok))
+                    if os.path.isabs(tok):
+                        add(tok, depth + 1)
+    add(prog)
+    return list(dict.fromkeys(n for n in names if n and n not in ("sh", "bash", "env")))
+
+
+def pids_of(b: dict, main_only: bool = False) -> list[int]:
+    """Processes of this browser. main_only: the browser process itself (not renderers,
+    zygotes, sandbox wrappers), which is what must get SIGTERM for a graceful exit."""
+    me = os.getpid()
+    table = _proc_table()
+    if b["flatpak"]:
+        try:
+            out = subprocess.run(["flatpak", "ps", "--columns=application,child-pid"], capture_output=True, text=True, timeout=10).stdout
+        except Exception:
+            return []
+        roots = {int(p) for a, p in (l.split()[:2] for l in out.splitlines() if len(l.split()) >= 2) if a == b["flatpak"] and p.isdigit()}
+        kids: dict[int, list[int]] = {}
+        for pid, (pp, _) in table.items():
+            kids.setdefault(pp, []).append(pid)
+        pids, stack = [], list(roots)
+        while stack:  # every descendant of the sandbox roots
+            p = stack.pop()
+            pids.append(p)
+            stack.extend(kids.get(p, []))
+    else:
+        names = real_names(b["argv"][0])
+        pat = re.compile(rf"(^|/)({'|'.join(re.escape(n) for n in names)})(\s|$)")
+        pids = [pid for pid, (_, cmd) in table.items()
+                if pid != me and pat.search(cmd) and "browser-ctl" not in cmd and "--version" not in cmd
+                and not AUTOMATION.search(cmd)]
+    if main_only:
+        def is_main(pid):
+            cmd = table.get(pid, (0, ""))[1]
+            first = os.path.basename(cmd.split(" ", 1)[0]) if cmd else ""
+            return cmd and "--type=" not in cmd and first not in ("bwrap", "zypak-helper", "zypak-sandbox", "flatpak", "sh", "bash")
+        pids = [p for p in pids if is_main(p)]
+    return sorted(set(pids))
+
+
+def cdp_info() -> dict | None:
+    try:
+        with urllib.request.urlopen(f"http://127.0.0.1:{CDP_PORT}/json/version", timeout=1.5) as r:
+            return json.load(r)
+    except Exception:
+        return None
+
+
+def marionette_up() -> bool:
+    try:
+        with socket.create_connection(("127.0.0.1", MARIONETTE_PORT), timeout=1.5) as s:
+            s.settimeout(1.5)
+            return b"marionette" in s.recv(200).lower() or True
+    except Exception:
+        return False
+
+
+def port_owner_pids(port: int) -> set[int]:
+    """PIDs listening on 127.0.0.1:port (via /proc/net/tcp + fd links); empty if unknown."""
+    inodes = set()
+    for tbl in ("/proc/net/tcp", "/proc/net/tcp6"):
+        try:
+            for line in open(tbl).read().splitlines()[1:]:
+                parts = line.split()
+                if parts[3] == "0A" and int(parts[1].split(":")[1], 16) == port:
+                    inodes.add(parts[9])
+        except Exception:
+            pass
+    pids = set()
+    for fd in glob.glob("/proc/[0-9]*/fd/*"):
+        try:
+            link = os.readlink(fd)
+        except Exception:
+            continue
+        if link.startswith("socket:[") and link[8:-1] in inodes:
+            pids.add(int(fd.split("/")[2]))
+    return pids
+
+
+def port_for(b: dict) -> int:
+    return MARIONETTE_PORT if b["engine"] == "gecko" else CDP_PORT
+
+
+def port_ready(b: dict) -> bool:
+    return marionette_up() if b["engine"] == "gecko" else cdp_info() is not None
+
+
+def holds_port(b: dict) -> bool:
+    if not port_ready(b):
+        return False
+    owners = port_owner_pids(port_for(b))
+    mine = set(pids_of(b))
+    return bool(owners & mine) if owners and mine else bool(mine)
+
+
+def state(b: dict) -> str:
+    if holds_port(b):
+        return "ready"
+    return "running-without-port" if pids_of(b) else "closed"
+
+
+# ------------------------------------------------------------------ actions
+
+def log(msg: str) -> None:
+    LOG.parent.mkdir(parents=True, exist_ok=True)
+    with open(LOG, "a") as f:
+        f.write(f"[{time.strftime('%F %T')}] {msg}\n")
+
+
+def launch(b: dict, url: str | None) -> int:
+    if b["engine"] in ("chromium", "qtwebengine") and cdp_info() and not holds_port(b):
+        print(f"another browser holds the CDP port {CDP_PORT} ({cdp_info().get('Browser')}); stop it first (ask the user)")
+        return 4
+    if b["engine"] == "gecko" and marionette_up() and not holds_port(b):
+        print(f"another Firefox-family browser holds Marionette port {MARIONETTE_PORT}; stop it first (ask the user)")
+        return 4
+    if b["engine"] == "chromium":
+        # Chromium pauses pages that are not on screen (another workspace, background tab, minimised):
+        # 2026-11-18 a Brave tab driven over CDP stayed blank (innerText "") and YouTube never drew its
+        # results, while headless and Firefox got them at once. Keep automated pages rendering.
+        extra = [f"--remote-debugging-port={CDP_PORT}", "--remote-debugging-address=127.0.0.1",
+                 "--no-first-run", "--no-default-browser-check", "--hide-crash-restore-bubble",
+                 "--disable-background-timer-throttling", "--disable-renderer-backgrounding",
+                 "--disable-backgrounding-occluded-windows"]
+    elif b["engine"] == "qtwebengine":
+        extra = ["--qt-flag", f"remote-debugging-port={CDP_PORT}"]
+    else:
+        extra = ["--marionette", "--remote-debugging-port", str(BIDI_PORT)]
+    prof = automation_profile(b)
+    if b["engine"] == "chromium" and prof.exists():
+        extra.append(f"--user-data-dir={prof}")  # this browser refused its main profile before
+    rc = _spawn_and_wait(b, b["argv"] + extra + ([url] if url else []))
+    if rc == "refused-default-profile":
+        # Google Chrome 136+ (and builds that follow it) refuse remote debugging on the main
+        # profile. Fall back to a separate automation profile the user signs in to once.
+        stop(b, quiet=True)
+        prof.mkdir(parents=True, exist_ok=True)
+        print(f"note: {b['name']} does not allow automating its main profile; using a separate automation "
+              f"profile ({prof}). It starts signed out: ask the user to sign in there once if the task needs it.")
+        rc = _spawn_and_wait(b, b["argv"] + extra + [f"--user-data-dir={prof}"] + ([url] if url else []))
+    if rc == "ok":
+        keep_rendering(b, wait=10)  # the window maps after the port opens
+        print(describe_ready(b))
+        return 0
+    print(f"{b['name']} started but its automation port did not open; see {LOG}")
+    return 1
+
+
+def automation_profile(b: dict) -> Path:
+    # inside the Flatpak's own data dir, which the sandbox can always write
+    if b["flatpak"]:
+        return Path.home() / ".var/app" / b["flatpak"] / "data/opencode-automation-profile"
+    return Path.home() / ".local/share/opencode/browser-profiles" / b["id"]
+
+
+def _spawn_and_wait(b: dict, argv: list[str]) -> str:
+    log("launch " + " ".join(argv))
+    start = LOG.stat().st_size if LOG.exists() else 0
+    with open(LOG, "a") as lf:
+        subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=lf, stderr=lf, start_new_session=True)
+    for _ in range(60):
+        if port_ready(b):
+            time.sleep(0.5)
+            return "ok"
+        try:
+            with open(LOG, errors="replace") as f:
+                f.seek(start)
+                if "requires a non-default data directory" in f.read():
+                    return "refused-default-profile"
+        except Exception:
+            pass
+        time.sleep(0.5)
+    return "timeout"
+
+
+RENDER_STATE = Path(__file__).resolve().parent.parent / "state" / "render-unfocused.json"
+
+
+def _hypr_clients() -> list:
+    import json as _json
+    if not shutil_which("hyprctl"):
+        return []
+    try:
+        return _json.loads(subprocess.run(["hyprctl", "clients", "-j"], capture_output=True, text=True, timeout=5).stdout or "[]")
+    except Exception:
+        return []
+
+
+def _set_render(address: str, on: bool) -> bool:
+    r = subprocess.run(["hyprctl", "dispatch", f'hl.dsp.window.set_prop({{ window = "address:{address}", prop = "render_unfocused", value = "{str(on).lower()}" }})'],
+                       capture_output=True, text=True, timeout=5)
+    return r.returncode == 0 and "error" not in (r.stdout + r.stderr).lower()
+
+
+def keep_rendering(b: dict, wait: float = 0) -> int:
+    """Hyprland stops frame callbacks for windows on another workspace, so an automated page there never
+    draws: 2026-11-18 the user's Brave sat on workspace 2 while they were on 4, YouTube downloaded its
+    page but rendered nothing (0 animation frames in 1.5 s) and every Brave run was slow or empty.
+    Marks this browser's windows render_unfocused (drawn at misc.render_unfocused_fps) and records
+    them; `release` (run by opencode-stack when OpenCode closes) clears them again, so the user's own
+    windows do not keep rendering off-screen afterwards. `wait`: seconds to wait for a new window."""
+    import json as _json
+    try:
+        marked = _json.loads(RENDER_STATE.read_text())
+    except Exception:
+        marked = {}
+    deadline = time.time() + wait
+    while True:
+        pids = set(pids_of(b))
+        wins = [c for c in _hypr_clients() if c.get("pid") in pids]
+        if wins or time.time() >= deadline:
+            break
+        time.sleep(0.5)
+    n = 0
+    for c in wins:
+        if c["address"] in marked:
+            continue
+        if _set_render(c["address"], True):
+            marked[c["address"]] = b["id"]
+            n += 1
+    if n:
+        RENDER_STATE.parent.mkdir(parents=True, exist_ok=True)
+        RENDER_STATE.write_text(_json.dumps(marked))
+        log(f"{b['id']}: {n} window(s) set render_unfocused (pages keep drawing on another workspace)")
+    return n
+
+
+def release_rendering() -> int:
+    """Undo keep_rendering for every window it marked that still exists."""
+    import json as _json
+    try:
+        marked = _json.loads(RENDER_STATE.read_text())
+    except Exception:
+        return 0
+    live = {c["address"] for c in _hypr_clients()}
+    n = sum(_set_render(a, False) for a in marked if a in live)
+    RENDER_STATE.unlink(missing_ok=True)
+    if n:
+        log(f"released render_unfocused on {n} window(s)")
+    return n
+
+
+def describe_ready(b: dict) -> str:
+    if b["engine"] == "gecko":
+        return f"ready: {b['name']} (Marionette 127.0.0.1:{MARIONETTE_PORT}) -> use the `my-firefox` MCP tools"
+    info = cdp_info() or {}
+    return f"ready: {b['name']} ({info.get('Browser', '?')}, CDP 127.0.0.1:{CDP_PORT}) -> use the `my-browser` MCP tools"
+
+
+def chromium_profiles(pids: list[int]) -> set[Path]:
+    """Profile dirs the running browser has open (read from /proc, so any browser/profile works)."""
+    out = set()
+    for pid in pids:
+        for fd in glob.glob(f"/proc/{pid}/fd/*"):
+            try:
+                link = os.readlink(fd)
+            except Exception:
+                continue
+            m = re.match(r"(.+?/(?:Default|Profile \d+|Guest Profile))/", link)
+            if m and Path(m.group(1), "Preferences").exists():
+                out.add(Path(m.group(1)))
+    return out
+
+
+def mark_clean(profiles: set[Path]) -> None:
+    # Closed from outside its UI, Chromium leaves exit_type=Crashed and shows "Restore pages?"
+    for p in profiles:
+        f = p / "Preferences"
+        try:
+            d = json.loads(f.read_text())
+            prof = d.setdefault("profile", {})
+            if prof.get("exit_type") != "Normal" or not prof.get("exited_cleanly", True):
+                prof["exit_type"], prof["exited_cleanly"] = "Normal", True
+                tmp = f.with_suffix(".browser-ctl")
+                tmp.write_text(json.dumps(d, separators=(",", ":")))
+                os.replace(tmp, f)
+        except Exception as e:
+            log(f"mark_clean {f}: {e}")
+
+
+def cdp_close() -> bool:
+    info = cdp_info()
+    if not info:
+        return False
+    js = ('const w=new WebSocket(process.argv[1]);w.onopen=()=>w.send(JSON.stringify({id:1,method:"Browser.close"}));'
+          'w.onmessage=w.onclose=()=>process.exit(0);setTimeout(()=>process.exit(1),5000)')
+    return subprocess.run(["node", "-e", js, info["webSocketDebuggerUrl"]], timeout=15).returncode == 0
+
+
+def stop(b: dict, quiet: bool = False) -> int:
+    pids = pids_of(b)
+    if not pids:
+        quiet or print(f"{b['name']} is not running")
+        return 0
+    profiles = chromium_profiles(pids) if b["engine"] == "chromium" else set()
+    if not (b["engine"] == "chromium" and holds_port(b) and cdp_close()):
+        for p in pids_of(b, main_only=True) or pids:
+            try:
+                os.kill(p, signal.SIGTERM)  # graceful: session is saved
+            except Exception:
+                pass
+    for _ in range(60):
+        if not pids_of(b):
+            time.sleep(0.5)
+            mark_clean(profiles)
+            quiet or print(f"{b['name']} closed")
+            return 0
+        time.sleep(0.25)
+    print(f"{b['name']} did not exit within 15 s; ask the user to close it")
+    return 1
+
+
+def find(bs: list[dict], ident: str) -> dict | None:
+    ident = ident.lower().strip()
+    for b in bs:
+        if ident == b["id"] or ident in b["aliases"] or ident == (b["flatpak"] or "").lower():
+            return b
+    return None
+
+
+def match(bs: list[dict], text: str) -> list[str]:
+    t = " " + re.sub(r"\s+", " ", text.lower()) + " "
+    hits = []
+    for b in bs:
+        for a in sorted(b["aliases"], key=len, reverse=True):
+            # "chrome" must not fire on "chrome-devtools" / "chrome extension" development talk
+            if re.search(rf"(?<![\w-]){re.escape(a)}(?![\w-])(?!\s+(devtools|extension|web store|api|mcp))", t):
+                hits.append(b["id"])
+                break
+    return hits
+
+
+def main() -> int:
+    args = sys.argv[1:]
+    if not args or args[0] in ("-h", "--help"):
+        print(__doc__)
+        return 0
+    cmd, rest = args[0], args[1:]
+    bs = discover()
+    if cmd == "list":
+        if "--json" in rest:
+            fast = "--no-state" in rest  # the context engine only needs names and engines
+            print(json.dumps([{**b, **({} if fast else {"state": state(b) if b["automatable"] else "n/a"})} for b in bs], indent=1))
+        else:
+            for b in bs:
+                how = f"{b['engine']} -> {b['mcp']}" if b["automatable"] else f"{b['engine']} -> desktop-control only"
+                print(f"{b['id']:<14} {b['name']:<28} {how:<32} {state(b) if b['automatable'] else ''}")
+        return 0
+    if cmd == "release":
+        print(f"released render_unfocused on {release_rendering()} window(s)")
+        return 0
+    if cmd == "match":
+        print(" ".join(match(bs, " ".join(rest))))
+        return 0
+    if cmd == "status" and not rest:
+        ready = [b for b in bs if b["automatable"] and holds_port(b)]
+        for b in ready:
+            print(describe_ready(b))
+        if not ready:
+            print("no browser has an automation port open")
+        return 0 if ready else 1
+    if not rest:
+        print("name a browser id; installed: " + ", ".join(b["id"] for b in bs))
+        return 2
+    b = find(bs, rest[0])
+    if not b:
+        print(f"'{rest[0]}' is not installed. Installed: " + ", ".join(f"{x['id']} ({x['name']})" for x in bs))
+        return 1
+    url = rest[1] if len(rest) > 1 else None
+    if not b["automatable"]:
+        print(f"{b['name']} ({b['engine']}) cannot be automated over a protocol; use the desktop-control skill (real cursor + `see`)")
+        return 5
+    s = state(b)
+    if cmd == "status":
+        print(describe_ready(b) if s == "ready" else f"{b['name']}: {s}")
+        return {"ready": 0, "closed": 1}.get(s, 3)
+    if cmd == "start":
+        if s == "ready":
+            keep_rendering(b)
+            print(describe_ready(b))
+            return 0
+        if s == "running-without-port":
+            print(f"{b['name']} is open without its automation port. Ask the user, then: browser-ctl restart {b['id']}")
+            return 3
+        return launch(b, url)
+    if cmd == "restart":
+        if s == "ready":
+            keep_rendering(b)
+            print(describe_ready(b))
+            return 0
+        r = stop(b)
+        return r if r else launch(b, url)
+    if cmd == "stop":
+        return stop(b)
+    print(__doc__)
+    return 2
+
+
+if __name__ == "__main__":
+    sys.exit(main())

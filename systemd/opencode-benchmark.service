@@ -1,0 +1,15 @@
+[Unit]
+Description=OpenCode Zenith Daily Model Benchmark & Ladder Recalibration
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/env python3 %h/.config/opencode/model_lab.py
+StandardOutput=journal
+StandardError=journal
+Environment="PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin"
+EnvironmentFile=-%h/.config/opencode/free-models.env
+TimeoutStartSec=7200
+Nice=10
+IOSchedulingClass=idle

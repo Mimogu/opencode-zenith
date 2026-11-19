@@ -1,0 +1,12 @@
+{
+  "_doc": "Generic requests used to measure each skill's baseline similarity (hubness correction). Kept separate from tools/recall_eval.py negatives so calibration is not tuned on its own test data.",
+  "prompts": [
+    "can you help me with this", "fix this", "what does this code do", "make it work",
+    "add a function that returns the sum of two numbers", "why is this slow", "clean this up a bit",
+    "write a script for me", "explain this error", "update the readme", "change the color to blue",
+    "how do I install this package", "add logging", "split this into two functions", "is this correct",
+    "rewrite this in typescript", "make the output prettier", "add a command line flag",
+    "what's the best way to do this", "refactor this file", "check my code", "write a test",
+    "set this up on my machine", "summarize the changes"
+  ]
+}
