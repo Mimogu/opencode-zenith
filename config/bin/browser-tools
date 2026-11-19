@@ -1,0 +1,242 @@
+#!/usr/bin/env python3
+"""browser-tools: exact tool cheat sheets for every browser MCP server, read from the servers themselves.
+
+    browser-tools            refresh state/browser-tools.json (only servers whose package changed)
+    browser-tools --all      re-read every server
+    browser-tools <server>   print that server's sheet (my-browser, my-firefox, playwright, camofox ...)
+
+Why: each browser server names its tools differently (Playwright `browser_click({target})`, Firefox
+`click_by_uid({uid})`, chrome-devtools `click({uid})`, camofox ...). 2026-11-18 a model used Brave's names
+on Firefox and spent one failed step per guess. The sheets come from each server's own `tools/list`
+(MCP), so a new browser or a tool update needs no hand edit. The context engine puts the sheet of the
+browser in use next to the request and onto failed calls.
+"""
+import hashlib
+import json
+import re
+import os
+import select
+import subprocess
+import sys
+import time
+
+CFG = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+OUT = os.path.join(CFG, "state", "browser-tools.json")
+OWN_BROWSERS = ("my-browser", "my-firefox")  # the user's real browser, with their tabs and logins
+BROWSER_SERVERS = ("playwright", "browser-profile", "my-browser", "my-firefox", "chrome-devtools", "camofox")
+# the tools a browser task needs; the rest (profiling, extensions, network…) stays out of the sheet
+CORE = ("navigate", "new_page", "tabs", "list_pages", "select_page", "close", "snapshot", "click", "hover",
+        "fill", "type", "press", "select_option", "evaluate", "run_code", "screenshot", "get_page_text",
+        "wait", "handle_dialog", "accept_dialog", "dismiss_dialog", "file_upload", "upload", "drag", "back",
+        "go_back", "navigate_back", "find", "get_text", "scroll", "create_tab", "open")
+
+
+def fingerprint(cmd):
+    """Changes when the server's package changes (path + mtime of the executable and its package.json)."""
+    parts = []
+    for c in cmd[:2]:
+        p = os.path.realpath(c) if os.path.exists(c) else c
+        try:
+            parts.append(f"{p}:{os.stat(p).st_mtime_ns}")
+            d = os.path.dirname(p)
+            for _ in range(4):
+                pj = os.path.join(d, "package.json")
+                if os.path.exists(pj):
+                    parts.append(f"{pj}:{os.stat(pj).st_mtime_ns}")
+                    break
+                d = os.path.dirname(d)
+        except OSError:
+            parts.append(p)
+    try:
+        parts.append(f"generator:{os.stat(os.path.realpath(__file__)).st_mtime_ns}")  # a change here refreshes every sheet
+    except OSError:
+        pass
+    return hashlib.sha256("|".join(parts + cmd).encode()).hexdigest()[:16]
+
+
+def rpc_tools(cmd, env, timeout=25):
+    p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, env=env, text=True)
+
+    def send(obj):
+        p.stdin.write(json.dumps(obj) + "\n")
+        p.stdin.flush()
+
+    def recv(want_id):
+        end = time.time() + timeout
+        buf = ""
+        while time.time() < end:
+            r, _, _ = select.select([p.stdout], [], [], max(0.1, end - time.time()))
+            if not r:
+                continue
+            line = p.stdout.readline()
+            if not line:
+                break
+            try:
+                msg = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if msg.get("id") == want_id:
+                return msg
+        raise TimeoutError("no answer")
+
+    try:
+        send({"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {"protocolVersion": "2025-03-26", "capabilities": {}, "clientInfo": {"name": "browser-tools", "version": "1"}}})
+        recv(1)
+        send({"jsonrpc": "2.0", "method": "notifications/initialized"})
+        tools, cursor, i = [], None, 2
+        while True:
+            send({"jsonrpc": "2.0", "id": i, "method": "tools/list", "params": {"cursor": cursor} if cursor else {}})
+            res = recv(i).get("result") or {}
+            tools += res.get("tools") or []
+            cursor = res.get("nextCursor")
+            i += 1
+            if not cursor:
+                return tools
+    finally:
+        p.kill()
+
+
+def signature(t):
+    props = (t.get("inputSchema") or {}).get("properties") or {}
+    req = set((t.get("inputSchema") or {}).get("required") or [])
+    def typ(v):
+        ty = v.get("type")
+        if v.get("enum"):
+            return "|".join(json.dumps(e) for e in v["enum"][:4])
+        names = {"string": "str", "number": "num", "integer": "int", "boolean": "bool", "array": "[]", "object": "{}"}
+        if isinstance(ty, list):
+            return "|".join(names.get(x, "any") for x in ty if x != "null") or "any"
+        if not ty and (v.get("anyOf") or v.get("oneOf")):
+            return "|".join(names.get(x.get("type"), "any") for x in (v.get("anyOf") or v.get("oneOf")) if x.get("type") != "null") or "any"
+        return names.get(ty, "any")
+    args = ", ".join(f"{k}{'' if k in req else '?'}: {typ(v)}" for k, v in props.items())
+    desc = (t.get("description") or "").strip().split("\n")[0]
+    desc = desc.split(". ")[0][:90]
+    # the format inside code fields is where calls failed (2026-11-18 Brave run: statements and IIFEs
+    # given to browser_run_code_unsafe, which wants `async (page) => {…}`)
+    fmt = []
+    for k, v in props.items():
+        if k in ("code", "function", "script", "expression", "source"):
+            d = re.sub(r"\s+", " ", v.get("description") or "").strip()
+            ex = re.search(r"(?:e\.g\.|For example:|Example[^:]*:)\s*(`[^`]+`|\S.{0,80})", d)
+            fmt.append(f"{k} = {(ex.group(1) if ex else d[:110]).strip()}")
+    return f'{t["name"]}({{ {args} }})' + (f"  // {desc}" if desc else "") + (f"  [{'; '.join(fmt)}]" if fmt else "")
+
+
+def one_call_example(server, tools):
+    """A whole open-and-read task as ONE execute script, built from this server's own tool names.
+    2026-11-18: OpenCode took 7-18 model steps (5-10 s each) for "search YouTube, report the first
+    result" by doing one action per step; the same task is one script: open, let the page settle, read.
+    No example (empty string) when one cannot be built from the schema alone: a wrong example costs more
+    than none (2026-11-18 review: chrome-devtools needs a pageId the script cannot know)."""
+    props = lambda t: ((t.get("inputSchema") or {}).get("properties") or {})
+    req = lambda t: set((t.get("inputSchema") or {}).get("required") or [])
+    ev = next((t for t in tools if "evaluate" in t["name"] and "privileged" not in t["name"]), None)
+    if not ev:
+        return ""
+    code_field = next((k for k in ("function", "expression", "code", "script") if k in props(ev)), None)
+    tab = "tabId" in req(ev)
+    if not code_field or req(ev) - {code_field, "tabId"}:
+        return ""
+    snap = next((t for t in tools if "snapshot" in t["name"] and not (req(t) - ({"tabId"} if tab else set()))), None)
+    if not snap:
+        return ""  # nothing to let the page settle with: a read loop without a pause just spins
+    own = server in OWN_BROWSERS
+    url = "https://www.youtube.com/results?search_query=lord+of+the+mysteries"
+    # the page function reports how much it found, so "got data" is checked on that count only
+    body = "{ const items = [...document.querySelectorAll('a#video-title')].slice(0, 3).map(a => ({ title: a.textContent.trim(), url: a.href })); return JSON.stringify({ found: items.length, items }); }"
+    js = f"() => {body}" if code_field != "expression" else f"(() => {body})()"
+    lines = [f'const s = tools["{server}"];']
+    if tab:
+        opener = next((t for t in tools if "create_tab" in t["name"] and "url" in props(t)), None)
+        closer = next((t for t in tools if "close_tab" in t["name"] and "tabId" in props(t)), None)
+        if not opener or not closer:
+            return ""
+        lines.append(f'const {{ tabId }} = await s.{opener["name"]}({{ url: "{url}" }});')
+        close = [f"await s.{closer['name']}({{ tabId }}); // close the tab you created"]
+    elif own:
+        # the user's own browser holds their tabs: open your own and close only that one (2026-11-18:
+        # an example using navigate reused the current tab and replaced the user's Mostaql/DuckDuckGo tabs)
+        tabs = next((t for t in tools if "tabs" in t["name"] and "new" in json.dumps(props(t).get("action", {}))), None)
+        newp = next((t for t in tools if t["name"] == "new_page" and "url" in props(t)), None)
+        closep = next((t for t in tools if t["name"] == "close_page" and "pageIdx" in props(t)), None)
+        if tabs:
+            lines.append(f'await s.{tabs["name"]}({{ action: "new", url: "{url}" }}); // your own new tab — never navigate the user\'s tabs')
+            close = [f'await s.{tabs["name"]}({{ action: "close" }}); // closes the current tab = the one you opened']
+        elif newp and closep:
+            lines.append(f'const opened = String(await s.{newp["name"]}({{ url: "{url}" }})); // "new page [N] → url" — your own tab')
+            lines.append('const idx = Number(opened.match(/\\[(\\d+)\\]/)?.[1]);')
+            close = [f'if (Number.isInteger(idx)) await s.{closep["name"]}({{ pageIdx: idx }}); // close only the tab you opened']
+        else:
+            return ""
+    else:
+        nav = next((t for t in tools if "navigate" in t["name"] and "url" in props(t) and not (req(t) - {"url"})), None)
+        if not nav:
+            return ""
+        lines.append(f'await s.{nav["name"]}({{ url: "{url}" }});')
+        close = []
+    snap_args = "{ tabId }" if tab and "tabId" in props(snap) else "{}"
+    # pause between tries: Code Mode has no setTimeout (2026-11-18 test), so the server's own wait tool
+    # (Playwright browser_wait_for({ time: seconds })) or a short busy-wait on Date.now()
+    waiter = next((t for t in tools if "wait" in t["name"] and "time" in props(t) and not req(t) - {"time"}), None)
+    pause = f"await s.{waiter['name']}({{ time: 1 }});" if waiter else "const p = Date.now() + 800; while (Date.now() < p) {}"
+    lines += ["let r;",
+              "// pages often draw their content after loading: try for up to 15 s (2026-11-18: a freshly",
+              "// started Firefox drew YouTube's results only after several seconds)",
+              "for (const until = Date.now() + 15000; Date.now() < until; ) {",
+              f"  await s.{snap['name']}({snap_args}); // lets the page settle",
+              f'  r = await s.{ev["name"]}({{ {"tabId, " if tab else ""}{code_field}: "{js}" }});',
+              '  const t = JSON.stringify(r);',
+              '  if (/found\\\\*":\\s*[1-9]/.test(t) || /error/i.test(t)) break; // data, or an error to read',
+              f"  {pause}",
+              "}"] + close + ["return r;"]
+    return "One call does a whole open-and-read task, waiting for the content — prefer this over one action per step (adapt the URL and the selector):\n" + "\n".join(lines)
+
+
+def sheet(server, tools):
+    core = [t for t in tools if any(k in t["name"] for k in CORE)]
+    lines = [f'{server} tools — call exactly like this inside execute: tools["{server}"].<name>({{...}}); no other names or fields exist:']
+    if server in OWN_BROWSERS:
+        lines.append("This is the user's own browser with their open tabs and logins: work in a new tab you open, close only that tab when done, and never navigate, reload or close the user's tabs.")
+    lines += [f"- {signature(t)}" for t in sorted(core, key=lambda t: t["name"])]
+    ex = one_call_example(server, tools)
+    return "\n".join(lines) + (f"\n{ex}" if ex else "")
+
+
+def servers():
+    cfg = json.load(open(os.path.join(CFG, "opencode.json")))
+    return {k: v for k, v in (cfg.get("mcp") or {}).items() if k in BROWSER_SERVERS and v.get("type") == "local" and v.get("enabled", True)}
+
+
+def main(argv):
+    try:
+        cache = json.load(open(OUT))
+    except Exception:
+        cache = {}
+    if argv and not argv[0].startswith("-"):
+        e = cache.get(argv[0])
+        print(e["sheet"] if e else f"no sheet for {argv[0]}: run browser-tools")
+        return 0 if e else 1
+    env = dict(os.environ)
+    changed = []
+    for name, spec in servers().items():
+        cmd = spec["command"]
+        env2 = {**env, **(spec.get("environment") or {})}
+        fp = fingerprint(cmd)
+        if "--all" not in argv and cache.get(name, {}).get("fp") == fp:
+            continue
+        try:
+            tools = rpc_tools(cmd, env2)
+        except Exception as e:
+            print(f"{name}: could not list tools ({e}); keeping the last sheet", file=sys.stderr)
+            continue
+        cache[name] = {"fp": fp, "at": time.strftime("%Y-%m-%dT%H:%M:%S"), "tools": [t["name"] for t in tools], "sheet": sheet(name, tools)}
+        changed.append(f"{name} ({len(tools)} tools)")
+    os.makedirs(os.path.dirname(OUT), exist_ok=True)
+    json.dump(cache, open(OUT, "w"), indent=1)
+    print("updated: " + (", ".join(changed) or "nothing (all current)"))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

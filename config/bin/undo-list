@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Lists what the undo-guard plugin kept before an agent deleted or overwrote it.
+#   undo-list            every kept run, newest last
+#   undo-list <word>     only runs whose paths or command mention <word>
+# Restore by hand: cp -a "<run>/home/$USER/.config/x" ~/.config/x
+root="${OPENCODE_UNDO_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/opencode/undo}"
+[ -f "$root/INDEX.log" ] || { echo "nothing kept yet ($root)"; exit 0; }
+while IFS=$'\t' read -r at session dir why paths; do
+  [ -d "$dir" ] || continue
+  [ -n "$1" ] && [[ "$why $paths" != *"$1"* ]] && continue
+  printf '%s  %s\n  run:   %s\n  kept:  %s\n  before: %s\n\n' "$at" "$session" "$dir" "$paths" "$why"
+done < "$root/INDEX.log"

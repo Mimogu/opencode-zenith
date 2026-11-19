@@ -1,0 +1,81 @@
+#!/usr/bin/env python3
+"""oc-lessons: what OpenCode learned from its own sessions (state/lessons.json, plugins/context-engine/lessons.mjs).
+
+    oc-lessons                 list active lessons (id, scope, uses, turns right/wrong)
+    oc-lessons all             also retired ones, with why
+    oc-lessons retire <id>     stop using a lesson
+    oc-lessons restore <id>    use a retired lesson again
+    oc-lessons add <scope> <rule...>   add one by hand (scope: general, pb:<playbook>, skill:<skill>)
+
+Lessons are learned automatically when a check sends a turn back or the user corrects it, and retired
+automatically when the turns that used them keep going wrong or they go unused for 45 days.
+"""
+import hashlib
+import json
+import os
+import sys
+import time
+
+FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "state", "lessons.json")
+
+
+def load():
+    try:
+        with open(FILE) as f:
+            d = json.load(f)
+    except (OSError, ValueError):
+        d = {}
+    d.setdefault("lessons", []); d.setdefault("turns", {}); d.setdefault("curated", 0)
+    return d
+
+
+def save(d):
+    tmp = FILE + ".tmp"
+    with open(tmp, "w") as f:
+        json.dump(d, f, indent=1)
+    os.replace(tmp, FILE)
+
+
+def show(ls, retired=False):
+    if not ls:
+        print("no lessons yet" if not retired else "nothing here")
+        return
+    for l in sorted(ls, key=lambda x: (x["scope"], -x.get("created", 0))):
+        day = time.strftime("%Y-%m-%d", time.localtime(l.get("created", 0) / 1000))
+        extra = f"  [retired: {l.get('retired_why', '?')}]" if l.get("status") != "active" else ""
+        print(f"{l['id']}  {l['scope']:<22} {day}  used {l.get('hits', 0)}x, right {l.get('good', 0)} / wrong {l.get('bad', 0)}, seen {l.get('support', 1)}x{extra}\n    {l['rule']}")
+
+
+def main(argv):
+    d = load()
+    cmd = argv[1] if len(argv) > 1 else "list"
+    if cmd in ("list", "ls"):
+        show([l for l in d["lessons"] if l.get("status") == "active"])
+    elif cmd == "all":
+        show(d["lessons"], retired=True)
+    elif cmd in ("retire", "restore") and len(argv) > 2:
+        hit = [l for l in d["lessons"] if l["id"] == argv[2]]
+        if not hit:
+            sys.exit(f"no lesson {argv[2]}")
+        l = hit[0]
+        if cmd == "retire":
+            l.update(status="retired", retired_why="retired by the user", retired_at=int(time.time() * 1000))
+        else:
+            l.update(status="active", last_hit=int(time.time() * 1000), bad=0)
+            l.pop("retired_why", None)
+        save(d)
+        print(f"{cmd}d {l['id']}: {l['rule']}")
+    elif cmd == "add" and len(argv) > 3:
+        scope, rule = argv[2], " ".join(argv[3:]).strip()
+        now = int(time.time() * 1000)
+        lid = "L" + hashlib.sha1((scope + rule).encode()).hexdigest()[:10]
+        d["lessons"].append({"id": lid, "scope": scope, "rule": rule, "source": "user", "created": now, "status": "active", "support": 1, "hits": 0, "good": 0, "bad": 0})
+        save(d)
+        print(f"added {lid}")
+    else:
+        print(__doc__.strip())
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main(sys.argv)

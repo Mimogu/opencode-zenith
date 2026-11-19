@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+"""oc-approve: standing approval for the OpenCode approval gate on one site.
+
+    oc-approve nafezly.com 2h     OpenCode may publish/send on nafezly.com for 2 hours without asking
+    oc-approve nafezly.com off    end it now
+    oc-approve                    list active approvals
+
+Durations: 30m, 2h, 1d. Everything else stays held until you approve it in chat.
+"""
+import json
+import os
+import re
+import sys
+import time
+
+P = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "state", "approvals.json")
+
+
+def load():
+    try:
+        return {d: t for d, t in json.load(open(P)).items() if t > time.time() * 1000}
+    except Exception:
+        return {}
+
+
+def main(a):
+    cur = load()
+    if not a:
+        for d, t in cur.items():
+            print(f"{d}\tuntil {time.strftime('%Y-%m-%d %H:%M', time.localtime(t / 1000))}")
+        if not cur:
+            print("no standing approvals: every publish/send is asked in chat")
+        return 0
+    if len(a) != 2:
+        print(__doc__.strip())
+        return 2
+    dom = a[0].lower().removeprefix("https://").removeprefix("http://").removeprefix("www.").split("/")[0]
+    if a[1] == "off":
+        cur.pop(dom, None)
+    else:
+        m = re.fullmatch(r"(\d+)([mhd])", a[1])
+        if not m:
+            print("duration like 30m, 2h, 1d")
+            return 2
+        secs = int(m[1]) * {"m": 60, "h": 3600, "d": 86400}[m[2]]
+        if secs > 7 * 86400:
+            print("at most 7d")
+            return 2
+        cur[dom] = int((time.time() + secs) * 1000)
+    os.makedirs(os.path.dirname(P), exist_ok=True)
+    json.dump(cur, open(P, "w"), indent=1)
+    return main([])
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

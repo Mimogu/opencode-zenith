@@ -1,0 +1,99 @@
+#!/usr/bin/env python3
+"""email-check: extract and check email addresses for contact lists.
+
+    email-check a@b.com c@d.org          check addresses (syntax + the domain accepts mail)
+    email-check -f list.txt              one address per line (or any text: addresses are found in it)
+    email-check --extract page.html ...  print the addresses found in saved pages, decoding Cloudflare
+                                         `data-cfemail` / `email-protection#` and "name [at] host [dot] com"
+
+Check result per address (tab separated): address, verdict, detail
+    ok           domain has MX records
+    a-only       no MX but an A record: many servers still deliver, treat as unconfirmed
+    no-mail      null MX, or neither record (typo, dead or retired domain): do not list it as working
+    bad-syntax   not an email address
+This checks the domain only; no mailbox is contacted, so "ok" does not prove the mailbox exists.
+"""
+import html
+import re
+import subprocess
+import sys
+
+EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}")
+NOT_EMAIL = re.compile(r"\.(png|jpe?g|gif|svg|webp|js|css)$|@\dx\b|example\.|sentry|wixpress", re.I)
+
+
+def cf_decode(hexstr: str) -> str:
+    key = int(hexstr[:2], 16)
+    return "".join(chr(int(hexstr[i:i + 2], 16) ^ key) for i in range(2, len(hexstr), 2))
+
+
+def extract(text: str) -> list[str]:
+    text = re.sub(r'data-cfemail="([0-9a-fA-F]+)"', lambda m: " " + cf_decode(m.group(1)) + " ", text)
+    text = re.sub(r"email-protection#([0-9a-fA-F]+)", lambda m: " " + cf_decode(m.group(1)) + " ", text)
+    text = html.unescape(text)
+    # " at " only for a written-out address: before an obfuscated dot ("info at acme [dot] com"), or after a
+    # mailbox word ("info at acme.com"); prose like "read more at wikipedia.org" is not an address (2026-11-18 review)
+    text = re.sub(r"\s*(\[at\]|\(at\)|\{at\})\s*", "@", text, flags=re.I)
+    text = re.sub(r"\s+at\s+(?=[\w-]+\s*(\[dot\]|\(dot\)|\{dot\}))", "@", text, flags=re.I)
+    text = re.sub(r"\b(info|contact|hello|support|admin|office|mail|enquiries|inquiries|jobs|careers|hr|press|media|billing|webmaster|team)\s+at\s+(?=[\w-]+\.[a-z]{2,})", r"\1@", text, flags=re.I)
+    text = re.sub(r"\s*(\[dot\]|\(dot\)|\{dot\})\s*", ".", text, flags=re.I)
+    seen, out = set(), []
+    for e in EMAIL.findall(text):
+        e = e.rstrip(".").lower()
+        if not NOT_EMAIL.search(e) and e not in seen:
+            seen.add(e)
+            out.append(e)
+    return out
+
+
+def dig(name: str, rtype: str) -> list[str]:
+    try:
+        r = subprocess.run(["dig", "+short", "+time=3", "+tries=2", rtype, name],
+                           capture_output=True, text=True, timeout=15)
+        return [l for l in r.stdout.split() if l and not l.startswith(";")]
+    except Exception:
+        return []
+
+
+def check(addr: str, cache: dict) -> tuple[str, str]:
+    if not re.fullmatch(EMAIL.pattern, addr):
+        return "bad-syntax", ""
+    domain = addr.rsplit("@", 1)[1].lower()
+    if domain not in cache:
+        mx = dig(domain, "MX")
+        hosts = sorted({h.rstrip(".") for h in mx if not h.isdigit()})
+        if mx and not any(hosts):  # RFC 7505 null MX "0 .": the domain says it accepts no mail
+            cache[domain] = ("no-mail", "null MX: domain publishes that it accepts no mail")
+        elif mx:
+            cache[domain] = ("ok", "MX " + ", ".join(hosts[:3]))
+        elif dig(domain, "A"):
+            cache[domain] = ("a-only", "no MX record, domain resolves")
+        else:
+            cache[domain] = ("no-mail", "domain has no MX or A record")
+    return cache[domain]
+
+
+def main(argv: list[str]) -> int:
+    if not argv or argv[0] in ("-h", "--help"):
+        print(__doc__.strip())
+        return 0
+    if argv[0] == "--extract":
+        for path in argv[1:]:
+            text = open(path, encoding="utf-8", errors="ignore").read()
+            print(f"{path}\t{', '.join(extract(text))}")
+        return 0
+    if argv[0] == "-f":
+        addrs = extract(open(argv[1], encoding="utf-8", errors="ignore").read())
+    else:
+        addrs = [a.strip().strip(",;<>").lower() for a in argv]
+    cache: dict = {}
+    bad = 0
+    for a in addrs:
+        verdict, detail = check(a, cache)
+        bad += verdict in ("no-mail", "bad-syntax")
+        print(f"{a}\t{verdict}\t{detail}")
+    return 1 if bad else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))
