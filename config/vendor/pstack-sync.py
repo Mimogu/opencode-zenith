@@ -51,7 +51,7 @@ def drop_section(text: str, title: str) -> str:
 
 
 def port(text: str) -> str:
-    text = re.sub(r"(?m)^On (Codex|GitHub Copilot|Muse), read the \[platform mapping\].*\n\n?", "", text)
+    text = re.sub(r"(?m)^On (Codex|GitHub Copilot|Muse|Antigravity), read the \[platform mapping\].*\n\n?", "", text)
     for sec in ("Models", "Reasoning effort"):
         text = drop_section(text, sec)
     for up, oc in AGENTS.items():
