@@ -647,16 +647,20 @@ def refresh_memory_index() -> dict:
     """Embed new/changed facts and index finished sessions (agy_recall). Never raises."""
     try:
         import sys as _sys
+        config_lib = os.path.join(os.path.dirname(os.path.abspath(__file__)), "lib")
+        if os.path.isdir(config_lib) and config_lib not in _sys.path:
+            _sys.path.insert(0, config_lib)
         lib = os.path.expanduser("~/.local/lib")
         if lib not in _sys.path:
-            _sys.path.insert(0, lib)
+            _sys.path.insert(1, lib)
         import agy_recall
-        try:  # mirror Claude Code's memory files first, so this pass embeds them
-            subprocess.run([_sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), "tools",
-                                                          "claude_memory_bridge.py")],
-                           capture_output=True, timeout=120)
-        except Exception:
-            pass
+        bridge_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tools", "claude_memory_bridge.py")
+        if os.path.isfile(bridge_script):
+            try:  # mirror Claude Code's memory files first, so this pass embeds them
+                subprocess.run([_sys.executable, bridge_script],
+                               capture_output=True, timeout=120)
+            except Exception:
+                pass
         return agy_recall.refresh(MEMORY_DB) if os.path.exists(MEMORY_DB) else {}
     except Exception as exc:
         return {"error": repr(exc)}

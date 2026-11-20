@@ -21,7 +21,11 @@ import sqlite3
 import sys
 import traceback
 
-sys.path.insert(0, os.path.expanduser("~/.local/lib"))
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+LIB_DIR = os.path.join(SCRIPT_DIR, "lib")
+if os.path.isdir(LIB_DIR) and LIB_DIR not in sys.path:
+    sys.path.insert(0, LIB_DIR)
+sys.path.insert(1, os.path.expanduser("~/.local/lib"))
 
 DATA_DIR = os.path.expanduser("~/.local/share/opencode/upgraded_memory")
 FALLBACK_DB = os.path.expanduser("~/.config/basic-memory/memory.db")
