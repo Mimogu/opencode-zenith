@@ -572,8 +572,8 @@ Push-Location $ConfigDir
 try {
     & $Python -c "import oclib, model_lab, sentinel, lab_tasks; print('harness imports OK')"
     if ($LASTEXITCODE -ne 0) { Warn 'the Python harness failed to import' } else { Ok 'Python harness' }
-    & $Python (Join-Path $ConfigDir 'tests\test_lab_tasks.py') *> $null
-    if ($LASTEXITCODE -eq 0) { Ok 'offline grader tests pass' } else { Warn 'offline grader tests failed (see log)' }
+    $graderOut = @(& $Python (Join-Path $ConfigDir 'tests\test_lab_tasks.py') 2>&1)
+    if ($LASTEXITCODE -eq 0) { Ok 'offline grader tests pass' } else { Info ($graderOut -join "`n"); Warn 'offline grader tests failed (see log)' }
     $cands = @(& $Python model_lab.py --list 2>$null | Where-Object { $_ -match '/' })
     Ok "$($cands.Count) models available for ranking"
 } finally { Pop-Location }
