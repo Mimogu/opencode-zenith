@@ -236,9 +236,16 @@
     "my-browser": {
       "type": "local",
       "command": [
-        "{{CONFIG_DIR}}/mcp-servers/node_modules/.bin/playwright-mcp",
+        "node",
+        "{{CONFIG_DIR}}/mcp-servers/node_modules/@playwright/mcp/cli.js",
         "--cdp-endpoint",
-        "http://127.0.0.1:9222"
+        "http://127.0.0.1:9222",
+        "--cdp-timeout",
+        "15000",
+        "--caps",
+        "vision,pdf",
+        "--image-responses",
+        "omit"
       ],
       "enabled": true,
       "timeout": 60000
@@ -246,7 +253,8 @@
     "my-firefox": {
       "type": "local",
       "command": [
-        "{{CONFIG_DIR}}/mcp-servers/node_modules/.bin/firefox-devtools-mcp",
+        "node",
+        "{{CONFIG_DIR}}/mcp-servers/node_modules/@mozilla/firefox-devtools-mcp/dist/index.js",
         "--connect-existing",
         "--marionette-port",
         "2828",

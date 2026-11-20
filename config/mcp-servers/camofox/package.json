@@ -1,0 +1,11 @@
+{
+  "name": "@askjo/camofox-browser-mcp",
+  "version": "1.18.1",
+  "description": "Standalone stdio MCP server exposing the camofox-browser REST API as MCP tools",
+  "type": "module",
+  "main": "server.mjs",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0"
+  }
+}

@@ -377,8 +377,12 @@ shell.Run Trim(cmd), 0, False
         Info 'Installing browser MCP servers (playwright-mcp, firefox-devtools-mcp)...'
         Push-Location $mcpDir
         try {
-            & $npmCmd ci --silent 2>$null
-            if ($LASTEXITCODE -ne 0) { & $npmCmd install --silent 2>$null }
+            if ($npmCmd) {
+                & $npmCmd ci --silent 2>$null
+                if ($LASTEXITCODE -ne 0) { & $npmCmd install --silent 2>$null }
+            } elseif (Have 'bun') {
+                & bun install --silent 2>$null
+            }
         } catch {} finally { Pop-Location }
     }
 
@@ -388,14 +392,31 @@ shell.Run Trim(cmd), 0, False
         $posixConfig = $ConfigDir.Replace('\', '/')
         $content = $content.Replace('{{CONFIG_DIR}}', $posixConfig)
         $content = $content.Replace('"python3"', '"python"')
-        $pwMcpCmd = Join-Path $ConfigDir 'mcp-servers\node_modules\.bin\playwright-mcp.cmd'
-        $ffMcpCmd = Join-Path $ConfigDir 'mcp-servers\node_modules\.bin\firefox-devtools-mcp.cmd'
-        if (Test-Path $pwMcpCmd) {
-            $content = $content.Replace('{{CONFIG_DIR}}/mcp-servers/node_modules/.bin/playwright-mcp', ($pwMcpCmd.Replace('\', '/')))
+
+        $pwMcpJs = Join-Path $ConfigDir 'mcp-servers\node_modules\@playwright\mcp\cli.js'
+        if (-not (Test-Path $pwMcpJs)) {
+            $content = [regex]::Replace($content, '("my-browser"\s*:\s*\{[^}]+?"enabled"\s*:\s*)true', '${1}false')
         }
-        if (Test-Path $ffMcpCmd) {
-            $content = $content.Replace('{{CONFIG_DIR}}/mcp-servers/node_modules/.bin/firefox-devtools-mcp', ($ffMcpCmd.Replace('\', '/')))
+        $ffMcpJs = Join-Path $ConfigDir 'mcp-servers\node_modules\@mozilla\firefox-devtools-mcp\dist\index.js'
+        if (-not (Test-Path $ffMcpJs)) {
+            $content = [regex]::Replace($content, '("my-firefox"\s*:\s*\{[^}]+?"enabled"\s*:\s*)true', '${1}false')
         }
+        $camoJs = Join-Path $ConfigDir 'mcp-servers\camofox\server.mjs'
+        if (-not (Test-Path $camoJs)) {
+            $content = [regex]::Replace($content, '("camofox"\s*:\s*\{[^}]+?"enabled"\s*:\s*)true', '${1}false')
+        }
+
+        $graphifyUp = $false
+        try {
+            $r = Invoke-WebRequest -UseBasicParsing -TimeoutSec 1 "http://127.0.0.1:8081/mcp" -ErrorAction SilentlyContinue
+            $graphifyUp = $true
+        } catch {
+            if ($_.Exception.Response) { $graphifyUp = $true }
+        }
+        if (-not $graphifyUp) {
+            $content = [regex]::Replace($content, '("graphify"\s*:\s*\{[^}]+?"enabled"\s*:\s*)true', '${1}false')
+        }
+
         [IO.File]::WriteAllText((Join-Path $ConfigDir 'opencode.json'), $content, (New-Object System.Text.UTF8Encoding $false))
     }
 } catch { Fail "could not copy the config into ${ConfigDir}: $($_.Exception.Message)" }
