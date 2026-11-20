@@ -34,4 +34,4 @@ if (Ask-YesNo 'Remove the saved OPENROUTER_API_KEY and OMNIROUTE_API_KEY?') {
 }
 Write-Host ''
 Write-Host 'Done. Git, Node.js, Python, OpenCode and OmniRoute are still installed; remove them from'
-Write-Host 'Settings > Apps (or "npm uninstall -g opencode-ai omniroute") if you no longer want them.'
+Write-Host 'Settings > Apps (or "npm uninstall -g @opencode/cli opencode-ai omniroute") if you no longer want them.'

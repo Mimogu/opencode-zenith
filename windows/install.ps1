@@ -181,20 +181,87 @@ Ok "Python: $Python"
 
 # ----------------------------------------------------------------- opencode
 Step 'OpenCode'
-if (-not (Have 'opencode')) {
-    Info 'installing OpenCode (npm package opencode-ai) ...'
-    & npm install -g opencode-ai@latest
-    Refresh-Path
-    $npmBin = (& npm prefix -g).Trim()
-    if ($npmBin) { Add-UserPath $npmBin }
+
+function Get-OpenCodeVer([string]$cmdPath = 'opencode') {
+    try {
+        $vStr = (& $cmdPath --version 2>$null | Select-Object -First 1)
+        if ($vStr -match 'v?(\d+)\.(\d+)\.(\d+)') {
+            return [version]"$($Matches[1]).$($Matches[2]).$($Matches[3])"
+        }
+    } catch {}
+    return $null
 }
-if (-not (Have 'opencode')) { Fail 'OpenCode is not on PATH after installing. Open a new window and run install.bat again.' }
-$OpenCodeExe = (Get-Command opencode).Source
+
+function Find-ValidOpenCode {
+    $candidates = @()
+    foreach ($c in @(Get-Command opencode -All -ErrorAction SilentlyContinue)) {
+        $v = Get-OpenCodeVer $c.Source
+        if ($v) { $candidates += @{ Path = $c.Source; Version = $v } }
+    }
+    $v2 = @($candidates | Where-Object { $_.Version.Major -ge 2 } | Sort-Object { $_.Version } -Descending)
+    if ($v2.Count -gt 0) { return $v2[0] }
+    if ($candidates.Count -gt 0) { return ($candidates | Sort-Object { $_.Version } -Descending)[0] }
+    return $null
+}
+
+$oc = Find-ValidOpenCode
+
+# If missing or outdated (e.g. legacy OpenCode 1.x like 1.18.30 from Chocolatey)
+if (-not $oc -or ($oc.Version.Major -lt 2)) {
+    if ($oc -and ($oc.Version.Major -lt 2)) {
+        Warn "Detected OpenCode $($oc.Version) at $($oc.Path). OpenCode Zenith requires OpenCode 2.x."
+        if ($oc.Path -like '*chocolatey*') {
+            Info 'The installed version comes from an outdated Chocolatey package. Upgrading to OpenCode 2...'
+            if (Have 'choco') {
+                try { & choco uninstall opencode -y 2>$null | Out-Null } catch {}
+            }
+        }
+    }
+
+    Info 'Installing/upgrading to OpenCode 2 (@opencode/cli) ...'
+    $installed = $false
+
+    if (Have 'winget') {
+        try {
+            & winget install --id Anomaly.OpenCode -e --silent --accept-package-agreements --accept-source-agreements 2>$null | Out-Null
+            Refresh-Path
+            $oc = Find-ValidOpenCode
+            if ($oc -and ($oc.Version.Major -ge 2)) { $installed = $true }
+        } catch {}
+    }
+
+    if (-not $installed -and (Have 'npm')) {
+        & npm install -g @opencode/cli@latest
+        Refresh-Path
+        $npmBin = (& npm prefix -g 2>$null).Trim()
+        if ($npmBin) {
+            Add-UserPath $npmBin
+            $env:Path = "$npmBin;" + $env:Path
+        }
+        $oc = Find-ValidOpenCode
+    }
+}
+
+if (-not $oc) { Fail 'OpenCode is not on PATH after installing. Open a new window and run install.bat again.' }
+if ($oc.Version.Major -lt 2) {
+    Fail "OpenCode 2.x is required for Zenith (found $($oc.Version) at $($oc.Path)). Run 'npm install -g @opencode/cli@latest' to update."
+}
+
+$OpenCodeExe = $oc.Path
+$ocDir = Split-Path $OpenCodeExe
+if ($ocDir) {
+    $env:Path = "$ocDir;" + $env:Path
+}
+
 # npm installs a .cmd shim; arguments through cmd.exe get mangled, so the harness
 # calls the real entry point (node + the package's bin script) when there is one
 $OpenCodeCmd = @($OpenCodeExe)
 try {
-    $ocPkg = Join-Path (& npm root -g).Trim() 'opencode-ai\package.json'
+    $npmRoot = (& npm root -g 2>$null).Trim()
+    $ocPkg = Join-Path $npmRoot '@opencode\cli\package.json'
+    if (-not (Test-Path $ocPkg)) {
+        $ocPkg = Join-Path $npmRoot 'opencode-ai\package.json'
+    }
     if (Test-Path $ocPkg) {
         $pkg = Get-Content $ocPkg -Raw | ConvertFrom-Json
         $bin = if ($pkg.bin -is [string]) { $pkg.bin } else { $pkg.bin.opencode }
@@ -205,11 +272,11 @@ try {
         }
     }
 } catch {}
-Ok "OpenCode $((& opencode --version 2>$null | Select-Object -First 1)) at $OpenCodeExe"
+Ok "OpenCode $($oc.Version) at $OpenCodeExe"
 
 # where this OpenCode keeps its config and data
 $paths = @{}
-foreach ($line in (& opencode debug paths 2>$null)) {
+foreach ($line in (& $OpenCodeExe debug paths 2>$null)) {
     if ($line -match '^\s*(\w+)\s+(.+?)\s*$') { $paths[$Matches[1]] = $Matches[2] }
 }
 $ConfigDir = if ($paths['config']) { $paths['config'] } else { Join-Path $env:USERPROFILE '.config\opencode' }
@@ -235,6 +302,15 @@ try {
         $content = Get-Content $tpl -Raw
         $posixConfig = $ConfigDir.Replace('\', '/')
         $content = $content.Replace('{{CONFIG_DIR}}', $posixConfig)
+        $content = $content.Replace('"python3"', '"python"')
+        if (-not (Have 'bun')) {
+            $content = [regex]::Replace($content, '("my-firefox"\s*:\s*\{[^}]+?"enabled"\s*:\s*)true', '${1}false')
+        }
+        $pwMcp = Join-Path $ConfigDir 'mcp-servers\node_modules\.bin\playwright-mcp.cmd'
+        $pwMcpExe = Join-Path $ConfigDir 'mcp-servers\node_modules\.bin\playwright-mcp'
+        if (-not (Test-Path $pwMcp) -and -not (Test-Path $pwMcpExe)) {
+            $content = [regex]::Replace($content, '("my-browser"\s*:\s*\{[^}]+?"enabled"\s*:\s*)true', '${1}false')
+        }
         [IO.File]::WriteAllText((Join-Path $ConfigDir 'opencode.json'), $content, (New-Object System.Text.UTF8Encoding $false))
     }
 } catch { Fail "could not copy the config into ${ConfigDir}: $($_.Exception.Message)" }
@@ -248,8 +324,14 @@ New-Item -ItemType Directory -Force -Path (Join-Path $ConfigDir 'state') | Out-N
 $skillCount = @(Get-ChildItem (Join-Path $ConfigDir 'skills') -Directory).Count
 Ok "installed $skillCount skills, agents, commands and plugins"
 
-& opencode debug config *> $null
-if ($LASTEXITCODE -ne 0) { Fail 'OpenCode rejected the installed config (opencode debug config failed).' }
+$debugOut = @(& $OpenCodeExe debug config --standalone 2>&1)
+if ($LASTEXITCODE -ne 0) {
+    $debugOut = @(& $OpenCodeExe debug config 2>&1)
+}
+if ($LASTEXITCODE -ne 0) {
+    Write-Host ($debugOut -join "`n") -ForegroundColor Red
+    Fail 'OpenCode rejected the installed config (opencode debug config failed).'
+}
 Ok 'OpenCode accepts the config'
 
 # ----------------------------------------------------------------- omniroute
@@ -416,7 +498,7 @@ try {
     $cands = @(& $Python model_lab.py --list 2>$null | Where-Object { $_ -match '/' })
     Ok "$($cands.Count) models available for ranking"
 } finally { Pop-Location }
-$agents = (& opencode debug agents 2>$null | Out-String)
+$agents = (& $OpenCodeExe debug agents 2>$null | Out-String)
 if ($agents -match '"build"') { Ok 'OpenCode loads the agents' } else { Warn 'could not confirm the agents loaded' }
 
 Write-Host ''
