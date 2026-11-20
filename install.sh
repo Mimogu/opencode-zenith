@@ -201,10 +201,24 @@ echo "[5/5] Finalizing environment & services..."
 if [ ! -f "${CONFIG_DIR}/free-models.env" ]; then
   cp "${SCRIPT_DIR}/.env.example" "${CONFIG_DIR}/free-models.env"
   echo "  [+] Generated new free-models.env from template."
+  if [ -e /dev/tty ] && [ -r /dev/tty ]; then
+    echo ""
+    echo "  [?] Would you like to enter your API keys now? (Press Enter to skip)"
+    printf "  Enter NVIDIA API key (from https://build.nvidia.com): "
+    read -r NV_KEY </dev/tty || NV_KEY=""
+    if [ -n "$NV_KEY" ]; then
+      sed -i "s|^NVIDIA_API_KEY=.*|NVIDIA_API_KEY=${NV_KEY}|" "${CONFIG_DIR}/free-models.env"
+      echo "  [✓] NVIDIA_API_KEY saved."
+    fi
+    printf "  Enter OpenRouter API key (from https://openrouter.ai/keys): "
+    read -r OR_KEY </dev/tty || OR_KEY=""
+    if [ -n "$OR_KEY" ]; then
+      sed -i "s|^OPENROUTER_API_KEY=.*|OPENROUTER_API_KEY=${OR_KEY}|" "${CONFIG_DIR}/free-models.env"
+      echo "  [✓] OPENROUTER_API_KEY saved."
+    fi
+  fi
   echo ""
-  echo "To connect free models, edit ${CONFIG_DIR}/free-models.env and add your API keys:"
-  echo "  - OpenRouter: https://openrouter.ai/keys"
-  echo "  - NVIDIA NIM: https://build.nvidia.com"
+  echo "To view or update your free model keys anytime: ${CONFIG_DIR}/free-models.env"
 else
   echo "  [✓] Existing free-models.env preserved (your API keys are safe)."
 fi

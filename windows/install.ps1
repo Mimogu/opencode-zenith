@@ -454,6 +454,22 @@ if (-not $NoOmniRoute) {
     if ($LASTEXITCODE -eq 0) { Ok 'admin password set' } else { Warn "could not set the password (exit $LASTEXITCODE); set it in the dashboard instead" }
     $pw1 = $null; $pw2 = $null
 
+    $existingNv = [Environment]::GetEnvironmentVariable('NVIDIA_API_KEY', 'User')
+    if ($existingNv) {
+        Ok 'Existing NVIDIA_API_KEY detected and preserved'
+    } else {
+        Write-Host ''
+        Info 'NVIDIA NIM powers the flagship Nemotron 3.5 Super VL model (free tier).'
+        Info 'Create a free key at https://build.nvidia.com, or press Enter to skip.'
+        $nvKey = Read-Secret 'NVIDIA API key (Enter = skip)'
+        if ($nvKey) {
+            Set-UserEnv 'NVIDIA_API_KEY' $nvKey
+            Ok 'NVIDIA_API_KEY saved for OpenCode'
+            Omni setup --non-interactive --add-provider --provider nvidia --provider-name 'NVIDIA NIM' --api-key $nvKey 2>$null | Out-Null
+        } else { Info 'skipped NVIDIA' }
+        $nvKey = $null
+    }
+
     $existingOr = [Environment]::GetEnvironmentVariable('OPENROUTER_API_KEY', 'User')
     if ($existingOr) {
         Ok 'Existing OPENROUTER_API_KEY detected and preserved'
@@ -501,6 +517,26 @@ if (-not $NoOmniRoute) {
             if ($LASTEXITCODE -eq 0) { Ok "created $($c.name)" } else { Warn "could not create $($c.name); create it in the dashboard (models: $($c.models -join ', '))" }
         }
     } else { Info 'skipped (needs the OmniRoute API key)' }
+
+    $envFile = Join-Path $ConfigDir 'free-models.env'
+    $envLines = @()
+    if (Test-Path $envFile) { $envLines = @(Get-Content $envFile) }
+    foreach ($pair in @(
+        @{ K = 'NVIDIA_API_KEY'; V = $env:NVIDIA_API_KEY },
+        @{ K = 'OPENROUTER_API_KEY'; V = $env:OPENROUTER_API_KEY },
+        @{ K = 'OMNIROUTE_API_KEY'; V = $env:OMNIROUTE_API_KEY }
+    )) {
+        if ($pair.V) {
+            if ($envLines -match "^$($pair.K)=") {
+                $envLines = $envLines -replace "^$($pair.K)=.*", "$($pair.K)=$($pair.V)"
+            } else {
+                $envLines += "$($pair.K)=$($pair.V)"
+            }
+        }
+    }
+    if ($envLines.Count -gt 0) {
+        Set-Content -Path $envFile -Value $envLines -Encoding UTF8
+    }
 }
 
 # ----------------------------------------------------------------- local embedding
