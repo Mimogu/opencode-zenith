@@ -49,5 +49,6 @@ Useful
 Removing it
 -----------
 Double-click uninstall.bat. It removes the background parts and, if you
-confirm, the OpenCode config folder and the saved keys. The installed
-programs stay; remove them from Settings > Apps if you want.
+confirm, the OpenCode config folder, the saved keys, and the local
+embedding model (embeddinggemma). The installed programs stay; remove
+them from Settings > Apps if you want.

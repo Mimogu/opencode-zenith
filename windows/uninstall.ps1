@@ -32,6 +32,14 @@ if (Ask-YesNo 'Remove the saved OPENROUTER_API_KEY, NVIDIA_API_KEY, and OMNIROUT
     foreach ($k in @('OPENROUTER_API_KEY', 'NVIDIA_API_KEY', 'OMNIROUTE_API_KEY')) { [Environment]::SetEnvironmentVariable($k, $null, 'User') }
     Write-Host '    removed'
 }
+
+if (Get-Command ollama -ErrorAction SilentlyContinue) {
+    $hasGemma = (& ollama list 2>$null) -match 'embeddinggemma'
+    if ($hasGemma -and (Ask-YesNo 'Remove local embedding model (embeddinggemma, ~620MB) to reclaim disk space?')) {
+        & ollama rm embeddinggemma
+        Write-Host '    removed embeddinggemma'
+    }
+}
 Write-Host ''
-Write-Host 'Done. Git, Node.js, Python, OpenCode and OmniRoute are still installed; remove them from'
+Write-Host 'Done. Git, Node.js, Python, OpenCode, OmniRoute and Ollama are still installed; remove them from'
 Write-Host 'Settings > Apps (or "npm uninstall -g @opencode/cli opencode-ai omniroute") if you no longer want them.'
