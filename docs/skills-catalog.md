@@ -169,6 +169,12 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **Upstream Repository:** [microsoft/markitdown](https://github.com/microsoft/markitdown)
 - **What It Does:** Converts virtually any document or media format (PDF, Word, PPTX, Excel, HTML, CSV, audio, images, ZIP) into clean, readable Markdown.
 - **When to Use:** When you have non-text files and want their full contents extracted into plain text or markdown for easy editing and analysis.
+- **Most Commonly Used Commands:**
+  ```bash
+  markitdown document.pdf                  # Convert and print Markdown to stdout
+  markitdown presentation.pptx -o out.md   # Convert PPTX and save directly to Markdown file
+  markitdown spreadsheet.xlsx --page 1     # Convert specific sheet of an Excel workbook
+  ```
 - **Example Prompt:**
   ```text
   use the markitdown skill to convert annual_report.pdf into clean markdown
@@ -711,6 +717,12 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Sets up and manages Git worktrees to work on multiple branches simultaneously in isolated directories without stashing or switching branches.
 - **When to Use:** When you need to review a bug fix or test a branch without interrupting your active working directory.
+- **Most Commonly Used Commands:**
+  ```bash
+  git worktree add ../<branch-name> <branch>  # Create an isolated workspace directory
+  git worktree list                           # View all active worktrees and checked out branches
+  git worktree remove ../<branch-name>        # Safely remove worktree after merge
+  ```
 - **Example Prompt:**
   ```text
   use the using-git-worktrees skill to create an isolated worktree for bugfix-auth
@@ -772,6 +784,13 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **Upstream Repository:** [supabase/cli](https://github.com/supabase/cli)
 - **What It Does:** Comprehensive guide for Supabase: PostgreSQL database, Auth, Row-Level Security (RLS) policies, Realtime, Storage, and Edge Functions.
 - **When to Use:** When building apps with Supabase, setting up RLS policies, configuring Auth, or debugging Supabase client libraries.
+- **Most Commonly Used Commands:**
+  ```bash
+  supabase db diff                         # Inspect uncommitted declarative schema changes
+  supabase migration new <name>            # Scaffold a new SQL migration file
+  supabase gen types typescript --local    # Generate TypeScript types from local database
+  supabase functions serve <name>          # Test a Supabase Edge Function locally
+  ```
 - **Example Prompt:**
   ```text
   use the supabase skill to configure Row-Level Security policies for our multi-tenant notes table
@@ -961,6 +980,13 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **Upstream Repository:** [Imbad0202/academic-research-skills](https://github.com/Imbad0202/academic-research-skills)
 - **What It Does:** Full academic manuscript writing assistant supporting 11 modes (literature reviews, outlines, drafts, citations, LaTeX/Pandoc formatting).
 - **When to Use:** When writing or formatting academic papers, journal submissions, or conference responses.
+- **Most Commonly Used Modes:**
+  ```text
+  academic-paper full                      # Run complete 12-agent research and writing pipeline
+  academic-paper plan                      # Deconstruct research questions into paper outline
+  academic-paper draft <section>           # Deep-dive draft for a specific section (e.g. Methodology)
+  academic-paper review                    # Multi-perspective peer review simulation
+  ```
 - **Example Prompt:**
   ```text
   use the academic-paper skill to draft the literature review section for our graph neural network paper
@@ -1265,6 +1291,13 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **Upstream Repository:** [microsoft/playwright](https://github.com/microsoft/playwright)
 - **What It Does:** Controls a headless or visible Chromium browser using Playwright: navigates web pages, fills forms, clicks elements, and takes full-page screenshots.
 - **When to Use:** When automating web tasks, scraping dynamic web pages, or testing web application interactions.
+- **Most Commonly Used Commands:**
+  ```text
+  navigate <url>                           # Open a URL in the browser
+  screenshot                               # Capture high-resolution screenshot of active page
+  click <selector>                         # Click on a button, link, or DOM element
+  fill <selector> "<value>"                # Type text into an input field or textarea
+  ```
 - **Example Prompt:**
   ```text
   use the browser-automation skill to open our staging site and verify the login flow
@@ -1287,6 +1320,13 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **Upstream Repository:** [anthropics/anthropic-quickstarts](https://github.com/anthropics/anthropic-quickstarts)
 - **What It Does:** Inspects and operates the Linux desktop: captures screen regions, manipulates windows (Hyprland/Wayland), clicks buttons, and types keys.
 - **When to Use:** When you want the AI to interact directly with desktop GUI applications on your Linux desktop.
+- **Most Commonly Used Commands:**
+  ```text
+  screenshot                               # Capture desktop screen state
+  click <x> <y>                            # Click at specific screen coordinates
+  type "<text>"                            # Send keystrokes to the focused window
+  key <combination>                        # Press hotkeys (e.g. Super+Return, Alt+Tab)
+  ```
 - **Example Prompt:**
   ```text
   use the desktop-control skill to take a screenshot of the active window and inspect its UI
@@ -1298,6 +1338,12 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **Upstream Repository:** [agentskills/agentskills](https://github.com/agentskills/agentskills)
 - **What It Does:** Discovers and installs new agent skills from online repositories (skills.sh, GitHub) matching tasks you want to accomplish.
 - **When to Use:** When you need a specialized capability that isn't currently installed and want to search for community skills.
+- **Most Commonly Used Commands:**
+  ```bash
+  find-skills search "<topic>"             # Search online GitHub repositories for agent skills
+  find-skills inspect <repo/skill>         # View skill contents and security score before installing
+  find-skills install <repo/skill>         # Download and register skill into local OpenCode config
+  ```
 - **Example Prompt:**
   ```text
   use the find-skills skill to search for skills related to Rust web development
@@ -1309,10 +1355,19 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **Upstream Repository:** [Graphify-Labs/graphify](https://github.com/Graphify-Labs/graphify)
 - **Execution Mode:** On-Demand Skill (`/graphify`) — *Operated strictly on-demand (not as a background MCP server) to eliminate context window token schema bloat, multi-project locking, and port conflicts.*
 - **What It Does:** Converts an entire codebase into a persistent knowledge graph mapping all functions, classes, imports, and calls for fast architectural queries.
-- **When to Use:** When exploring a huge project and you need to query caller/callee graphs or circular dependencies.
+- **When to Use:** When exploring a project and you need to query caller/callee graphs, dependency paths, or architectural hub nodes.
+- **Most Commonly Used Commands:**
+  ```bash
+  /graphify .                              # Build knowledge graph for the current repository
+  /graphify query "<question>"             # Broad architectural query using BFS graph traversal
+  /graphify path "<Source>" "<Target>"     # Find shortest dependency/call path between two components
+  /graphify explain "<Node>"               # Plain-language breakdown of a class/function/module
+  /graphify --update                       # Incrementally re-index only newly created or modified files
+  /graphify <path>                         # Build knowledge graph for a specific subfolder or project
+  ```
 - **Example Prompt:**
   ```text
-  use the graphify skill to build a knowledge graph of this repository and find the key hub nodes
+  use the graphify skill to trace the shortest path between "AuthService" and "DatabasePool"
   ```
 
 <a id="skill-mcp-builder"></a>
@@ -1321,6 +1376,12 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **Upstream Repository:** [modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers)
 - **What It Does:** Guides the creation of robust, standard-compliant Model Context Protocol (MCP) servers (Python/Node.js) to give AI agents custom tools and resources.
 - **When to Use:** When developing a new MCP server or tool integration to connect external services to OpenCode.
+- **Most Commonly Used Commands:**
+  ```bash
+  mcp-builder init python                  # Scaffold FastMCP Python server with standard schema
+  mcp-builder init typescript              # Scaffold Node.js / TypeScript MCP server
+  mcp-builder test                         # Run automated compliance check against local MCP server
+  ```
 - **Example Prompt:**
   ```text
   use the mcp-builder skill to build a Python MCP server that provides weather tools
