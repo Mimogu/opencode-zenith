@@ -143,13 +143,19 @@ mkdir -p "$CONFIG_DIR"
 cp -r "${SCRIPT_DIR}/config/"* "$CONFIG_DIR/"
 rm -rf "${CONFIG_DIR}/__pycache__" "${CONFIG_DIR}/tests/__pycache__"
 
-# Install pinned MCP server binaries (playwright-mcp, firefox-devtools-mcp)
+# Install pinned MCP server binaries (playwright-mcp, firefox-devtools-mcp, camofox)
 if [ -f "${CONFIG_DIR}/mcp-servers/package.json" ]; then
   echo "  [+] Installing browser MCP server binaries..."
   if has_cmd npm; then
     (cd "${CONFIG_DIR}/mcp-servers" && (npm ci --silent 2>/dev/null || npm install --silent 2>/dev/null || true))
+    if [ -f "${CONFIG_DIR}/mcp-servers/camofox/package.json" ]; then
+      (cd "${CONFIG_DIR}/mcp-servers/camofox" && (npm ci --silent 2>/dev/null || npm install --silent 2>/dev/null || true))
+    fi
   elif has_cmd bun; then
     (cd "${CONFIG_DIR}/mcp-servers" && bun install --silent 2>/dev/null || true)
+    if [ -f "${CONFIG_DIR}/mcp-servers/camofox/package.json" ]; then
+      (cd "${CONFIG_DIR}/mcp-servers/camofox" && bun install --silent 2>/dev/null || true)
+    fi
   fi
   if [ -f "${CONFIG_DIR}/mcp-servers/node_modules/@playwright/mcp/cli.js" ] && [ -f "${CONFIG_DIR}/mcp-servers/node_modules/@mozilla/firefox-devtools-mcp/dist/index.js" ]; then
     echo "  [✓] Browser MCP tools ready (playwright-mcp, firefox-devtools-mcp)."
@@ -161,7 +167,7 @@ echo "[3/5] Initializing configuration files..."
 if [ -f "${CONFIG_DIR}/opencode.json.template" ]; then
   sed "s|{{CONFIG_DIR}}|${CONFIG_DIR}|g" "${CONFIG_DIR}/opencode.json.template" > "${CONFIG_DIR}/opencode.json"
 
-  # Validate MCP server availability and cleanly disable missing/unreachable ones
+  # Validate MCP server availability and cleanly configure enabled/disabled states
   python3 -c "
 import json, os, urllib.request
 
@@ -182,8 +188,8 @@ except Exception as e:
     if hasattr(e, 'code'):
         graphify_up = True
 
-if not graphify_up and 'graphify' in mcp:
-    mcp['graphify']['enabled'] = False
+if 'graphify' in mcp:
+    mcp['graphify']['enabled'] = bool(graphify_up)
 
 # Browser & local MCP checks
 pw_js = '${CONFIG_DIR}/mcp-servers/node_modules/@playwright/mcp/cli.js'
@@ -261,41 +267,82 @@ fi
 
 # 6. Environment configuration setup
 echo "[5/5] Finalizing environment & services..."
-if [ ! -f "${CONFIG_DIR}/free-models.env" ]; then
-  cp "${SCRIPT_DIR}/.env.example" "${CONFIG_DIR}/free-models.env"
+CONFIG_ENV="${CONFIG_DIR}/free-models.env"
+if [ ! -f "$CONFIG_ENV" ]; then
+  cp "${SCRIPT_DIR}/.env.example" "$CONFIG_ENV"
   echo "  [+] Generated new free-models.env from template."
-  if [ -e /dev/tty ] && [ -r /dev/tty ]; then
-    echo ""
-    echo "  [?] Would you like to enter your API keys now? (Press Enter to skip)"
-    printf "  Enter NVIDIA API key (from https://build.nvidia.com): "
-    read -r NV_KEY </dev/tty || NV_KEY=""
-    if [ -n "$NV_KEY" ]; then
-      python3 -c "
-import sys, re
-k, v, p = sys.argv[1], sys.argv[2], sys.argv[3]
-with open(p, 'r', encoding='utf-8') as f: c = f.read()
-pat = re.compile(rf'^{k}=.*$', re.M)
-c = pat.sub(lambda m: f'{k}={v}', c) if pat.search(c) else c + f'\n{k}={v}\n'
-with open(p, 'w', encoding='utf-8') as f: f.write(c)
-" "NVIDIA_API_KEY" "$NV_KEY" "${CONFIG_DIR}/free-models.env"
-      echo "  [✓] NVIDIA_API_KEY saved."
-    fi
-    printf "  Enter OpenRouter API key (from https://openrouter.ai/keys): "
-    read -r OR_KEY </dev/tty || OR_KEY=""
-    if [ -n "$OR_KEY" ]; then
-      python3 -c "
-import sys, re
-k, v, p = sys.argv[1], sys.argv[2], sys.argv[3]
-with open(p, 'r', encoding='utf-8') as f: c = f.read()
-pat = re.compile(rf'^{k}=.*$', re.M)
-c = pat.sub(lambda m: f'{k}={v}', c) if pat.search(c) else c + f'\n{k}={v}\n'
-with open(p, 'w', encoding='utf-8') as f: f.write(c)
-" "OPENROUTER_API_KEY" "$OR_KEY" "${CONFIG_DIR}/free-models.env"
-      echo "  [✓] OPENROUTER_API_KEY saved."
-    fi
-  fi
+fi
+
+if [ -e /dev/tty ] && [ -r /dev/tty ]; then
+  python3 -c "
+import sys, re, os
+
+p = sys.argv[1]
+if not os.path.isfile(p):
+    exit(0)
+
+with open(p, 'r', encoding='utf-8') as f:
+    content = f.read()
+
+def get_key(k):
+    m = re.search(rf'^{k}=(.*)$', content, re.M)
+    v = m.group(1).strip() if m else ''
+    if v.startswith(('sk-your-', 'nvapi-your-', 'omni-your-')):
+        return ''
+    return v
+
+def mask(v):
+    if not v or len(v) <= 8:
+        return '***'
+    return v[:6] + '...' + v[-4:]
+
+def update_key(k, v):
+    global content
+    pat = re.compile(rf'^{k}=.*$', re.M)
+    if pat.search(content):
+        content = pat.sub(f'{k}={v}', content)
+    else:
+        content += f'\n{k}={v}\n'
+
+keys = [
+    ('NVIDIA_API_KEY', 'NVIDIA API key (from https://build.nvidia.com)'),
+    ('OPENROUTER_API_KEY', 'OpenRouter API key (from https://openrouter.ai/keys)'),
+    ('OMNIROUTE_API_KEY', 'OmniRoute API key (from http://localhost:20128)'),
+]
+
+try:
+    with open('/dev/tty', 'r') as tty, open('/dev/tty', 'w') as tty_out:
+        for k, desc in keys:
+            curr = os.environ.get(k, '') or get_key(k)
+            if curr:
+                m = mask(curr)
+                tty_out.write(f'  Existing {k} detected ({m}).\n  Enter new key to update (Enter = keep current): ')
+                tty_out.flush()
+                line = tty.readline().strip()
+                if line:
+                    update_key(k, line)
+                    tty_out.write(f'  [✓] {k} updated.\n\n')
+                else:
+                    update_key(k, curr)
+                    tty_out.write(f'  [✓] Current {k} preserved.\n\n')
+            else:
+                tty_out.write(f'  Enter {desc} (Enter = skip): ')
+                tty_out.flush()
+                line = tty.readline().strip()
+                if line:
+                    update_key(k, line)
+                    tty_out.write(f'  [✓] {k} saved.\n\n')
+                else:
+                    tty_out.write(f'  [i] Skipped {k} (existing settings preserved).\n\n')
+            tty_out.flush()
+except Exception:
+    pass
+
+with open(p, 'w', encoding='utf-8') as f:
+    f.write(content)
+" "$CONFIG_ENV" 2>/dev/null || true
   echo ""
-  echo "To view or update your free model keys anytime: ${CONFIG_DIR}/free-models.env"
+  echo "To view or update your free model keys anytime: ${CONFIG_ENV}"
 else
   echo "  [✓] Existing free-models.env preserved (your API keys are safe)."
 fi
@@ -313,6 +360,15 @@ if [ -d "${SCRIPT_DIR}/systemd" ] && has_cmd systemctl; then
   systemctl --user enable --now opencode-sentinel.service 2>/dev/null || true
   systemctl --user enable --now opencode-benchmark.timer 2>/dev/null || true
   echo "  [✓] Systemd user services (omniroute, sentinel, benchmark timer) enabled."
+fi
+
+# Restart OpenCode background services so new MCP servers and config take effect
+if has_cmd opencode-stack; then
+  opencode-stack down >/dev/null 2>&1 || true
+  opencode-stack up >/dev/null 2>&1 || true
+elif has_cmd pkill; then
+  pkill -fx "/usr/lib/opencode-desktop/opencode-cli serve --service" 2>/dev/null || true
+  pkill -f "opencode-cli serve" 2>/dev/null || true
 fi
 
 if [ "$CLEANUP_TEMP" = true ]; then
