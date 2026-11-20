@@ -1,0 +1,11 @@
+[
+  {
+    "name": "zenith-free-fallback",
+    "strategy": "priority",
+    "models": [
+      "openrouter/google/gemini-2.0-flash-exp:free",
+      "openrouter/deepseek/deepseek-chat:free",
+      "openrouter/meta-llama/llama-3.3-70b-instruct:free"
+    ]
+  }
+]

@@ -207,13 +207,27 @@ if [ ! -f "${CONFIG_DIR}/free-models.env" ]; then
     printf "  Enter NVIDIA API key (from https://build.nvidia.com): "
     read -r NV_KEY </dev/tty || NV_KEY=""
     if [ -n "$NV_KEY" ]; then
-      sed -i "s|^NVIDIA_API_KEY=.*|NVIDIA_API_KEY=${NV_KEY}|" "${CONFIG_DIR}/free-models.env"
+      python3 -c "
+import sys, re
+k, v, p = sys.argv[1], sys.argv[2], sys.argv[3]
+with open(p, 'r', encoding='utf-8') as f: c = f.read()
+pat = re.compile(rf'^{k}=.*$', re.M)
+c = pat.sub(lambda m: f'{k}={v}', c) if pat.search(c) else c + f'\n{k}={v}\n'
+with open(p, 'w', encoding='utf-8') as f: f.write(c)
+" "NVIDIA_API_KEY" "$NV_KEY" "${CONFIG_DIR}/free-models.env"
       echo "  [✓] NVIDIA_API_KEY saved."
     fi
     printf "  Enter OpenRouter API key (from https://openrouter.ai/keys): "
     read -r OR_KEY </dev/tty || OR_KEY=""
     if [ -n "$OR_KEY" ]; then
-      sed -i "s|^OPENROUTER_API_KEY=.*|OPENROUTER_API_KEY=${OR_KEY}|" "${CONFIG_DIR}/free-models.env"
+      python3 -c "
+import sys, re
+k, v, p = sys.argv[1], sys.argv[2], sys.argv[3]
+with open(p, 'r', encoding='utf-8') as f: c = f.read()
+pat = re.compile(rf'^{k}=.*$', re.M)
+c = pat.sub(lambda m: f'{k}={v}', c) if pat.search(c) else c + f'\n{k}={v}\n'
+with open(p, 'w', encoding='utf-8') as f: f.write(c)
+" "OPENROUTER_API_KEY" "$OR_KEY" "${CONFIG_DIR}/free-models.env"
       echo "  [✓] OPENROUTER_API_KEY saved."
     fi
   fi
