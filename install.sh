@@ -34,7 +34,17 @@ has_cmd() {
   command -v "$1" >/dev/null 2>&1
 }
 
-# 1. Dependency Checks
+# Ensure local user bin paths are available in PATH
+mkdir -p "${HOME}/.local/bin" "${HOME}/.npm-global/bin"
+export PATH="${HOME}/.local/bin:${HOME}/.npm-global/bin:${HOME}/.bun/bin:${PATH}"
+
+for profile in "${HOME}/.bashrc" "${HOME}/.profile"; do
+  if [ -f "$profile" ] && ! grep -q "\.local/bin" "$profile" 2>/dev/null; then
+    echo 'export PATH="${HOME}/.local/bin:${HOME}/.npm-global/bin:${HOME}/.bun/bin:${PATH}"' >> "$profile"
+  fi
+done
+
+# 1. Dependency Checks & Setup
 echo "[1/5] Checking prerequisites..."
 for tool in git python3; do
   if has_cmd "$tool"; then
@@ -45,36 +55,75 @@ for tool in git python3; do
   fi
 done
 
+# Check search tools (ripgrep / fd)
+if has_cmd rg; then
+  echo "  [✓] ripgrep (rg) found"
+else
+  echo "  [i] ripgrep (rg) not found. Highly recommended for code search (e.g. sudo apt install ripgrep / sudo pacman -S ripgrep)."
+fi
+if has_cmd fd || has_cmd fdfind; then
+  echo "  [✓] fd found"
+else
+  echo "  [i] fd not found. Recommended for file discovery (e.g. sudo apt install fd-find / sudo pacman -S fd)."
+fi
+
+# Ensure npm doesn't fail with EACCES on root-owned /usr/local
+if has_cmd npm; then
+  NPM_PREFIX="$(npm config get prefix 2>/dev/null || true)"
+  if [ "$NPM_PREFIX" = "/usr" ] || [ "$NPM_PREFIX" = "/usr/local" ]; then
+    mkdir -p "${HOME}/.npm-global"
+    npm config set prefix "${HOME}/.npm-global" 2>/dev/null || true
+  fi
+fi
+
 if ! has_cmd bun && ! has_cmd node; then
   echo "  [+] Node/Bun missing. Installing Bun..."
   curl -fsSL --connect-timeout 15 --max-time 120 https://bun.sh/install | bash
   export PATH="${HOME}/.bun/bin:${PATH}"
 fi
 
-if ! has_cmd opencode; then
-  echo "  [+] Installing OpenCode CLI..."
+# Check OpenCode version (ensure v2.x)
+get_opencode_version() {
+  if has_cmd opencode; then
+    local v
+    v="$(opencode --version 2>/dev/null | head -n 1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || true)"
+    echo "$v"
+  fi
+}
+
+OC_VER="$(get_opencode_version)"
+OC_MAJOR="${OC_VER%%.*}"
+
+if [ -z "$OC_VER" ] || [ "${OC_MAJOR:-0}" -lt 2 ]; then
+  if [ -n "$OC_VER" ]; then
+    echo "  [!] Found outdated OpenCode $OC_VER. OpenCode Zenith requires OpenCode 2.x."
+  fi
+  echo "  [+] Installing/upgrading to OpenCode 2 (@opencode/cli)..."
   if has_cmd bun; then
-    bun install -g @opencode/cli || bun install -g opencode-ai
+    bun install -g @opencode/cli || curl -fsSL https://opencode.ai/install | bash
   elif has_cmd npm; then
-    npm install -g @opencode/cli || npm install -g opencode-ai
+    npm install -g @opencode/cli 2>/dev/null || curl -fsSL https://opencode.ai/install | bash
   else
-    curl -fsSL https://opencode.ai/install | bash || true
+    curl -fsSL https://opencode.ai/install | bash
   fi
+  export PATH="${HOME}/.local/bin:${HOME}/.npm-global/bin:${HOME}/.bun/bin:${PATH}"
+  OC_VER="$(get_opencode_version)"
+  echo "  [✓] OpenCode ${OC_VER:-2.x} ready."
 else
-  echo "  [✓] opencode found. Ensuring latest version..."
-  if has_cmd timeout; then
-    if has_cmd bun; then
-      timeout 15 bun install -g @opencode/cli >/dev/null 2>&1 || timeout 15 bun install -g opencode-ai >/dev/null 2>&1 || true
-    elif has_cmd npm; then
-      timeout 15 npm install -g @opencode/cli >/dev/null 2>&1 || timeout 15 npm install -g opencode-ai >/dev/null 2>&1 || true
-    fi
-  else
-    if has_cmd bun; then
-      bun install -g @opencode/cli >/dev/null 2>&1 || bun install -g opencode-ai >/dev/null 2>&1 || true
-    elif has_cmd npm; then
-      npm install -g @opencode/cli >/dev/null 2>&1 || npm install -g opencode-ai >/dev/null 2>&1 || true
-    fi
+  echo "  [✓] OpenCode $OC_VER found."
+fi
+
+# OmniRoute gateway
+if ! has_cmd omniroute; then
+  echo "  [+] Installing OmniRoute gateway..."
+  if has_cmd bun; then
+    bun install -g omniroute || true
+  elif has_cmd npm; then
+    npm install -g omniroute 2>/dev/null || true
   fi
+fi
+if has_cmd omniroute; then
+  echo "  [✓] OmniRoute gateway ready."
 fi
 
 # 2. Backup existing configuration
@@ -93,6 +142,16 @@ cp -r "${SCRIPT_DIR}/config/"* "$CONFIG_DIR/"
 echo "[3/5] Initializing configuration files..."
 if [ -f "${CONFIG_DIR}/opencode.json.template" ]; then
   sed "s|{{CONFIG_DIR}}|${CONFIG_DIR}|g" "${CONFIG_DIR}/opencode.json.template" > "${CONFIG_DIR}/opencode.json"
+fi
+
+echo "  [+] Validating OpenCode configuration..."
+if has_cmd opencode; then
+  if opencode debug config --standalone >/dev/null 2>&1 || opencode debug config >/dev/null 2>&1; then
+    echo "  [✓] OpenCode accepts the config."
+  else
+    echo "  [!] Warning: opencode debug config reported an issue with the configuration:"
+    opencode debug config --standalone 2>&1 || opencode debug config 2>&1 || true
+  fi
 fi
 
 # 4. Helper scripts
@@ -150,14 +209,19 @@ else
   echo "  [✓] Existing free-models.env preserved (your API keys are safe)."
 fi
 
-# 6. Service templates
+# 7. Service templates
 if [ -d "${SCRIPT_DIR}/systemd" ] && has_cmd systemctl; then
   SYSTEMD_USER="${HOME}/.config/systemd/user"
   mkdir -p "$SYSTEMD_USER"
-  cp "${SCRIPT_DIR}/systemd/"* "$SYSTEMD_USER/"
+  [ -f "${SCRIPT_DIR}/systemd/omniroute.service" ] && cp "${SCRIPT_DIR}/systemd/omniroute.service" "$SYSTEMD_USER/"
+  [ -f "${SCRIPT_DIR}/systemd/opencode-sentinel.service" ] && cp "${SCRIPT_DIR}/systemd/opencode-sentinel.service" "$SYSTEMD_USER/"
+  [ -f "${SCRIPT_DIR}/systemd/opencode-benchmark.service" ] && cp "${SCRIPT_DIR}/systemd/opencode-benchmark.service" "$SYSTEMD_USER/"
+  [ -f "${SCRIPT_DIR}/systemd/opencode-benchmark.timer" ] && cp "${SCRIPT_DIR}/systemd/opencode-benchmark.timer" "$SYSTEMD_USER/"
   systemctl --user daemon-reload 2>/dev/null || true
+  systemctl --user enable --now omniroute.service 2>/dev/null || true
+  systemctl --user enable --now opencode-sentinel.service 2>/dev/null || true
   systemctl --user enable --now opencode-benchmark.timer 2>/dev/null || true
-  echo "  [✓] Systemd user timer opencode-benchmark.timer configured."
+  echo "  [✓] Systemd user services (omniroute, sentinel, benchmark timer) enabled."
 fi
 
 if [ "$CLEANUP_TEMP" = true ]; then
