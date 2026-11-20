@@ -206,7 +206,7 @@ test("prune: current turn ages only old steps, in chunks; recent steps and signe
   msgs.push(call("e", "edit", { filePath: "/w.py", oldString: "a", newString: "b" })); // file edited later
   msgs.push(result("e", "edit", "ok"));
   msgs[3].content[0].providerMetadata = { anthropic: { signature: "sig" } };          // signed reasoning of step 1
-  const { messages, stats } = prune(msgs);
+  const { messages, stats } = prune(msgs, { keepRecent: 10, chunk: 8 });
   // 31 steps: (31 - 10) / 8 -> 16 aged steps
   expect(messages[1].content.find((p) => p.type === "tool-call").input.content).toContain("lines written earlier");
   expect(messages[4].content[0].result.value).toContain("edited or read again later");
@@ -219,7 +219,7 @@ test("prune: current turn ages only old steps, in chunks; recent steps and signe
   expect(stats.saved).toBeGreaterThan(60_000);
   // one more step inside the same chunk: the pruned prefix is byte-identical (prompt cache keeps hitting)
   const more = [...msgs, call("x", "shell", { command: "ls" }), result("x", "shell", "ok")];
-  const again = prune(more).messages;
+  const again = prune(more, { keepRecent: 10, chunk: 8 }).messages;
   expect(JSON.stringify(again.slice(0, firstFresh))).toBe(JSON.stringify(messages.slice(0, firstFresh)));
 });
 

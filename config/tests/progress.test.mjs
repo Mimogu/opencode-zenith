@@ -24,36 +24,36 @@ test("narration detection looks at the first sentence only", () => {
   expect(isNarration("Hyprland installed; next the shell config.")).toBe(false);
 });
 
-test(`a note after ${SILENT_EVERY} silent steps, and again after ${SILENT_EVERY * 2}`, () => {
+test("a note after 5 silent steps, and again after 10", () => {
   const msgs = [user("fix my bar", "u1"), ...step("Checking the bar config first."), ...Array.from({ length: 10 }, () => step("")).flat()];
-  const r = addProgressNotes(msgs, "u1");
+  const r = addProgressNotes(msgs, "u1", { every: 5 });
   expect(r.notes).toBe(2);
-  expect(notesIn(r.messages)[0]).toContain(`last ${SILENT_EVERY} steps`);
-  expect(notesIn(r.messages)[1]).toContain(`last ${SILENT_EVERY * 2} steps`);
+  expect(notesIn(r.messages)[0]).toContain("last 5 steps");
+  expect(notesIn(r.messages)[1]).toContain("last 10 steps");
   expect(notesIn(msgs).length).toBe(0); // input untouched
 });
 
 test("an update resets the silence count", () => {
   const msgs = [user("go", "u1"), ...step("Plan: check, fix, test."), ...step("", 3), ...step("The timer is the cause; fixing it."), ...step("", 3)];
-  expect(addProgressNotes(msgs, "u1").notes).toBe(0);
+  expect(addProgressNotes(msgs, "u1", { every: 5 }).notes).toBe(0);
 });
 
 test("two announcement-only updates in a row get one note; the opening plan does not count", () => {
   const msgs = [user("go", "u1"), ...step("I'll start by looking at the config."), ...step("Let me read the env file."), ...step("Now let me check the logs.")];
-  const r = addProgressNotes(msgs, "u1");
+  const r = addProgressNotes(msgs, "u1", { every: 5 });
   expect(r.notes).toBe(1);
   expect(notesIn(r.messages)[0]).toContain("only announced the next step");
   const good = [user("go", "u1"), ...step("I'll start by looking at the config."), ...step("The env file sets the wrong path. Let me fix it."), ...step("Fixed; now testing.")];
-  expect(addProgressNotes(good, "u1").notes).toBe(0);
+  expect(addProgressNotes(good, "u1", { every: 5 }).notes).toBe(0);
 });
 
 test("earlier turns are left alone and notes are stable from step to step", () => {
   const old = [user("old task", "u0"), ...Array.from({ length: 12 }, () => step("")).flat(), { role: "assistant", content: [{ type: "text", text: "Done." }] }];
   const now = [user("new task", "u1"), ...Array.from({ length: 6 }, () => step("")).flat()];
-  const r1 = addProgressNotes([...old, ...now], "u1");
+  const r1 = addProgressNotes([...old, ...now], "u1", { every: 5 });
   expect(r1.notes).toBe(1);
   // the next step adds one more call: the note already given stays byte-identical
-  const r2 = addProgressNotes([...old, ...now, ...step("")], "u1");
+  const r2 = addProgressNotes([...old, ...now, ...step("")], "u1", { every: 5 });
   expect(JSON.stringify(r2.messages.slice(0, -2))).toBe(JSON.stringify(r1.messages));
 });
 
