@@ -1,6 +1,8 @@
 // Offline tests for plugins/context-engine: bun test tests/context_engine.test.mjs
 // Ollama is pointed at a closed port, so this also covers the keyword-only fallback.
 process.env.OLLAMA_HOST = "127.0.0.1:9";
+delete process.env.OPENCODE_PRUNE_KEEP;
+delete process.env.OPENCODE_SILENT_EVERY;
 import { test, expect } from "bun:test";
 import fs from "fs";
 import os from "os";

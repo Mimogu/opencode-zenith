@@ -47,7 +47,7 @@ done
 
 if ! has_cmd bun && ! has_cmd node; then
   echo "  [+] Node/Bun missing. Installing Bun..."
-  curl -fsSL https://bun.sh/install | bash
+  curl -fsSL --connect-timeout 15 --max-time 120 https://bun.sh/install | bash
   export PATH="${HOME}/.bun/bin:${PATH}"
 fi
 
