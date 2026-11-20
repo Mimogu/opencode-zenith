@@ -141,6 +141,17 @@ mkdir -p "$CONFIG_DIR"
 cp -r "${SCRIPT_DIR}/config/"* "$CONFIG_DIR/"
 rm -rf "${CONFIG_DIR}/__pycache__" "${CONFIG_DIR}/tests/__pycache__"
 
+# Install pinned MCP server binaries (playwright-mcp, firefox-devtools-mcp)
+if [ -f "${CONFIG_DIR}/mcp-servers/package.json" ]; then
+  echo "  [+] Installing browser MCP server binaries..."
+  if has_cmd npm; then
+    (cd "${CONFIG_DIR}/mcp-servers" && (npm ci --silent 2>/dev/null || npm install --silent 2>/dev/null || true))
+  fi
+  if [ -f "${CONFIG_DIR}/mcp-servers/node_modules/.bin/playwright-mcp" ]; then
+    echo "  [✓] Browser MCP tools ready (playwright-mcp, firefox-devtools-mcp)."
+  fi
+fi
+
 # 3. Process configuration templates
 echo "[3/5] Initializing configuration files..."
 if [ -f "${CONFIG_DIR}/opencode.json.template" ]; then
