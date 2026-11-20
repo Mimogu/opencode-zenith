@@ -374,16 +374,31 @@ shell.Run Trim(cmd), 0, False
     }
     $mcpDir = Join-Path $ConfigDir 'mcp-servers'
     if (Test-Path (Join-Path $mcpDir 'package.json')) {
-        Info 'Installing browser MCP servers (playwright-mcp, firefox-devtools-mcp)...'
+        Info 'Installing browser MCP servers (playwright-mcp, firefox-devtools-mcp, camofox)...'
         Push-Location $mcpDir
         try {
-            if ($npmCmd) {
-                & $npmCmd ci --silent 2>$null
-                if ($LASTEXITCODE -ne 0) { & $npmCmd install --silent 2>$null }
+            if (Have 'npm') {
+                & npm ci --silent 2>$null
+                if ($LASTEXITCODE -ne 0 -or -not (Test-Path (Join-Path $mcpDir 'node_modules\@playwright\mcp\cli.js'))) {
+                    & npm install --silent 2>$null
+                }
             } elseif (Have 'bun') {
                 & bun install --silent 2>$null
             }
         } catch {} finally { Pop-Location }
+
+        $camoDir = Join-Path $mcpDir 'camofox'
+        if (Test-Path (Join-Path $camoDir 'package.json')) {
+            Push-Location $camoDir
+            try {
+                if (Have 'npm') {
+                    & npm ci --silent 2>$null
+                    if ($LASTEXITCODE -ne 0) { & npm install --silent 2>$null }
+                } elseif (Have 'bun') {
+                    & bun install --silent 2>$null
+                }
+            } catch {} finally { Pop-Location }
+        }
     }
 
     $tpl = Join-Path $ConfigDir 'opencode.json.template'
@@ -395,15 +410,15 @@ shell.Run Trim(cmd), 0, False
 
         $pwMcpJs = Join-Path $ConfigDir 'mcp-servers\node_modules\@playwright\mcp\cli.js'
         if (-not (Test-Path $pwMcpJs)) {
-            $content = [regex]::Replace($content, '("my-browser"\s*:\s*\{[^}]+?"enabled"\s*:\s*)true', '${1}false')
+            $content = [regex]::Replace($content, '("my-browser"\s*:\s*\{[^}]+?"enabled"\s*:\s*)(true|false)', '${1}false')
         }
         $ffMcpJs = Join-Path $ConfigDir 'mcp-servers\node_modules\@mozilla\firefox-devtools-mcp\dist\index.js'
         if (-not (Test-Path $ffMcpJs)) {
-            $content = [regex]::Replace($content, '("my-firefox"\s*:\s*\{[^}]+?"enabled"\s*:\s*)true', '${1}false')
+            $content = [regex]::Replace($content, '("my-firefox"\s*:\s*\{[^}]+?"enabled"\s*:\s*)(true|false)', '${1}false')
         }
         $camoJs = Join-Path $ConfigDir 'mcp-servers\camofox\server.mjs'
         if (-not (Test-Path $camoJs)) {
-            $content = [regex]::Replace($content, '("camofox"\s*:\s*\{[^}]+?"enabled"\s*:\s*)true', '${1}false')
+            $content = [regex]::Replace($content, '("camofox"\s*:\s*\{[^}]+?"enabled"\s*:\s*)(true|false)', '${1}false')
         }
 
         $graphifyUp = $false
@@ -413,9 +428,8 @@ shell.Run Trim(cmd), 0, False
         } catch {
             if ($_.Exception.Response) { $graphifyUp = $true }
         }
-        if (-not $graphifyUp) {
-            $content = [regex]::Replace($content, '("graphify"\s*:\s*\{[^}]+?"enabled"\s*:\s*)true', '${1}false')
-        }
+        $targetGraphifyState = if ($graphifyUp) { 'true' } else { 'false' }
+        $content = [regex]::Replace($content, '("graphify"\s*:\s*\{[^}]+?"enabled"\s*:\s*)(true|false)', "${1}$targetGraphifyState")
 
         [IO.File]::WriteAllText((Join-Path $ConfigDir 'opencode.json'), $content, (New-Object System.Text.UTF8Encoding $false))
     }
@@ -520,20 +534,39 @@ if (-not $NoOmniRoute) {
         }
     }
 
+    function Mask-Key($k) {
+        if (-not $k -or $k.Length -le 8) { return '***' }
+        return ($k.Substring(0, [Math]::Min(6, $k.Length)) + '...' + $k.Substring($k.Length - [Math]::Min(4, $k.Length)))
+    }
+
     $existingNv = [Environment]::GetEnvironmentVariable('NVIDIA_API_KEY', 'User')
     if (-not $existingNv -and $envMap.ContainsKey('NVIDIA_API_KEY')) {
         $existingNv = $envMap['NVIDIA_API_KEY']
         Set-UserEnv 'NVIDIA_API_KEY' $existingNv
     }
+    Write-Host ''
     if ($existingNv) {
-        Ok 'Existing NVIDIA_API_KEY detected and preserved'
+        $m = Mask-Key $existingNv
+        Info "Existing NVIDIA_API_KEY detected ($m)."
+        $nvKey = Read-Secret 'NVIDIA API key (Enter = keep current key)'
+        if ($nvKey) {
+            $existingNv = $nvKey
+            Set-UserEnv 'NVIDIA_API_KEY' $nvKey
+            $env:NVIDIA_API_KEY = $nvKey
+            Ok 'NVIDIA_API_KEY updated for OpenCode'
+            Omni setup --non-interactive --add-provider --provider nvidia --provider-name 'NVIDIA NIM' --api-key $nvKey 2>$null | Out-Null
+        } else {
+            Ok 'Current NVIDIA_API_KEY preserved'
+        }
+        $nvKey = $null
     } else {
-        Write-Host ''
         Info 'NVIDIA NIM powers the flagship Nemotron 3.5 Super VL model (free tier).'
         Info 'Create a free key at https://build.nvidia.com, or press Enter to skip.'
         $nvKey = Read-Secret 'NVIDIA API key (Enter = skip)'
         if ($nvKey) {
+            $existingNv = $nvKey
             Set-UserEnv 'NVIDIA_API_KEY' $nvKey
+            $env:NVIDIA_API_KEY = $nvKey
             Ok 'NVIDIA_API_KEY saved for OpenCode'
             Omni setup --non-interactive --add-provider --provider nvidia --provider-name 'NVIDIA NIM' --api-key $nvKey 2>$null | Out-Null
         } else { Info 'skipped NVIDIA (existing settings preserved)' }
@@ -545,15 +578,30 @@ if (-not $NoOmniRoute) {
         $existingOr = $envMap['OPENROUTER_API_KEY']
         Set-UserEnv 'OPENROUTER_API_KEY' $existingOr
     }
+    Write-Host ''
     if ($existingOr) {
-        Ok 'Existing OPENROUTER_API_KEY detected and preserved'
+        $m = Mask-Key $existingOr
+        Info "Existing OPENROUTER_API_KEY detected ($m)."
+        $orKey = Read-Secret 'OpenRouter API key (Enter = keep current key)'
+        if ($orKey) {
+            $existingOr = $orKey
+            Set-UserEnv 'OPENROUTER_API_KEY' $orKey
+            $env:OPENROUTER_API_KEY = $orKey
+            Ok 'OPENROUTER_API_KEY updated for OpenCode'
+            Omni setup --non-interactive --add-provider --provider openrouter --provider-name OpenRouter --api-key $orKey --test-provider
+            if ($LASTEXITCODE -eq 0) { Ok 'OpenRouter connected to OmniRoute' } else { Warn 'could not add OpenRouter to OmniRoute; add it in the dashboard' }
+        } else {
+            Ok 'Current OPENROUTER_API_KEY preserved'
+        }
+        $orKey = $null
     } else {
-        Write-Host ''
         Info 'OpenRouter gives free fallback models when the OpenCode free allowance runs out.'
         Info 'Create a free key at https://openrouter.ai/keys, or press Enter to skip.'
         $orKey = Read-Secret 'OpenRouter API key (Enter = skip)'
         if ($orKey) {
+            $existingOr = $orKey
             Set-UserEnv 'OPENROUTER_API_KEY' $orKey
+            $env:OPENROUTER_API_KEY = $orKey
             Ok 'OPENROUTER_API_KEY saved for OpenCode'
             Omni setup --non-interactive --add-provider --provider openrouter --provider-name OpenRouter --api-key $orKey --test-provider
             if ($LASTEXITCODE -eq 0) { Ok 'OpenRouter connected to OmniRoute' } else { Warn 'could not add OpenRouter to OmniRoute; add it in the dashboard' }
@@ -566,10 +614,21 @@ if (-not $NoOmniRoute) {
         $existingOmni = $envMap['OMNIROUTE_API_KEY']
         Set-UserEnv 'OMNIROUTE_API_KEY' $existingOmni
     }
+    Write-Host ''
     if ($existingOmni) {
-        Ok 'Existing OMNIROUTE_API_KEY detected and preserved'
+        $m = Mask-Key $existingOmni
+        Info "Existing OMNIROUTE_API_KEY detected ($m)."
+        $omniKey = Read-Secret 'OmniRoute API key (Enter = keep current key)'
+        if ($omniKey) {
+            $existingOmni = $omniKey
+            Set-UserEnv 'OMNIROUTE_API_KEY' $omniKey
+            $env:OMNIROUTE_API_KEY = $omniKey
+            Ok 'OMNIROUTE_API_KEY updated for OpenCode'
+        } else {
+            Ok 'Current OMNIROUTE_API_KEY preserved'
+        }
+        $omniKey = $null
     } else {
-        Write-Host ''
         Info "Now the OmniRoute dashboard opens in your browser (http://localhost:$OmniPort)."
         Info '  1. Log in with your admin password.'
         Info '  2. Optional: Providers -> add the AI accounts you want to route through OmniRoute'
@@ -578,7 +637,9 @@ if (-not $NoOmniRoute) {
         Start-Process "http://localhost:$OmniPort"
         $omniKey = Read-Secret 'Paste the OmniRoute API key (Enter = skip)'
         if ($omniKey) {
+            $existingOmni = $omniKey
             Set-UserEnv 'OMNIROUTE_API_KEY' $omniKey
+            $env:OMNIROUTE_API_KEY = $omniKey
             Ok 'OMNIROUTE_API_KEY saved for OpenCode'
         } else { Warn 'no OmniRoute key: OpenCode can only use OmniRoute after you set OMNIROUTE_API_KEY' }
         $omniKey = $null
@@ -602,9 +663,9 @@ if (-not $NoOmniRoute) {
     $envLines = @()
     if (Test-Path $envFile) { $envLines = @(Get-Content $envFile) }
     foreach ($pair in @(
-        @{ K = 'NVIDIA_API_KEY'; V = $env:NVIDIA_API_KEY },
-        @{ K = 'OPENROUTER_API_KEY'; V = $env:OPENROUTER_API_KEY },
-        @{ K = 'OMNIROUTE_API_KEY'; V = $env:OMNIROUTE_API_KEY }
+        @{ K = 'NVIDIA_API_KEY'; V = $existingNv },
+        @{ K = 'OPENROUTER_API_KEY'; V = $existingOr },
+        @{ K = 'OMNIROUTE_API_KEY'; V = $existingOmni }
     )) {
         if ($pair.V) {
             $found = $false
@@ -675,6 +736,7 @@ Get-CimInstance Win32_Process -Filter "Name like 'python%'" -ErrorAction Silentl
     Where-Object { $_.CommandLine -match 'sentinel\.py' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
 Start-Process -FilePath $PythonW -ArgumentList @("`"$(Join-Path $ConfigDir 'sentinel.py')`"") -WorkingDirectory $ConfigDir -WindowStyle Hidden
 Ok 'sentinel started'
+Get-Process -Name 'opencode-cli' -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
 
 $taskName = 'OpenCode Model Lab'
 try {

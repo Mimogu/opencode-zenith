@@ -138,6 +138,39 @@ NVIDIA_API_KEY=your_key_here
 OMNIROUTE_API_KEY=your_key_here
 ```
 
+### 🔄 Changing or Rotating API Keys Anytime
+
+You can view, edit, or rotate your API keys whenever you want using any of these 4 convenient methods:
+
+1. **Re-running the Installer (Interactive Update)**:
+   Simply run `./install.sh` (Linux) or `windows\install.bat` (Windows). The installer automatically detects your existing keys, displays a masked preview (e.g. `nvapi-...4a2b`), and prompts:
+   ```text
+   Existing NVIDIA_API_KEY detected (nvapi-...4a2b).
+   NVIDIA API key (Enter = keep current key):
+   ```
+   - Press **Enter** to keep your current key untouched.
+   - Paste a new key to instantly update `free-models.env`, your user environment, and sync it with OmniRoute.
+
+2. **Directly Editing `free-models.env`**:
+   Open the configuration file in any text editor:
+   - **Linux**: `nano ~/.config/opencode/free-models.env`
+   - **Windows**: `notepad $env:USERPROFILE\.config\opencode\free-models.env`
+   Save your edits; all Zenith background services and plugins load this file automatically.
+
+3. **Via the OmniRoute Dashboard**:
+   - Open [http://localhost:20128](http://localhost:20128) in your browser.
+   - Go to **Providers** &rarr; select **NVIDIA NIM** or **OpenRouter** to update provider credentials.
+   - Go to **API Keys** to generate, rotate, or inspect OmniRoute gateway keys.
+
+4. **Via Windows User Environment Variables (Windows)**:
+   In PowerShell:
+   ```powershell
+   [Environment]::SetEnvironmentVariable('NVIDIA_API_KEY', 'nvapi-your-new-key', 'User')
+   [Environment]::SetEnvironmentVariable('OPENROUTER_API_KEY', 'sk-or-your-new-key', 'User')
+   [Environment]::SetEnvironmentVariable('OMNIROUTE_API_KEY', 'omni-your-new-key', 'User')
+   ```
+   *(Or search "Edit environment variables for your account" from the Windows Start menu).*
+
 ### 🧠 Local Vector Embeddings (Optional via Ollama)
 
 OpenCode Zenith features an intelligent memory and skill-routing engine with hybrid vector + keyword recall:
