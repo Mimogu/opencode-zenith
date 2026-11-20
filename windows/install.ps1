@@ -19,6 +19,8 @@ param(
     [switch]$NoOmniRoute
 )
 
+try { Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force -ErrorAction SilentlyContinue } catch {}
+
 # Not 'Stop': Windows PowerShell 5.1 turns any stderr line of a redirected native
 # program (npm/node/opencode notices) into a fatal error. Steps that must not fail
 # use -ErrorAction Stop explicitly and every native call checks $LASTEXITCODE.
@@ -97,6 +99,51 @@ function Refresh-Path {
     $m = [Environment]::GetEnvironmentVariable('Path', 'Machine')
     $u = [Environment]::GetEnvironmentVariable('Path', 'User')
     $env:Path = "$m;$u"
+    foreach ($extra in @(
+        "$env:ProgramFiles\nodejs",
+        "$env:LOCALAPPDATA\Microsoft\WinGet\Links",
+        "$env:APPDATA\npm"
+    )) {
+        if ((Test-Path $extra) -and ($env:Path -notlike "*$extra*")) {
+            $env:Path = "$extra;" + $env:Path
+        }
+    }
+}
+function npm {
+    $c = (Get-Command npm.cmd -ErrorAction SilentlyContinue)
+    if (-not $c -and (Test-Path "$env:ProgramFiles\nodejs\npm.cmd")) {
+        $c = Get-Item "$env:ProgramFiles\nodejs\npm.cmd"
+    }
+    if ($c) {
+        $exe = if ($c.Source) { $c.Source } else { $c.FullName }
+        & $exe @args
+    } else {
+        & (Get-Command npm -CommandType Application,ExternalScript -ErrorAction SilentlyContinue | Select-Object -First 1) @args
+    }
+}
+function npx {
+    $c = (Get-Command npx.cmd -ErrorAction SilentlyContinue)
+    if (-not $c -and (Test-Path "$env:ProgramFiles\nodejs\npx.cmd")) {
+        $c = Get-Item "$env:ProgramFiles\nodejs\npx.cmd"
+    }
+    if ($c) {
+        $exe = if ($c.Source) { $c.Source } else { $c.FullName }
+        & $exe @args
+    } else {
+        & (Get-Command npx -CommandType Application,ExternalScript -ErrorAction SilentlyContinue | Select-Object -First 1) @args
+    }
+}
+function Get-NpmRoot {
+    try {
+        $r = (& npm root -g 2>$null | Select-Object -First 1)
+        if ($r -and (Test-Path $r.Trim())) { return $r.Trim() }
+    } catch {}
+    $appData = [Environment]::GetFolderPath('ApplicationData')
+    $fallback = Join-Path $appData 'npm\node_modules'
+    if (Test-Path $fallback) { return $fallback }
+    $progFiles = Join-Path $env:ProgramFiles 'nodejs\node_modules'
+    if (Test-Path $progFiles) { return $progFiles }
+    return $null
 }
 function Set-UserEnv([string]$name, [string]$value) {
     [Environment]::SetEnvironmentVariable($name, $value, 'User')
@@ -257,18 +304,20 @@ if ($ocDir) {
 # calls the real entry point (node + the package's bin script) when there is one
 $OpenCodeCmd = @($OpenCodeExe)
 try {
-    $npmRoot = (& npm root -g 2>$null).Trim()
-    $ocPkg = Join-Path $npmRoot '@opencode\cli\package.json'
-    if (-not (Test-Path $ocPkg)) {
-        $ocPkg = Join-Path $npmRoot 'opencode-ai\package.json'
-    }
-    if (Test-Path $ocPkg) {
-        $pkg = Get-Content $ocPkg -Raw | ConvertFrom-Json
-        $bin = if ($pkg.bin -is [string]) { $pkg.bin } else { $pkg.bin.opencode }
-        $binPath = Join-Path (Split-Path $ocPkg) $bin
-        if ($bin -and (Test-Path $binPath)) {
-            if ($binPath -match '\.exe$') { $OpenCodeCmd = @($binPath) }
-            else { $OpenCodeCmd = @((Get-Command node).Source, $binPath) }
+    $npmRoot = Get-NpmRoot
+    if ($npmRoot) {
+        $ocPkg = Join-Path $npmRoot '@opencode\cli\package.json'
+        if (-not (Test-Path $ocPkg)) {
+            $ocPkg = Join-Path $npmRoot 'opencode-ai\package.json'
+        }
+        if (Test-Path $ocPkg) {
+            $pkg = Get-Content $ocPkg -Raw | ConvertFrom-Json
+            $bin = if ($pkg.bin -is [string]) { $pkg.bin } else { $pkg.bin.opencode }
+            $binPath = Join-Path (Split-Path $ocPkg) $bin
+            if ($bin -and (Test-Path $binPath)) {
+                if ($binPath -match '\.exe$') { $OpenCodeCmd = @($binPath) }
+                else { $OpenCodeCmd = @((Get-Command node).Source, $binPath) }
+            }
         }
     }
 } catch {}
@@ -338,12 +387,16 @@ Ok 'OpenCode accepts the config'
 $OmniMjs = $null
 if (-not $NoOmniRoute) {
     Step "OmniRoute gateway ($OmniRouteVersion)"
-    $npmRoot = (& npm root -g).Trim()
-    $OmniMjs = Join-Path $npmRoot 'omniroute\bin\omniroute.mjs'
-    if (-not (Test-Path $OmniMjs)) {
+    Refresh-Path
+    $npmRoot = Get-NpmRoot
+    $OmniMjs = if ($npmRoot) { Join-Path $npmRoot 'omniroute\bin\omniroute.mjs' } else { $null }
+    if (-not $OmniMjs -or -not (Test-Path $OmniMjs)) {
         Info 'installing OmniRoute (npm) ...'
         & npm install -g "omniroute@$OmniRouteVersion"
-        if (-not (Test-Path $OmniMjs)) { Fail 'OmniRoute did not install (npm install -g omniroute failed).' }
+        Refresh-Path
+        $npmRoot = Get-NpmRoot
+        $OmniMjs = if ($npmRoot) { Join-Path $npmRoot 'omniroute\bin\omniroute.mjs' } else { $null }
+        if (-not $OmniMjs -or -not (Test-Path $OmniMjs)) { Fail 'OmniRoute did not install (npm install -g omniroute failed).' }
     }
     Ok "OmniRoute at $OmniMjs"
 
