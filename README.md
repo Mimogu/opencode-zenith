@@ -67,6 +67,53 @@ cd opencode-zenith
 
 ---
 
+## 🔄 How to Update OpenCode Zenith
+
+OpenCode Zenith receives continuous improvements: new engineering skills, updated prompt rules, model failover enhancements, and engine bug fixes.
+
+Updating is **100% safe and non-destructive**:
+* 🛡️ **Your API keys are never touched**: `free-models.env` (Linux) and Windows User Environment variables are preserved intact.
+* 📦 **Automatic Backup**: Your previous configuration is automatically saved with a timestamp (`~/.config/opencode.bak.<timestamp>`).
+* ⚡ **Core Engine Update**: The `opencode` CLI engine itself is automatically updated to the latest upstream release.
+
+Choose the update method that matches how you installed:
+
+### 1. For 1-Line Terminal Installs
+Simply run the same command again. It fetches the latest bundle, backs up your old configuration, and installs all updates automatically:
+
+* **Linux**:
+  ```bash
+  curl -fsSL https://raw.githubusercontent.com/Mimogu/opencode-zenith/main/install.sh | bash
+  ```
+* **Windows (PowerShell)**:
+  ```powershell
+  irm https://raw.githubusercontent.com/Mimogu/opencode-zenith/main/windows/install.ps1 | iex
+  ```
+
+### 2. For Download & Double-Click Installs (Windows ZIP)
+1. Click the green **`<> Code`** button at the top of this GitHub repo and select **Download ZIP**.
+2. Extract the new `.zip` archive.
+3. Open the `windows` folder and double-click **`install.bat`**.
+4. The installer automatically recognizes that your programs and API keys are already configured, backs up your previous config, and deploys the update.
+
+### 3. For Git Clone Installs
+Open your terminal in the cloned repository folder:
+
+* **Linux**:
+  ```bash
+  cd opencode-zenith
+  git pull
+  ./install.sh
+  ```
+* **Windows**:
+  ```cmd
+  cd opencode-zenith
+  git pull
+  windows\install.bat
+  ```
+
+---
+
 ## 🔑 Setting Up Free API Keys (Zero-Cost Operation)
 
 OpenCode Zenith works out of the box with completely free developer tier keys.
@@ -178,7 +225,7 @@ No. The installer checks if Git, Python, Node, Bun, and ripgrep are already inst
 
 <details>
 <summary><b>How do I update OpenCode Zenith?</b></summary>
-Run <code>git pull</code> in your cloned repository, or run <code>opencode reload</code> in your terminal.
+See the detailed <a href="#-how-to-update-opencode-zenith">How to Update</a> section above. Depending on your installation method, you can simply re-run the 1-line command, re-run <code>install.bat</code> from a new ZIP, or run <code>git pull && ./install.sh</code>. Your API keys are always preserved.
 </details>
 
 ---

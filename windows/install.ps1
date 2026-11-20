@@ -24,12 +24,33 @@ param(
 # use -ErrorAction Stop explicitly and every native call checks $LASTEXITCODE.
 $ErrorActionPreference = 'Continue'
 $ProgressPreference = 'SilentlyContinue'
-$Here = $PSScriptRoot
-$Payload = Join-Path $Here 'payload'
-$OmniRouteVersion = (Get-Content (Join-Path $Payload 'omniroute-version.txt') -ErrorAction SilentlyContinue | Select-Object -First 1)
-if (-not $OmniRouteVersion) { $OmniRouteVersion = 'latest' }
-$OmniPort = 20128
+$Here = if ($PSScriptRoot) { $PSScriptRoot } else { Get-Location }
+$ConfigSrc = Join-Path $Here '..\config'
+$TempDownload = $null
 $Stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
+
+if (-not (Test-Path (Join-Path $ConfigSrc 'opencode.json.template'))) {
+    if (Test-Path (Join-Path $Here 'payload\opencode\opencode.json')) {
+        $ConfigSrc = Join-Path $Here 'payload\opencode'
+    } else {
+        Write-Host "    [+] Fetching latest Opencode Zenith release..." -ForegroundColor Cyan
+        $TempZip = Join-Path $env:TEMP "opencode-zenith-$Stamp.zip"
+        $TempFolder = Join-Path $env:TEMP "opencode-zenith-$Stamp"
+        Invoke-WebRequest -Uri "https://github.com/Mimogu/opencode-zenith/archive/refs/heads/main.zip" -OutFile $TempZip
+        Expand-Archive -Path $TempZip -DestinationPath $TempFolder -Force
+        Remove-Item -Force $TempZip -ErrorAction SilentlyContinue
+        $ConfigSrc = Join-Path $TempFolder "opencode-zenith-main\config"
+        $TempDownload = $TempFolder
+    }
+}
+
+$Payload = Join-Path $Here 'payload'
+$OmniRouteVersion = 'latest'
+if (Test-Path (Join-Path $Payload 'omniroute-version.txt')) {
+    $OmniRouteVersion = (Get-Content (Join-Path $Payload 'omniroute-version.txt') -ErrorAction SilentlyContinue | Select-Object -First 1)
+    if (-not $OmniRouteVersion) { $OmniRouteVersion = 'latest' }
+}
+$OmniPort = 20128
 $LogFile = Join-Path $env:TEMP "opencode-setup-$Stamp.log"
 Start-Transcript -Path $LogFile -Append | Out-Null
 
@@ -79,11 +100,11 @@ function Add-UserPath([string]$dir) {
 
 # ----------------------------------------------------------------- checks
 Step 'Checking the bundle'
-if (-not (Test-Path (Join-Path $Payload 'opencode\opencode.json'))) {
-    Fail "payload\opencode is missing. Extract the whole zip, then run install.bat from the extracted folder."
+if (-not (Test-Path $ConfigSrc)) {
+    Fail "Configuration bundle could not be found at $ConfigSrc. Extract the whole zip, then run install.bat from the extracted folder."
 }
 Get-ChildItem -Path $Here -Recurse -File | Unblock-File -ErrorAction SilentlyContinue
-Ok "bundle found at $Here"
+Ok "bundle found at $ConfigSrc"
 Info "log file: $LogFile"
 
 # ----------------------------------------------------------------- programs
@@ -192,8 +213,17 @@ if ((Test-Path $ConfigDir) -and (Get-ChildItem $ConfigDir -Force -ErrorAction Si
 }
 try {
     New-Item -ItemType Directory -Force -Path $ConfigDir -ErrorAction Stop | Out-Null
-    Copy-Item -Path (Join-Path $Payload 'opencode\*') -Destination $ConfigDir -Recurse -Force -ErrorAction Stop
-    Copy-Item -Path (Join-Path $Here 'run-hidden.vbs') -Destination $ConfigDir -Force -ErrorAction Stop
+    Copy-Item -Path (Join-Path $ConfigSrc '*') -Destination $ConfigDir -Recurse -Force -ErrorAction Stop
+    if (Test-Path (Join-Path $Here 'run-hidden.vbs')) {
+        Copy-Item -Path (Join-Path $Here 'run-hidden.vbs') -Destination $ConfigDir -Force -ErrorAction Stop
+    }
+    $tpl = Join-Path $ConfigDir 'opencode.json.template'
+    if (Test-Path $tpl) {
+        $content = Get-Content $tpl -Raw
+        $posixConfig = $ConfigDir.Replace('\', '/')
+        $content = $content.Replace('{{CONFIG_DIR}}', $posixConfig)
+        [IO.File]::WriteAllText((Join-Path $ConfigDir 'opencode.json'), $content, (New-Object System.Text.UTF8Encoding $false))
+    }
 } catch { Fail "could not copy the config into ${ConfigDir}: $($_.Exception.Message)" }
 $pathsJson = @{
     config = $ConfigDir; data = $DataDir; log = $LogDir
@@ -250,31 +280,41 @@ if (-not $NoOmniRoute) {
     if ($LASTEXITCODE -eq 0) { Ok 'admin password set' } else { Warn "could not set the password (exit $LASTEXITCODE); set it in the dashboard instead" }
     $pw1 = $null; $pw2 = $null
 
-    Write-Host ''
-    Info 'OpenRouter gives free fallback models when the OpenCode free allowance runs out.'
-    Info 'Create a free key at https://openrouter.ai/keys, or press Enter to skip.'
-    $orKey = Read-Secret 'OpenRouter API key (Enter = skip)'
-    if ($orKey) {
-        Set-UserEnv 'OPENROUTER_API_KEY' $orKey
-        Ok 'OPENROUTER_API_KEY saved for OpenCode'
-        Omni setup --non-interactive --add-provider --provider openrouter --provider-name OpenRouter --api-key $orKey --test-provider
-        if ($LASTEXITCODE -eq 0) { Ok 'OpenRouter connected to OmniRoute' } else { Warn 'could not add OpenRouter to OmniRoute; add it in the dashboard' }
-    } else { Info 'skipped OpenRouter' }
-    $orKey = $null
+    $existingOr = [Environment]::GetEnvironmentVariable('OPENROUTER_API_KEY', 'User')
+    if ($existingOr) {
+        Ok 'Existing OPENROUTER_API_KEY detected and preserved'
+    } else {
+        Write-Host ''
+        Info 'OpenRouter gives free fallback models when the OpenCode free allowance runs out.'
+        Info 'Create a free key at https://openrouter.ai/keys, or press Enter to skip.'
+        $orKey = Read-Secret 'OpenRouter API key (Enter = skip)'
+        if ($orKey) {
+            Set-UserEnv 'OPENROUTER_API_KEY' $orKey
+            Ok 'OPENROUTER_API_KEY saved for OpenCode'
+            Omni setup --non-interactive --add-provider --provider openrouter --provider-name OpenRouter --api-key $orKey --test-provider
+            if ($LASTEXITCODE -eq 0) { Ok 'OpenRouter connected to OmniRoute' } else { Warn 'could not add OpenRouter to OmniRoute; add it in the dashboard' }
+        } else { Info 'skipped OpenRouter' }
+        $orKey = $null
+    }
 
-    Write-Host ''
-    Info "Now the OmniRoute dashboard opens in your browser (http://localhost:$OmniPort)."
-    Info '  1. Log in with the admin password you just chose.'
-    Info '  2. Optional: Providers -> add the AI accounts you want to route through OmniRoute'
-    Info '     (for example Antigravity / Google login). The combos below use those models.'
-    Info '  3. API Keys -> create a key, copy it, and come back to this window.'
-    Start-Process "http://localhost:$OmniPort"
-    $omniKey = Read-Secret 'Paste the OmniRoute API key (Enter = skip)'
-    if ($omniKey) {
-        Set-UserEnv 'OMNIROUTE_API_KEY' $omniKey
-        Ok 'OMNIROUTE_API_KEY saved for OpenCode'
-    } else { Warn 'no OmniRoute key: OpenCode can only use OmniRoute after you set OMNIROUTE_API_KEY' }
-    $omniKey = $null
+    $existingOmni = [Environment]::GetEnvironmentVariable('OMNIROUTE_API_KEY', 'User')
+    if ($existingOmni) {
+        Ok 'Existing OMNIROUTE_API_KEY detected and preserved'
+    } else {
+        Write-Host ''
+        Info "Now the OmniRoute dashboard opens in your browser (http://localhost:$OmniPort)."
+        Info '  1. Log in with the admin password you just chose.'
+        Info '  2. Optional: Providers -> add the AI accounts you want to route through OmniRoute'
+        Info '     (for example Antigravity / Google login). The combos below use those models.'
+        Info '  3. API Keys -> create a key, copy it, and come back to this window.'
+        Start-Process "http://localhost:$OmniPort"
+        $omniKey = Read-Secret 'Paste the OmniRoute API key (Enter = skip)'
+        if ($omniKey) {
+            Set-UserEnv 'OMNIROUTE_API_KEY' $omniKey
+            Ok 'OMNIROUTE_API_KEY saved for OpenCode'
+        } else { Warn 'no OmniRoute key: OpenCode can only use OmniRoute after you set OMNIROUTE_API_KEY' }
+        $omniKey = $null
+    }
 
     Step 'OmniRoute combos'
     $combosFile = Join-Path $Payload 'omniroute-combos.json'
@@ -350,5 +390,8 @@ Info "Background at login: $launcher"
 if ($OmniMjs) { Info "OmniRoute dashboard: http://localhost:$OmniPort" }
 Info "Setup log:          $LogFile"
 Info 'To remove everything later, run uninstall.bat from this folder.'
+if ($TempDownload -and (Test-Path $TempDownload)) {
+    Remove-Item -Path $TempDownload -Recurse -Force -ErrorAction SilentlyContinue
+}
 Stop-Transcript | Out-Null
 exit 0
