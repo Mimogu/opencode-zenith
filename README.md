@@ -283,6 +283,37 @@ If you want deep semantic vector embeddings for memory and skill matching:
 * Alternatively, you can install <a href="https://ollama.com">Ollama</a> anytime and run: <code>ollama pull embeddinggemma</code>. Zenith will automatically detect it on <code>http://127.0.0.1:11434</code> and activate semantic vector search.
 </details>
 
+<details>
+<summary><b>How do I uninstall OpenCode Zenith?</b></summary>
+
+Uninstallation safely stops background services (OmniRoute and Sentinel), removes scheduled timers, and removes the configuration folder after prompting you. Base system packages (Git, Node, Bun, Python) remain untouched.
+
+* **Method 1: One-Line Uninstaller (Automated)**
+  * **Linux**:
+    ```bash
+    curl -fsSL https://raw.githubusercontent.com/Mimogu/opencode-zenith/main/uninstall.sh | bash
+    ```
+  * **Windows (PowerShell)**:
+    ```powershell
+    irm https://raw.githubusercontent.com/Mimogu/opencode-zenith/main/windows/uninstall.ps1 | iex
+    ```
+
+* **Method 2: Windows ZIP Download**
+  * Open the extracted `opencode-zenith` folder and double-click **`uninstall.bat`** (or `windows\uninstall.bat`).
+  * It will ask for confirmation before removing config files and saved keys.
+
+* **Method 3: Standard Git Clone**
+  * In your cloned `opencode-zenith` directory, run:
+    * **Linux**:
+      ```bash
+      ./uninstall.sh
+      ```
+    * **Windows**:
+      ```cmd
+      uninstall.bat
+      ```
+</details>
+
 ---
 
 ## 📄 License

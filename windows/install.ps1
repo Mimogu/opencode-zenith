@@ -508,15 +508,17 @@ if (-not $NoOmniRoute) {
 
     Step 'OmniRoute combos'
     $combosFile = Join-Path $ConfigSrc 'omniroute-combos.json'
-    if ((Test-Path $combosFile) -and $env:OMNIROUTE_API_KEY) {
-        $existing = @()
-        try { $existing = @((Omni combo list --output json 2>$null | Out-String | ConvertFrom-Json) | ForEach-Object { $_.name }) } catch {}
-        foreach ($c in (Get-Content $combosFile -Raw | ConvertFrom-Json)) {
-            if ($existing -contains $c.name) { Ok "$($c.name) already exists"; continue }
-            Omni combo create $c.name --strategy $c.strategy --models ($c.models -join ',') *> $null
-            if ($LASTEXITCODE -eq 0) { Ok "created $($c.name)" } else { Warn "could not create $($c.name); create it in the dashboard (models: $($c.models -join ', '))" }
-        }
-    } else { Info 'skipped (needs the OmniRoute API key)' }
+    if (Test-Path $combosFile) {
+        if ($env:OMNIROUTE_API_KEY) {
+            $existing = @()
+            try { $existing = @((Omni combo list --output json 2>$null | Out-String | ConvertFrom-Json) | ForEach-Object { $_.name }) } catch {}
+            foreach ($c in (Get-Content $combosFile -Raw | ConvertFrom-Json)) {
+                if ($existing -contains $c.name) { Ok "$($c.name) already exists"; continue }
+                Omni combo create $c.name --strategy $c.strategy --models ($c.models -join ',') *> $null
+                if ($LASTEXITCODE -eq 0) { Ok "created $($c.name)" } else { Warn "could not create $($c.name); create it in the dashboard (models: $($c.models -join ', '))" }
+            }
+        } else { Info 'skipped (requires OMNIROUTE_API_KEY)' }
+    } else { Info 'skipped (no combos file)' }
 
     $envFile = Join-Path $ConfigDir 'free-models.env'
     $envLines = @()
@@ -527,9 +529,15 @@ if (-not $NoOmniRoute) {
         @{ K = 'OMNIROUTE_API_KEY'; V = $env:OMNIROUTE_API_KEY }
     )) {
         if ($pair.V) {
-            if ($envLines -match "^$($pair.K)=") {
-                $envLines = $envLines -replace "^$($pair.K)=.*", "$($pair.K)=$($pair.V)"
-            } else {
+            $found = $false
+            for ($i = 0; $i -lt $envLines.Count; $i++) {
+                if ($envLines[$i] -match "^$($pair.K)=") {
+                    $envLines[$i] = "$($pair.K)=$($pair.V)"
+                    $found = $true
+                    break
+                }
+            }
+            if (-not $found) {
                 $envLines += "$($pair.K)=$($pair.V)"
             }
         }
