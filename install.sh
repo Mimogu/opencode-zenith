@@ -103,8 +103,28 @@ if has_cmd ollama; then
     echo "  [✓] embeddinggemma model ready."
   fi
 else
-  echo "  [i] Ollama not installed. Zenith will use its fast built-in BM25 keyword matching for memory and skill routing."
-  echo "      To enable semantic vector embeddings anytime: install Ollama and run 'ollama pull embeddinggemma'."
+  INSTALL_OLLAMA="n"
+  if [ -e /dev/tty ] && [ -r /dev/tty ]; then
+    printf "  [?] Ollama not found. Would you like to install Ollama & download embeddinggemma (~620MB) for vector search? [y/N]: "
+    read -r INSTALL_OLLAMA </dev/tty || INSTALL_OLLAMA="n"
+  fi
+  if [[ "$INSTALL_OLLAMA" =~ ^[Yy]$ ]]; then
+    echo "  [+] Installing Ollama..."
+    curl -fsSL https://ollama.com/install.sh | sh || true
+    if has_cmd ollama; then
+      echo "  [✓] Ollama installed. Starting service..."
+      systemctl start ollama 2>/dev/null || systemctl --user start ollama 2>/dev/null || true
+      sleep 2
+      echo "  [+] Pulling embeddinggemma model..."
+      ollama pull embeddinggemma || echo "  [!] Could not pull model automatically. Run 'ollama pull embeddinggemma' anytime."
+      echo "  [✓] embeddinggemma model ready."
+    else
+      echo "  [!] Ollama installation did not complete. Continuing with keyword fallback."
+    fi
+  else
+    echo "  [i] Skipping Ollama. Zenith will use fast built-in BM25 keyword matching for memory and skill routing."
+    echo "      To enable semantic vector embeddings anytime: install Ollama and run 'ollama pull embeddinggemma'."
+  fi
 fi
 
 # 6. Environment configuration setup

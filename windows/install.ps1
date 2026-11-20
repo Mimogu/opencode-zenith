@@ -342,8 +342,23 @@ if (Have 'ollama') {
         Ok 'embeddinggemma model is ready'
     }
 } else {
-    Info 'Ollama not detected. Zenith will use fast built-in BM25 keyword matching for skills and memory.'
-    Info 'To enable semantic vector embeddings anytime: install Ollama and run "ollama pull embeddinggemma"'
+    Write-Host ''
+    if (Ask-YesNo 'Ollama is not installed. Would you like to install Ollama and download embeddinggemma (~620MB) for vector search?' $false) {
+        Step 'Installing Ollama via winget'
+        & winget install -e --id Ollama.Ollama --accept-source-agreements --accept-package-agreements
+        Refresh-Path
+        if (Have 'ollama') {
+            Ok 'Ollama installed successfully'
+            Info 'Pulling embeddinggemma model...'
+            & ollama pull embeddinggemma
+            if ($LASTEXITCODE -eq 0) { Ok 'embeddinggemma model is ready' }
+        } else {
+            Warn 'Ollama was installed; open a new terminal or reboot to use it'
+        }
+    } else {
+        Info 'Skipping Ollama. Zenith will use fast built-in BM25 keyword matching for skills and memory.'
+        Info 'To enable semantic vector embeddings anytime: install Ollama and run "ollama pull embeddinggemma"'
+    }
 }
 
 # ----------------------------------------------------------------- background
