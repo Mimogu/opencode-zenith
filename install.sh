@@ -178,6 +178,8 @@ with open(p, 'r', encoding='utf-8') as f:
     data = json.load(f)
 
 mcp = data.get('mcp', {})
+if 'servers' in mcp:
+    mcp = mcp['servers']
 
 # Graphify remote endpoint check
 graphify_up = False
