@@ -69,12 +69,30 @@ else
   echo "  [i] No configuration folder found at $CONFIG_DIR."
 fi
 
-# 4. Completion notice
-echo "[4/4] Cleanup complete."
+# 4. Local Embedding AI cleanup (optional)
+echo "[4/5] Checking local embedding models..."
+if command -v ollama >/dev/null 2>&1; then
+  if ollama list 2>/dev/null | grep -q "embeddinggemma"; then
+    if ask_yes_no "Remove the local embedding model (embeddinggemma, ~620MB) to reclaim disk space?" "y"; then
+      echo "  [-] Removing embeddinggemma model..."
+      ollama rm embeddinggemma 2>/dev/null || true
+      echo "  [✓] embeddinggemma removed."
+    else
+      echo "  [i] embeddinggemma model kept."
+    fi
+  else
+    echo "  [i] No embeddinggemma model found in Ollama."
+  fi
+fi
+
+# 5. Completion notice
+echo "[5/5] Cleanup complete."
 echo ""
 echo "=================================================="
 echo "          Opencode Zenith Uninstalled             "
 echo "=================================================="
-echo "Base programs (Git, Python, Node, Bun, OpenCode CLI, OmniRoute)"
-echo "remain installed. To uninstall global packages if desired:"
-echo "  npm uninstall -g @opencode/cli omniroute"
+echo "Base programs (Git, Python, Node, Bun, OpenCode CLI, OmniRoute, Ollama)"
+echo "remain installed. If you wish to remove them completely:"
+echo "  - CLI packages: npm uninstall -g @opencode/cli omniroute (or bun remove -g)"
+echo "  - Ollama model: ollama rm embeddinggemma"
+echo "  - Ollama service (Linux): sudo systemctl stop ollama && sudo rm /usr/local/bin/ollama"

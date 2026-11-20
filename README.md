@@ -364,6 +364,33 @@ If you also wish to remove the OpenCode and OmniRoute CLI tools from your system
 
 ---
 
+### Optional: Removing the Local Embedded AI (Ollama & embeddinggemma)
+
+If you installed Ollama and downloaded the `embeddinggemma` model (~620MB) during setup and wish to reclaim disk space or remove it completely:
+
+1. **Delete the embedding model (`embeddinggemma`, ~620MB)**:  
+   Both uninstallers (`uninstall.sh` and `uninstall.bat`) will ask if you want to delete this model automatically. You can also delete it manually anytime:
+   ```bash
+   ollama rm embeddinggemma
+   ```
+
+2. **Completely uninstall Ollama (if you no longer use it)**:
+   * **Linux**:
+     ```bash
+     # Stop and disable the Ollama system service
+     sudo systemctl stop ollama 2>/dev/null || true
+     sudo systemctl disable ollama 2>/dev/null || true
+
+     # Remove Ollama binaries and downloaded models
+     sudo rm -f /usr/local/bin/ollama
+     rm -rf ~/.ollama
+     ```
+   * **Windows**:
+     * Open Windows **Settings > Apps > Installed apps**, locate **Ollama**, and click **Uninstall**.
+     * Optionally delete the model cache folder: `%USERPROFILE%\.ollama`.
+
+---
+
 ## 📄 License
 
 Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
