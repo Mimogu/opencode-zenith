@@ -138,6 +138,17 @@ NVIDIA_API_KEY=your_key_here
 OMNIROUTE_API_KEY=your_key_here
 ```
 
+### 🧠 Local Vector Embeddings (Optional via Ollama)
+
+OpenCode Zenith features an intelligent memory and skill-routing engine with hybrid vector + keyword recall:
+
+* **Default Mode (Zero Setup)**: Uses built-in BM25 keyword matching with stemming and synonym resolution. It works out of the box with zero external models or RAM usage.
+* **Semantic Vector Mode (Enhanced)**: To enable deep vector similarity matching for skills and conversation recall, install [Ollama](https://ollama.com) and run:
+  ```bash
+  ollama pull embeddinggemma
+  ```
+  Zenith automatically detects Ollama on `http://127.0.0.1:11434`, warms up `embeddinggemma` (~620MB) on demand, and automatically unloads it from RAM after 20 minutes of inactivity. If Ollama is ever stopped, Zenith seamlessly falls back to BM25 keyword matching without blocking.
+
 ---
 
 ## 🕹️ Everyday Commands & Cheat Sheet

@@ -92,7 +92,23 @@ if [ -f "${SCRIPT_DIR}/scripts/browser-ctl" ]; then
   chmod +x "${HOME}/.local/bin/browser-ctl"
 fi
 
-# 5. Environment configuration setup
+# 5. Local Embedding AI (Ollama + embeddinggemma)
+echo "[4/5] Checking local embedding engine..."
+if has_cmd ollama; then
+  echo "  [✓] Ollama found."
+  if ! ollama list 2>/dev/null | grep -q "embeddinggemma"; then
+    echo "  [+] Pulling recommended local embedding model (embeddinggemma, ~620MB)..."
+    ollama pull embeddinggemma || echo "  [!] Could not pull embeddinggemma automatically. You can run 'ollama pull embeddinggemma' anytime."
+  else
+    echo "  [✓] embeddinggemma model ready."
+  fi
+else
+  echo "  [i] Ollama not installed. Zenith will use its fast built-in BM25 keyword matching for memory and skill routing."
+  echo "      To enable semantic vector embeddings anytime: install Ollama and run 'ollama pull embeddinggemma'."
+fi
+
+# 6. Environment configuration setup
+echo "[5/5] Finalizing environment & services..."
 if [ ! -f "${CONFIG_DIR}/free-models.env" ]; then
   cp "${SCRIPT_DIR}/.env.example" "${CONFIG_DIR}/free-models.env"
   echo "  [+] Generated new free-models.env from template."

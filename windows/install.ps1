@@ -329,6 +329,23 @@ if (-not $NoOmniRoute) {
     } else { Info 'skipped (needs the OmniRoute API key)' }
 }
 
+# ----------------------------------------------------------------- local embedding
+Step 'Checking local embedding AI (Ollama)'
+if (Have 'ollama') {
+    Ok 'Ollama found'
+    $models = @(& ollama list 2>$null)
+    if ($models -notmatch 'embeddinggemma') {
+        Info 'Pulling recommended local embedding model (embeddinggemma, ~620MB)...'
+        & ollama pull embeddinggemma
+        if ($LASTEXITCODE -eq 0) { Ok 'embeddinggemma pulled successfully' } else { Warn 'could not pull embeddinggemma; you can run "ollama pull embeddinggemma" later' }
+    } else {
+        Ok 'embeddinggemma model is ready'
+    }
+} else {
+    Info 'Ollama not detected. Zenith will use fast built-in BM25 keyword matching for skills and memory.'
+    Info 'To enable semantic vector embeddings anytime: install Ollama and run "ollama pull embeddinggemma"'
+}
+
 # ----------------------------------------------------------------- background
 Step 'Background: sentinel, OmniRoute at login, daily model benchmark'
 $vbs = Join-Path $ConfigDir 'run-hidden.vbs'
