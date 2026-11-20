@@ -100,17 +100,15 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 2. **Combining Slash Commands & Skills:**
    ```text
    /plan use the docx skill to create an executive financial report
-   /goal use the ponytails skill to simplify and refactor our auth middleware
+   /goal use the ponytail skill to simplify and refactor our auth middleware
    ```
-
----
 
 ---
 
 ## Quick Category Index
 
 1. [Document, Office & Content Creation](#document-office-content-creation) *(6 skills)* — Tools for generating, editing, and converting Word, PowerPoint, Excel, PDF, and Markdown files.
-2. [Web, Frontend & UI/UX Design](#web-frontend-ui/ux-design) *(7 skills)* — Tools and design standards for modern HTML/CSS, UI polish, design systems, and web widgets.
+2. [Web, Frontend & UI/UX Design](#web-frontend-ui-ux-design) *(7 skills)* — Tools and design standards for modern HTML/CSS, UI polish, design systems, and web widgets.
 3. [Software Architecture, Coding & Refactoring](#software-architecture-coding-refactoring) *(10 skills)* — Engineering principles, minimalist architectures, TypeScript practices, and code cleaners.
 4. [Testing, Verification & Debugging](#testing-verification-debugging) *(6 skills)* — Root-cause debugging, test suites, benchmarks, and pre-completion proof enforcers.
 5. [Code Review, Auditing & Security](#code-review-auditing-security) *(7 skills)* — Deep branch audits, OWASP security checks, impact analysis, and critical objective reviews.
@@ -124,6 +122,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 
 ---
 
+<a id="document-office-content-creation"></a>
 ## 1. Document, Office & Content Creation
 
 *Tools for generating, editing, and converting Word, PowerPoint, Excel, PDF, and Markdown files.*
@@ -215,6 +214,8 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 
 ---
 
+<a id="web-frontend-ui-ux-design"></a>
+<a id="web-frontend-ui/ux-design"></a>
 ## 2. Web, Frontend & UI/UX Design
 
 *Tools and design standards for modern HTML/CSS, UI polish, design systems, and web widgets.*
@@ -312,6 +313,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 
 ---
 
+<a id="software-architecture-coding-refactoring"></a>
 ## 3. Software Architecture, Coding & Refactoring
 
 *Engineering principles, minimalist architectures, TypeScript practices, and code cleaners.*
@@ -445,6 +447,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 
 ---
 
+<a id="testing-verification-debugging"></a>
 ## 4. Testing, Verification & Debugging
 
 *Root-cause debugging, test suites, benchmarks, and pre-completion proof enforcers.*
@@ -530,6 +533,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 
 ---
 
+<a id="code-review-auditing-security"></a>
 ## 5. Code Review, Auditing & Security
 
 *Deep branch audits, OWASP security checks, impact analysis, and critical objective reviews.*
@@ -627,6 +631,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 
 ---
 
+<a id="git-devops-containers-deployment"></a>
 ## 6. Git, DevOps, Containers & Deployment
 
 *Git workflows, merge conflict resolutions, Docker optimization, and CI/CD pipelines.*
@@ -730,6 +735,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 
 ---
 
+<a id="database-backend-cloud"></a>
 ## 7. Database, Backend & Cloud
 
 *Safe migrations, high-performance SQL, query tuning, and Supabase integrations.*
@@ -798,6 +804,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 
 ---
 
+<a id="data-science-analytics-visualizations"></a>
 ## 8. Data Science, Analytics & Visualizations
 
 *Exploratory data analysis, statistics, A/B testing, dashboards, machine learning, and plotting.*
@@ -955,6 +962,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 
 ---
 
+<a id="web-research-academic-document-intelligence"></a>
 ## 9. Web Research, Academic & Document Intelligence
 
 *Web queries, deep research dossiers, academic paper pipelines, and photo geolocation.*
@@ -1071,6 +1079,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 
 ---
 
+<a id="autonomous-multi-agent-orchestration"></a>
 ## 10. Autonomous Multi-Agent & Orchestration
 
 *Lifecycle planning, subagent task execution, prompt sharpening, and structured ideation.*
@@ -1168,6 +1177,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 
 ---
 
+<a id="creative-media-gaming-3d"></a>
 ## 11. Creative, Media, Gaming & 3D
 
 *AI image/video generation, programmatic film direction, Godot 4, generative art, and 3D voxels.*
@@ -1265,6 +1275,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 
 ---
 
+<a id="system-desktop-browser-tooling"></a>
 ## 12. System, Desktop, Browser & Tooling
 
 *Linux desktop control, browser automation, knowledge graphs, MCP builders, and memory tools.*
@@ -1443,7 +1454,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 | [`codebase-onboarding`](#skill-codebase-onboarding) | [Software Architecture, Coding & Refactoring](#software-architecture-coding-refactoring) | Scans an unfamiliar codebase, maps its architecture, entry points, data flows, and key abstractions, and writes a clear developer onboarding guide.. |
 | [`context-budget`](#skill-context-budget) | [System, Desktop, Browser & Tooling](#system-desktop-browser-tooling) | Audits token overhead consumed by system prompts, AGENTS.md, active skills, tools, and commands, providing optimization tips for smaller models.. |
 | [`correct`](#skill-correct) | [Testing, Verification & Debugging](#testing-verification-debugging) | Analyzes recurring coding or configuration errors made by AI agents in your repository and encodes preventative rules so they never happen again.. |
-| [`create-design-md`](#skill-create-design-md) | [Web, Frontend & UI/UX Design](#web-frontend-ui/ux-design) | Inspects an existing website or code repository and generates a comprehensive DESIGN.md documenting its typography, colors, spacing, and components.. |
+| [`create-design-md`](#skill-create-design-md) | [Web, Frontend & UI/UX Design](#web-frontend-ui-ux-design) | Inspects an existing website or code repository and generates a comprehensive DESIGN.md documenting its typography, colors, spacing, and components.. |
 | [`data-analyze`](#skill-data-analyze) | [Data Science, Analytics & Visualizations](#data-science-analytics-visualizations) | Conducts complete data analyses from raw CSV/database records: data cleaning, summarization, trend detection, and answering business questions.. |
 | [`data-build-dashboard`](#skill-data-build-dashboard) | [Data Science, Analytics & Visualizations](#data-science-analytics-visualizations) | Builds interactive, self-contained HTML dashboards containing charts, date range filters, KPI cards, and sortable data tables.. |
 | [`data-context-extractor`](#skill-data-context-extractor) | [Data Science, Analytics & Visualizations](#data-science-analytics-visualizations) | Extracts organizational tribal knowledge, table definitions, and business logic from analysts into a reusable domain skill.. |
@@ -1458,17 +1469,17 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 | [`database-migrations`](#skill-database-migrations) | [Database, Backend & Cloud](#database-backend-cloud) | Designs safe, non-locking database migrations with zero downtime, proper rollback scripts, column defaults, and index creation.. |
 | [`deep-research`](#skill-deep-research) | [Web Research, Academic & Document Intelligence](#web-research-academic-document-intelligence) | Executes thorough, exhaustive research on complex topics, cross-referencing multiple authoritative sources to produce a structured dossier.. |
 | [`deployment-patterns`](#skill-deployment-patterns) | [Git, DevOps, Containers & Deployment](#git-devops-containers-deployment) | Configures end-to-end deployment workflows: GitHub Actions, automated testing pipelines, Docker publishing, and blue/green deployments.. |
-| [`design-quality`](#skill-design-quality) | [Web, Frontend & UI/UX Design](#web-frontend-ui/ux-design) | Audits, critiques, and refines visual components, UI layouts, color palettes, and typography to eliminate amateurish design flaws.. |
+| [`design-quality`](#skill-design-quality) | [Web, Frontend & UI/UX Design](#web-frontend-ui-ux-design) | Audits, critiques, and refines visual components, UI layouts, color palettes, and typography to eliminate amateurish design flaws.. |
 | [`desktop-control`](#skill-desktop-control) | [System, Desktop, Browser & Tooling](#system-desktop-browser-tooling) | Inspects and operates the Linux desktop: captures screen regions, manipulates windows (Hyprland/Wayland), clicks buttons, and types keys.. |
 | [`deslop`](#skill-deslop) | [Software Architecture, Coding & Refactoring](#software-architecture-coding-refactoring) | Cleans up repetitive, overly verbose, or hallucinated AI boilerplate, restoring idiomatic patterns and concise, clean coding style.. |
 | [`docker-infra`](#skill-docker-infra) | [Git, DevOps, Containers & Deployment](#git-devops-containers-deployment) | Creates and optimizes production-ready Dockerfiles, multi-stage builds, docker-compose.yml files, and health checks with minimal image size.. |
 | [`documentation-lookup`](#skill-documentation-lookup) | [Web Research, Academic & Document Intelligence](#web-research-academic-document-intelligence) | Fetches current, up-to-date documentation for libraries, frameworks, and APIs directly instead of relying on outdated training memory.. |
 | [`docx`](#skill-docx) | [Document, Office & Content Creation](#document-office-content-creation) | Creates, formats, reads, and updates Microsoft Word (.docx) documents with clean typography, styled headings, tables, callout boxes, and headers/footers.. |
-| [`dual-viewport-ui`](#skill-dual-viewport-ui) | [Web, Frontend & UI/UX Design](#web-frontend-ui/ux-design) | Architects synchronized dual-pane web interfaces that combine an interactive 3D WebGL scene with a reactive 2D parameter control panel.. |
+| [`dual-viewport-ui`](#skill-dual-viewport-ui) | [Web, Frontend & UI/UX Design](#web-frontend-ui-ux-design) | Architects synchronized dual-pane web interfaces that combine an interactive 3D WebGL scene with a reactive 2D parameter control panel.. |
 | [`engineering-principles`](#skill-engineering-principles) | [Software Architecture, Coding & Refactoring](#software-architecture-coding-refactoring) | Enforces pragmatic software craftsmanship: subtract unnecessary code before adding, fix root causes, avoid over-engineering, and keep codebase lean.. |
 | [`experiment-and-inference`](#skill-experiment-and-inference) | [Data Science, Analytics & Visualizations](#data-science-analytics-visualizations) | Designs controlled experiments and A/B tests: sample size calculations, power analysis, randomization, and causal effect estimation.. |
 | [`find-skills`](#skill-find-skills) | [System, Desktop, Browser & Tooling](#system-desktop-browser-tooling) | Discovers and installs new agent skills from online repositories (skills.sh, GitHub) matching tasks you want to accomplish.. |
-| [`frontend-design`](#skill-frontend-design) | [Web, Frontend & UI/UX Design](#web-frontend-ui/ux-design) | Helps create visually distinctive, polished, and personality-driven web interfaces with cohesive color schemes, micro-interactions, and typography.. |
+| [`frontend-design`](#skill-frontend-design) | [Web, Frontend & UI/UX Design](#web-frontend-ui-ux-design) | Helps create visually distinctive, polished, and personality-driven web interfaces with cohesive color schemes, micro-interactions, and typography.. |
 | [`geo-sleuth`](#skill-geo-sleuth) | [Web Research, Academic & Document Intelligence](#web-research-academic-document-intelligence) | Geolocates or chronolocates photos using tool-verified evidence: camera metadata (EXIF), landmarks, sun shadow math, street view, and OCR signs.. |
 | [`git-conflict-resolver`](#skill-git-conflict-resolver) | [Git, DevOps, Containers & Deployment](#git-devops-containers-deployment) | Resolves complex git merge conflicts, rebase collisions, and detached HEAD states systematically without losing code changes.. |
 | [`git-workflow`](#skill-git-workflow) | [Git, DevOps, Containers & Deployment](#git-devops-containers-deployment) | Guides clean Git practices: conventional commit messages, feature branch workflows, PR templates, and maintaining clean git history.. |
@@ -1481,7 +1492,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 | [`mcp-builder`](#skill-mcp-builder) | [System, Desktop, Browser & Tooling](#system-desktop-browser-tooling) | Guides the creation of robust, standard-compliant Model Context Protocol (MCP) servers (Python/Node.js) to give AI agents custom tools and resources.. |
 | [`memory-import`](#skill-memory-import) | [System, Desktop, Browser & Tooling](#system-desktop-browser-tooling) | Imports exported memories and chat histories from ChatGPT, Claude, or Gemini into OpenCode's local long-term memory engine.. |
 | [`ml-workflow`](#skill-ml-workflow) | [Data Science, Analytics & Visualizations](#data-science-analytics-visualizations) | Guides sound machine learning workflows: feature engineering, train/validation/test splits, cross-validation, hyperparameter tuning, and metric evaluation.. |
-| [`modern-web-guidance`](#skill-modern-web-guidance) | [Web, Frontend & UI/UX Design](#web-frontend-ui/ux-design) | Provides cutting-edge standards for HTML, CSS, and modern browser APIs (dialogs, popovers, view transitions, container queries, :has selectors).. |
+| [`modern-web-guidance`](#skill-modern-web-guidance) | [Web, Frontend & UI/UX Design](#web-frontend-ui-ux-design) | Provides cutting-edge standards for HTML, CSS, and modern browser APIs (dialogs, popovers, view transitions, container queries, :has selectors).. |
 | [`no-comments`](#skill-no-comments) | [Software Architecture, Coding & Refactoring](#software-architecture-coding-refactoring) | Finds and deletes redundant, obvious, or noisy comments that state what code clearly does, keeping only indispensable architectural explanations.. |
 | [`output-skill`](#skill-output-skill) | [System, Desktop, Browser & Tooling](#system-desktop-browser-tooling) | Overrides default model truncation behavior when generating massive code files or lengthy reports to ensure nothing gets cut off.. |
 | [`owasp-security`](#skill-owasp-security) | [Code Review, Auditing & Security](#code-review-auditing-security) | Audits application code against OWASP Top 10 vulnerabilities: injection, broken authentication, sensitive data exposure, and security misconfigurations.. |
@@ -1512,7 +1523,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 | [`verification-before-completion`](#skill-verification-before-completion) | [Testing, Verification & Debugging](#testing-verification-debugging) | Requires running tests, linters, or build commands and verifying positive output before asserting that a task is finished or working.. |
 | [`video-gen`](#skill-video-gen) | [Creative, Media, Gaming & 3D](#creative-media-gaming-3d) | Generates short animated video clips from text prompts using tiered video generation models in OmniRoute.. |
 | [`voxel-craft-cad`](#skill-voxel-craft-cad) | [Creative, Media, Gaming & 3D](#creative-media-gaming-3d) | Writes parametric math code to generate procedural 3D voxel structures, architectural blueprints, and voxel models.. |
-| [`web-artifacts-builder`](#skill-web-artifacts-builder) | [Web, Frontend & UI/UX Design](#web-frontend-ui/ux-design) | Builds standalone, self-contained single-page HTML/JS applications, calculators, visualizers, and interactive prototypes that run directly in any browser.. |
-| [`web-design-guidelines`](#skill-web-design-guidelines) | [Web, Frontend & UI/UX Design](#web-frontend-ui/ux-design) | Audits website code against official Web Interface Guidelines, checking accessibility (contrast, keyboard focus, screen readers) and UX design standards.. |
+| [`web-artifacts-builder`](#skill-web-artifacts-builder) | [Web, Frontend & UI/UX Design](#web-frontend-ui-ux-design) | Builds standalone, self-contained single-page HTML/JS applications, calculators, visualizers, and interactive prototypes that run directly in any browser.. |
+| [`web-design-guidelines`](#skill-web-design-guidelines) | [Web, Frontend & UI/UX Design](#web-frontend-ui-ux-design) | Audits website code against official Web Interface Guidelines, checking accessibility (contrast, keyboard focus, screen readers) and UX design standards.. |
 | [`web-research`](#skill-web-research) | [Web Research, Academic & Document Intelligence](#web-research-academic-document-intelligence) | Searches the web across multiple sources, extracts key facts, and compiles concise, cited summaries with direct source URLs.. |
 | [`xlsx`](#skill-xlsx) | [Document, Office & Content Creation](#document-office-content-creation) | Builds and audits Excel spreadsheets (.xlsx) with clean formulas, formatted headers, zebra striping, currency/date number formatting, and multi-sheet workbooks.. |
