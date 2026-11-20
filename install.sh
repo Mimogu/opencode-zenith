@@ -213,12 +213,16 @@ if has_cmd opencode; then
   fi
 fi
 
-# 4. Helper scripts
-mkdir -p "${HOME}/.local/bin"
+# 4. Helper scripts & libraries
+mkdir -p "${HOME}/.local/bin" "${HOME}/.local/lib"
 if [ -f "${SCRIPT_DIR}/scripts/browser-ctl" ]; then
   cp "${SCRIPT_DIR}/scripts/browser-ctl" "${HOME}/.local/bin/"
   chmod +x "${HOME}/.local/bin/browser-ctl"
 fi
+
+for f in "${CONFIG_DIR}/lib/"agy_*.py; do
+  [ -f "$f" ] && cp "$f" "${HOME}/.local/lib/" 2>/dev/null || true
+done
 
 # 5. Local Embedding AI (Ollama + embeddinggemma)
 echo "[4/5] Checking local embedding engine..."
