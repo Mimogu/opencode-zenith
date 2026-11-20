@@ -67,6 +67,15 @@ else
   echo "  [i] fd not found. Recommended for file discovery (e.g. sudo apt install fd-find / sudo pacman -S fd)."
 fi
 
+# Ensure graphify CLI is available for on-demand knowledge graph extraction
+if ! has_cmd graphify; then
+  echo "  [+] Installing Graphify CLI for on-demand codebase knowledge graphs..."
+  python3 -m pip install -q --user --break-system-packages graphifyy 2>/dev/null || python3 -m pip install -q graphifyy 2>/dev/null || true
+fi
+if has_cmd graphify; then
+  echo "  [✓] Graphify CLI ready (on-demand /graphify skill)."
+fi
+
 # Ensure npm doesn't fail with EACCES on root-owned /usr/local
 if has_cmd npm; then
   NPM_PREFIX="$(npm config get prefix 2>/dev/null || true)"
@@ -181,22 +190,9 @@ mcp = data.get('mcp', {})
 if 'servers' in mcp:
     mcp = mcp['servers']
 
-# Graphify remote endpoint check (only register when the endpoint is active, as OpenCode attempts connection for all remote MCPs)
-graphify_up = False
-try:
-    with urllib.request.urlopen('http://127.0.0.1:8081/mcp', timeout=1) as resp:
-        graphify_up = True
-except Exception as e:
-    if hasattr(e, 'code'):
-        graphify_up = True
-
-if graphify_up:
-    mcp['graphify'] = {
-        'type': 'remote',
-        'url': 'http://127.0.0.1:8081/mcp',
-        'enabled': True
-    }
-elif 'graphify' in mcp:
+# Graphify is strictly operated on-demand via the /graphify skill (not as a persistent MCP server)
+# to avoid token-taxing tool schema bloat on every turn, single-project locking, and port conflicts.
+if 'graphify' in mcp:
     del mcp['graphify']
 
 # Browser & local MCP checks
