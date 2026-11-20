@@ -54,23 +54,25 @@ fi
 if ! has_cmd opencode; then
   echo "  [+] Installing OpenCode CLI..."
   if has_cmd bun; then
-    bun install -g opencode-ai
+    bun install -g @opencode/cli || bun install -g opencode-ai
   elif has_cmd npm; then
-    npm install -g opencode-ai
+    npm install -g @opencode/cli || npm install -g opencode-ai
+  else
+    curl -fsSL https://opencode.ai/install | bash || true
   fi
 else
   echo "  [✓] opencode found. Ensuring latest version..."
   if has_cmd timeout; then
     if has_cmd bun; then
-      timeout 15 bun install -g opencode-ai >/dev/null 2>&1 || true
+      timeout 15 bun install -g @opencode/cli >/dev/null 2>&1 || timeout 15 bun install -g opencode-ai >/dev/null 2>&1 || true
     elif has_cmd npm; then
-      timeout 15 npm install -g opencode-ai >/dev/null 2>&1 || true
+      timeout 15 npm install -g @opencode/cli >/dev/null 2>&1 || timeout 15 npm install -g opencode-ai >/dev/null 2>&1 || true
     fi
   else
     if has_cmd bun; then
-      bun install -g opencode-ai >/dev/null 2>&1 || true
+      bun install -g @opencode/cli >/dev/null 2>&1 || bun install -g opencode-ai >/dev/null 2>&1 || true
     elif has_cmd npm; then
-      npm install -g opencode-ai >/dev/null 2>&1 || true
+      npm install -g @opencode/cli >/dev/null 2>&1 || npm install -g opencode-ai >/dev/null 2>&1 || true
     fi
   fi
 fi
