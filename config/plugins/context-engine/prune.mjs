@@ -173,7 +173,7 @@ function supersededReads(messages) {
   return out;
 }
 
-export function prune(messages) {
+export function prune(messages, { keepRecent = KEEP_RECENT, chunk = CHUNK } = {}) {
   const stats = { reasoning: 0, deduped: 0, trimmed: 0, notices: 0, aged: 0, saved: 0 };
   if (!Array.isArray(messages) || messages.length < 3) return { messages, stats };
   let boundary = -1;
@@ -204,7 +204,7 @@ export function prune(messages) {
   // aged steps of the turn in progress: all but the last KEEP_RECENT, in CHUNK-sized moves
   const turnSteps = [];
   for (let i = Math.max(boundary, 0); i < messages.length; i++) if (messages[i]?.role === "assistant") turnSteps.push(i);
-  const agedCount = boundary < 0 ? 0 : Math.max(0, Math.floor((turnSteps.length - KEEP_RECENT) / CHUNK) * CHUNK);
+  const agedCount = boundary < 0 ? 0 : Math.max(0, Math.floor((turnSteps.length - keepRecent) / chunk) * chunk);
   const agedUntil = agedCount ? turnSteps[agedCount] : boundary; // first index NOT aged in the current turn
 
   for (let i = 0; i < Math.max(agedUntil, 0); i++) {
