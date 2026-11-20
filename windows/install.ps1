@@ -343,8 +343,30 @@ if ((Test-Path $ConfigDir) -and (Get-ChildItem $ConfigDir -Force -ErrorAction Si
 try {
     New-Item -ItemType Directory -Force -Path $ConfigDir -ErrorAction Stop | Out-Null
     Copy-Item -Path (Join-Path $ConfigSrc '*') -Destination $ConfigDir -Recurse -Force -ErrorAction Stop
-    if (Test-Path (Join-Path $Here 'run-hidden.vbs')) {
-        Copy-Item -Path (Join-Path $Here 'run-hidden.vbs') -Destination $ConfigDir -Force -ErrorAction Stop
+    $targetVbs = Join-Path $ConfigDir 'run-hidden.vbs'
+    $vbsCandidates = @(
+        (Join-Path $Here 'run-hidden.vbs'),
+        (Join-Path $Here 'windows\run-hidden.vbs'),
+        (Join-Path (Split-Path $ConfigSrc) 'windows\run-hidden.vbs')
+    )
+    $foundVbs = $vbsCandidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+    if ($foundVbs) {
+        Copy-Item -Path $foundVbs -Destination $targetVbs -Force -ErrorAction SilentlyContinue
+    }
+    if (-not (Test-Path $targetVbs)) {
+        $vbsCode = @'
+' Start a program with no console window (used by the scheduled tasks).
+' Usage: wscript.exe run-hidden.vbs <program> [args...]
+Set shell = CreateObject("WScript.Shell")
+cmd = ""
+For i = 0 To WScript.Arguments.Count - 1
+    arg = WScript.Arguments(i)
+    If InStr(arg, " ") > 0 Then arg = Chr(34) & arg & Chr(34)
+    cmd = cmd & arg & " "
+Next
+shell.Run Trim(cmd), 0, False
+'@
+        [IO.File]::WriteAllText($targetVbs, $vbsCode, (New-Object System.Text.UTF8Encoding $false))
     }
     $tpl = Join-Path $ConfigDir 'opencode.json.template'
     if (Test-Path $tpl) {
@@ -407,11 +429,15 @@ if (-not $NoOmniRoute) {
     }
     if (-not (Omni-Up)) {
         $vbs = Join-Path $ConfigDir 'run-hidden.vbs'
-        Start-Process -FilePath 'wscript.exe' -ArgumentList @("`"$vbs`"", 'node', "`"$OmniMjs`"", 'serve', '--no-open')
+        if (Test-Path $vbs) {
+            Start-Process -FilePath 'wscript.exe' -ArgumentList @("`"$vbs`"", 'node', "`"$OmniMjs`"", 'serve', '--no-open')
+        } else {
+            Start-Process -FilePath 'node.exe' -ArgumentList @("`"$OmniMjs`"", 'serve', '--no-open') -WindowStyle Hidden
+        }
         Info 'starting OmniRoute ...'
         $up = $false
-        for ($i = 0; $i -lt 60; $i++) { Start-Sleep -Seconds 2; if (Omni-Up) { $up = $true; break } }
-        if (-not $up) { Warn 'OmniRoute did not answer within 2 minutes; it will start at the next login. Continuing.' }
+        for ($i = 0; $i -lt 30; $i++) { Start-Sleep -Seconds 1; if (Omni-Up) { $up = $true; break } }
+        if (-not $up) { Warn 'OmniRoute did not answer within 30 seconds; it will start at the next login. Continuing.' }
     }
     if (Omni-Up) { Ok "OmniRoute is running on http://localhost:$OmniPort" }
 
