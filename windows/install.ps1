@@ -423,17 +423,24 @@ mcp = data.get('mcp', {})
 if 'servers' in mcp:
     mcp = mcp['servers']
 
-# Graphify remote endpoint check
+# Graphify remote endpoint check (only register when the endpoint is active, as OpenCode attempts connection for all remote MCPs)
 graphify_up = False
 try:
     req = urllib.request.Request('http://127.0.0.1:8081/mcp', method='GET')
     with urllib.request.urlopen(req, timeout=1) as resp:
         graphify_up = True
-except Exception:
-    graphify_up = False
+except Exception as e:
+    if hasattr(e, 'code'):
+        graphify_up = True
 
-if 'graphify' in mcp:
-    mcp['graphify']['enabled'] = bool(graphify_up)
+if graphify_up:
+    mcp['graphify'] = {
+        'type': 'remote',
+        'url': 'http://127.0.0.1:8081/mcp',
+        'enabled': True
+    }
+elif 'graphify' in mcp:
+    del mcp['graphify']
 
 # Check browser MCP binaries
 if not os.path.isfile(r'$pwMcpJs') and 'my-browser' in mcp:
