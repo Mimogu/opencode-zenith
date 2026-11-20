@@ -28,8 +28,8 @@ if ((Test-Path $configDir) -and (Ask-YesNo "Delete the OpenCode config folder $c
     Remove-Item $configDir -Recurse -Force
     Write-Host '    deleted'
 }
-if (Ask-YesNo 'Remove the saved OPENROUTER_API_KEY and OMNIROUTE_API_KEY?') {
-    foreach ($k in @('OPENROUTER_API_KEY', 'OMNIROUTE_API_KEY')) { [Environment]::SetEnvironmentVariable($k, $null, 'User') }
+if (Ask-YesNo 'Remove the saved OPENROUTER_API_KEY, NVIDIA_API_KEY, and OMNIROUTE_API_KEY?') {
+    foreach ($k in @('OPENROUTER_API_KEY', 'NVIDIA_API_KEY', 'OMNIROUTE_API_KEY')) { [Environment]::SetEnvironmentVariable($k, $null, 'User') }
     Write-Host '    removed'
 }
 Write-Host ''
