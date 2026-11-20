@@ -365,6 +365,10 @@ if [ -d "${SCRIPT_DIR}/systemd" ] && has_cmd systemctl; then
 fi
 
 # Restart OpenCode background services so new MCP servers and config take effect
+if has_cmd opencode; then
+  opencode service restart >/dev/null 2>&1 || true
+  opencode reload >/dev/null 2>&1 || true
+fi
 if has_cmd opencode-stack; then
   opencode-stack down >/dev/null 2>&1 || true
   opencode-stack up >/dev/null 2>&1 || true

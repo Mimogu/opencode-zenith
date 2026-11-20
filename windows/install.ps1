@@ -403,35 +403,58 @@ shell.Run Trim(cmd), 0, False
 
     $tpl = Join-Path $ConfigDir 'opencode.json.template'
     if (Test-Path $tpl) {
-        $content = Get-Content $tpl -Raw
         $posixConfig = $ConfigDir.Replace('\', '/')
-        $content = $content.Replace('{{CONFIG_DIR}}', $posixConfig)
-        $content = $content.Replace('"python3"', '"python"')
+        $pwMcpJs = (Join-Path $ConfigDir 'mcp-servers\node_modules\@playwright\mcp\cli.js').Replace('\', '/')
+        $ffMcpJs = (Join-Path $ConfigDir 'mcp-servers\node_modules\@mozilla\firefox-devtools-mcp\dist\index.js').Replace('\', '/')
+        $camoJs = (Join-Path $ConfigDir 'mcp-servers\camofox\server.mjs').Replace('\', '/')
+        $targetJson = (Join-Path $ConfigDir 'opencode.json').Replace('\', '/')
+        $posixTpl = $tpl.Replace('\', '/')
 
-        $pwMcpJs = Join-Path $ConfigDir 'mcp-servers\node_modules\@playwright\mcp\cli.js'
-        if (-not (Test-Path $pwMcpJs)) {
-            $content = [regex]::Replace($content, '("my-browser"\s*:\s*\{[^}]+?"enabled"\s*:\s*)(true|false)', '${1}false')
-        }
-        $ffMcpJs = Join-Path $ConfigDir 'mcp-servers\node_modules\@mozilla\firefox-devtools-mcp\dist\index.js'
-        if (-not (Test-Path $ffMcpJs)) {
-            $content = [regex]::Replace($content, '("my-firefox"\s*:\s*\{[^}]+?"enabled"\s*:\s*)(true|false)', '${1}false')
-        }
-        $camoJs = Join-Path $ConfigDir 'mcp-servers\camofox\server.mjs'
-        if (-not (Test-Path $camoJs)) {
-            $content = [regex]::Replace($content, '("camofox"\s*:\s*\{[^}]+?"enabled"\s*:\s*)(true|false)', '${1}false')
-        }
+        $pyCode = @"
+import json, os, urllib.request
 
-        $graphifyUp = $false
+p = r'$targetJson'
+tpl = r'$posixTpl'
+with open(tpl, 'r', encoding='utf-8') as f:
+    text = f.read().replace('{{CONFIG_DIR}}', r'$posixConfig').replace('\"python3\"', '\"python\"')
+    data = json.loads(text)
+
+mcp = data.get('mcp', {})
+if 'servers' in mcp:
+    mcp = mcp['servers']
+
+# Graphify remote endpoint check
+graphify_up = False
+try:
+    req = urllib.request.Request('http://127.0.0.1:8081/mcp', method='GET')
+    with urllib.request.urlopen(req, timeout=1) as resp:
+        graphify_up = True
+except Exception:
+    graphify_up = False
+
+if 'graphify' in mcp:
+    mcp['graphify']['enabled'] = bool(graphify_up)
+
+# Check browser MCP binaries
+if not os.path.isfile(r'$pwMcpJs') and 'my-browser' in mcp:
+    mcp['my-browser']['enabled'] = False
+if not os.path.isfile(r'$ffMcpJs') and 'my-firefox' in mcp:
+    mcp['my-firefox']['enabled'] = False
+if not os.path.isfile(r'$camoJs') and 'camofox' in mcp:
+    mcp['camofox']['enabled'] = False
+
+with open(p, 'w', encoding='utf-8') as f:
+    json.dump(data, f, indent=2)
+"@
         try {
-            $r = Invoke-WebRequest -UseBasicParsing -TimeoutSec 1 "http://127.0.0.1:8081/mcp" -ErrorAction SilentlyContinue
-            $graphifyUp = $true
-        } catch {
-            if ($_.Exception.Response) { $graphifyUp = $true }
-        }
-        $targetGraphifyState = if ($graphifyUp) { 'true' } else { 'false' }
-        $content = [regex]::Replace($content, '("graphify"\s*:\s*\{[^}]+?"enabled"\s*:\s*)(true|false)', "${1}$targetGraphifyState")
+            & $Python -c $pyCode 2>$null
+        } catch {}
 
-        [IO.File]::WriteAllText((Join-Path $ConfigDir 'opencode.json'), $content, (New-Object System.Text.UTF8Encoding $false))
+        if (-not (Test-Path (Join-Path $ConfigDir 'opencode.json'))) {
+            $content = Get-Content $tpl -Raw
+            $content = $content.Replace('{{CONFIG_DIR}}', $posixConfig).Replace('"python3"', '"python"')
+            [IO.File]::WriteAllText((Join-Path $ConfigDir 'opencode.json'), $content, (New-Object System.Text.UTF8Encoding $false))
+        }
     }
 } catch { Fail "could not copy the config into ${ConfigDir}: $($_.Exception.Message)" }
 $pathsJson = @{
@@ -736,7 +759,9 @@ Get-CimInstance Win32_Process -Filter "Name like 'python%'" -ErrorAction Silentl
     Where-Object { $_.CommandLine -match 'sentinel\.py' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
 Start-Process -FilePath $PythonW -ArgumentList @("`"$(Join-Path $ConfigDir 'sentinel.py')`"") -WorkingDirectory $ConfigDir -WindowStyle Hidden
 Ok 'sentinel started'
-Get-Process -Name 'opencode-cli' -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+Get-Process -Name 'opencode-cli', 'OpenCode' -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+try { & $OpenCodeExe service restart 2>$null | Out-Null } catch {}
+try { & $OpenCodeExe reload 2>$null | Out-Null } catch {}
 
 $taskName = 'OpenCode Model Lab'
 try {
@@ -763,6 +788,14 @@ try {
 } finally { Pop-Location }
 $agents = (& $OpenCodeExe debug agents 2>$null | Out-String)
 if ($agents -match '"build"') { Ok 'OpenCode loads the agents' } else { Warn 'could not confirm the agents loaded' }
+
+$mcpOut = @(& $OpenCodeExe mcp list 2>&1)
+if ($mcpOut.Count -gt 0) {
+    Ok "MCP servers ready ($($mcpOut.Count) configured):"
+    foreach ($m in $mcpOut) { Info "       $m" }
+} else {
+    Warn 'No MCP servers listed yet. Run /reload inside OpenCode or restart the terminal.'
+}
 
 Write-Host ''
 if (Ask-YesNo 'Run a quick model test now? (uses about 3 free messages, takes a few minutes)' $false) {
