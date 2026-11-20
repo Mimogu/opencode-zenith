@@ -372,19 +372,29 @@ shell.Run Trim(cmd), 0, False
 '@
         [IO.File]::WriteAllText($targetVbs, $vbsCode, (New-Object System.Text.UTF8Encoding $false))
     }
+    $mcpDir = Join-Path $ConfigDir 'mcp-servers'
+    if (Test-Path (Join-Path $mcpDir 'package.json')) {
+        Info 'Installing browser MCP servers (playwright-mcp, firefox-devtools-mcp)...'
+        Push-Location $mcpDir
+        try {
+            & $npmCmd ci --silent 2>$null
+            if ($LASTEXITCODE -ne 0) { & $npmCmd install --silent 2>$null }
+        } catch {} finally { Pop-Location }
+    }
+
     $tpl = Join-Path $ConfigDir 'opencode.json.template'
     if (Test-Path $tpl) {
         $content = Get-Content $tpl -Raw
         $posixConfig = $ConfigDir.Replace('\', '/')
         $content = $content.Replace('{{CONFIG_DIR}}', $posixConfig)
         $content = $content.Replace('"python3"', '"python"')
-        if (-not (Have 'bun')) {
-            $content = [regex]::Replace($content, '("my-firefox"\s*:\s*\{[^}]+?"enabled"\s*:\s*)true', '${1}false')
+        $pwMcpCmd = Join-Path $ConfigDir 'mcp-servers\node_modules\.bin\playwright-mcp.cmd'
+        $ffMcpCmd = Join-Path $ConfigDir 'mcp-servers\node_modules\.bin\firefox-devtools-mcp.cmd'
+        if (Test-Path $pwMcpCmd) {
+            $content = $content.Replace('{{CONFIG_DIR}}/mcp-servers/node_modules/.bin/playwright-mcp', ($pwMcpCmd.Replace('\', '/')))
         }
-        $pwMcp = Join-Path $ConfigDir 'mcp-servers\node_modules\.bin\playwright-mcp.cmd'
-        $pwMcpExe = Join-Path $ConfigDir 'mcp-servers\node_modules\.bin\playwright-mcp'
-        if (-not (Test-Path $pwMcp) -and -not (Test-Path $pwMcpExe)) {
-            $content = [regex]::Replace($content, '("my-browser"\s*:\s*\{[^}]+?"enabled"\s*:\s*)true', '${1}false')
+        if (Test-Path $ffMcpCmd) {
+            $content = $content.Replace('{{CONFIG_DIR}}/mcp-servers/node_modules/.bin/firefox-devtools-mcp', ($ffMcpCmd.Replace('\', '/')))
         }
         [IO.File]::WriteAllText((Join-Path $ConfigDir 'opencode.json'), $content, (New-Object System.Text.UTF8Encoding $false))
     }
