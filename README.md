@@ -236,7 +236,51 @@ No. The installer checks if Git, Python, Node, Bun, and ripgrep are already inst
 
 <details>
 <summary><b>How do I update OpenCode Zenith?</b></summary>
-See the detailed <a href="#-how-to-update-opencode-zenith">How to Update</a> section above. Depending on your installation method, you can simply re-run the 1-line command, re-run <code>install.bat</code> from a new ZIP, or run <code>git pull && ./install.sh</code>. Your API keys are always preserved.
+
+Updating is 100% safe, non-destructive, and automatically backs up your existing configuration. Your API keys (`free-models.env` or Windows User environment variables) are **never overwritten**.
+
+Choose the update instructions for how you originally installed:
+
+* **1. If you installed via the 1-Line Command**:  
+  Re-run the exact same command in your terminal. It will download the latest update, upgrade the `opencode` CLI, and deploy updated skills and plugins:
+  * **Linux**:
+    ```bash
+    curl -fsSL https://raw.githubusercontent.com/Mimogu/opencode-zenith/main/install.sh | bash
+    ```
+  * **Windows (PowerShell)**:
+    ```powershell
+    irm https://raw.githubusercontent.com/Mimogu/opencode-zenith/main/windows/install.ps1 | iex
+    ```
+
+* **2. If you installed via the Windows ZIP Download**:  
+  1. Download the latest **`opencode-zenith`** ZIP from GitHub (**`<> Code`** → **Download ZIP**).
+  2. Extract the `.zip` archive.
+  3. Double-click `windows\install.bat`. It will recognize your existing setup and saved API keys, upgrade OpenCode, back up your old config, and apply the update without asking you to re-type keys.
+
+* **3. If you cloned via Git**:  
+  Open your terminal inside your `opencode-zenith` folder and run:
+  * **Linux**:
+    ```bash
+    git pull && ./install.sh
+    ```
+  * **Windows**:
+    ```cmd
+    git pull
+    windows\install.bat
+    ```
+
+* **What happens to my API keys and memory?**  
+  All your API keys, model benchmarks, and personal configurations remain intact. A timestamped backup (`~/.config/opencode.bak.<timestamp>`) is created automatically before updating.
+</details>
+
+<details>
+<summary><b>Do I need to install Ollama for local embeddings?</b></summary>
+
+No, it is optional. OpenCode Zenith includes a high-speed built-in BM25 keyword matching engine that requires zero extra software and zero background RAM.
+
+If you want deep semantic vector embeddings for memory and skill matching:
+* The installer will detect if you have Ollama installed and offer to install Ollama and download the <code>embeddinggemma</code> model (~620MB) for you.
+* Alternatively, you can install <a href="https://ollama.com">Ollama</a> anytime and run: <code>ollama pull embeddinggemma</code>. Zenith will automatically detect it on <code>http://127.0.0.1:11434</code> and activate semantic vector search.
 </details>
 
 ---
