@@ -343,6 +343,10 @@ if ((Test-Path $ConfigDir) -and (Get-ChildItem $ConfigDir -Force -ErrorAction Si
 try {
     New-Item -ItemType Directory -Force -Path $ConfigDir -ErrorAction Stop | Out-Null
     Copy-Item -Path (Join-Path $ConfigSrc '*') -Destination $ConfigDir -Recurse -Force -ErrorAction Stop
+    $pycache = Join-Path $ConfigDir '__pycache__'
+    if (Test-Path $pycache) { Remove-Item $pycache -Recurse -Force -ErrorAction SilentlyContinue }
+    $testPycache = Join-Path $ConfigDir 'tests\__pycache__'
+    if (Test-Path $testPycache) { Remove-Item $testPycache -Recurse -Force -ErrorAction SilentlyContinue }
     $targetVbs = Join-Path $ConfigDir 'run-hidden.vbs'
     $vbsCandidates = @(
         (Join-Path $Here 'run-hidden.vbs'),
@@ -586,7 +590,7 @@ if (-not $NoOmniRoute) {
         }
     }
     if ($envLines.Count -gt 0) {
-        Set-Content -Path $envFile -Value $envLines -Encoding UTF8
+        [IO.File]::WriteAllText($envFile, ($envLines -join [Environment]::NewLine), (New-Object System.Text.UTF8Encoding $false))
     }
 }
 

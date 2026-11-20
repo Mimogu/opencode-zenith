@@ -24,7 +24,7 @@ ask_yes_no() {
 }
 
 # 1. Stop and disable systemd user services
-echo "[1/4] Stopping background services..."
+echo "[1/5] Stopping background services..."
 if command -v systemctl >/dev/null 2>&1; then
   for unit in opencode-benchmark.timer opencode-benchmark.service opencode-sentinel.service omniroute.service; do
     if systemctl --user is-active --quiet "$unit" 2>/dev/null || systemctl --user is-enabled --quiet "$unit" 2>/dev/null; then
@@ -50,20 +50,33 @@ pkill -u "$(id -u)" -f "omniroute serve" 2>/dev/null || true
 echo "  [✓] Background services stopped."
 
 # 2. Remove helper scripts
-echo "[2/4] Removing Zenith binaries..."
+echo "[2/5] Removing Zenith binaries..."
 if [ -f "${HOME}/.local/bin/browser-ctl" ]; then
   rm -f "${HOME}/.local/bin/browser-ctl"
   echo "  [-] Removed ${HOME}/.local/bin/browser-ctl"
 fi
 
 # 3. Clean configuration folder
-echo "[3/4] Cleaning OpenCode configuration..."
+echo "[3/5] Cleaning OpenCode configuration..."
 if [ -d "$CONFIG_DIR" ]; then
-  if ask_yes_no "Delete the OpenCode Zenith configuration folder ($CONFIG_DIR)?" "y"; then
+  if ask_yes_no "Delete the OpenCode Zenith configuration folder ($CONFIG_DIR)?" "n"; then
     rm -rf "$CONFIG_DIR"
     echo "  [✓] Configuration removed."
   else
     echo "  [i] Configuration preserved at $CONFIG_DIR."
+    if [ -f "${CONFIG_DIR}/free-models.env" ]; then
+      if ask_yes_no "Scrub saved API keys from ${CONFIG_DIR}/free-models.env?" "n"; then
+        python3 -c "
+with open('${CONFIG_DIR}/free-models.env', 'r', encoding='utf-8') as f: lines = f.readlines()
+with open('${CONFIG_DIR}/free-models.env', 'w', encoding='utf-8') as f:
+    for line in lines:
+        for k in ['NVIDIA_API_KEY', 'OPENROUTER_API_KEY', 'OMNIROUTE_API_KEY']:
+            if line.startswith(f'{k}='): line = f'{k}=\n'
+        f.write(line)
+"
+        echo "  [✓] Saved API keys cleared from free-models.env."
+      fi
+    fi
   fi
 else
   echo "  [i] No configuration folder found at $CONFIG_DIR."

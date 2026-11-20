@@ -147,7 +147,7 @@ OpenCode Zenith features an intelligent memory and skill-routing engine with hyb
   ```bash
   ollama pull embeddinggemma
   ```
-  Zenith automatically detects Ollama on `http://127.0.0.1:11434`, warms up `embeddinggemma` (~620MB) on demand, and automatically unloads it from RAM after 20 minutes of inactivity. If Ollama is ever stopped, Zenith seamlessly falls back to BM25 keyword matching without blocking.
+  Zenith automatically detects Ollama on `http://127.0.0.1:11434`, uses `embeddinggemma` (~620MB) on demand, and seamlessly falls back to fast BM25 keyword matching without blocking if Ollama is ever stopped or unavailable.
 
 ---
 
