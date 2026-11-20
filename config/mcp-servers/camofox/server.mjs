@@ -21,7 +21,7 @@
 import { randomUUID } from "node:crypto";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 
 import { loadMcpConfig } from "./lib/config.mjs";
 import {
@@ -35,15 +35,21 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 // Version from this package's own package.json (single source — no hardcoded
 // duplicate). mcp/ is an independently installable package (@askjo/camofox-browser-mcp)
 // with its own manifest, so this reads locally rather than the parent repo's.
-const VERSION = JSON.parse(
-  readFileSync(join(__dirname, "package.json"), "utf8")
-).version;
+let VERSION = "1.18.1";
+try {
+  const pkgPath = join(__dirname, "package.json");
+  if (existsSync(pkgPath)) {
+    VERSION = JSON.parse(readFileSync(pkgPath, "utf8")).version || VERSION;
+  }
+} catch {
+  // safe fallback
+}
 
 // Server config (apiKey / accessKey / cookiesDir / port). The standalone
 // package reads only its own environment settings; CAMOFOX_BASE_URL overrides
 // the derived local URL.
 const CONFIG = loadMcpConfig();
-const BASE_URL = process.env.CAMOFOX_BASE_URL || `http://localhost:${CONFIG.port}`;
+const BASE_URL = process.env.CAMOFOX_BASE_URL || process.env.CAMOFOX_URL || `http://localhost:${CONFIG.port}`;
 
 // Per-MCP-server userId so each host session gets an isolated camofox session
 // (cookie/storage partition). Falls back to a random id.

@@ -135,6 +135,8 @@ if [ -d "$CONFIG_DIR" ]; then
   echo "  [!] Existing config found at $CONFIG_DIR"
   echo "  [+] Creating backup at $BACKUP_DIR"
   cp -r "$CONFIG_DIR" "$BACKUP_DIR"
+  # Remove legacy symlinks that conflict with directory bundles
+  find "$CONFIG_DIR" -type l -exec rm -f {} + 2>/dev/null || true
 fi
 
 mkdir -p "$CONFIG_DIR"
@@ -146,8 +148,10 @@ if [ -f "${CONFIG_DIR}/mcp-servers/package.json" ]; then
   echo "  [+] Installing browser MCP server binaries..."
   if has_cmd npm; then
     (cd "${CONFIG_DIR}/mcp-servers" && (npm ci --silent 2>/dev/null || npm install --silent 2>/dev/null || true))
+  elif has_cmd bun; then
+    (cd "${CONFIG_DIR}/mcp-servers" && bun install --silent 2>/dev/null || true)
   fi
-  if [ -f "${CONFIG_DIR}/mcp-servers/node_modules/.bin/playwright-mcp" ]; then
+  if [ -f "${CONFIG_DIR}/mcp-servers/node_modules/@playwright/mcp/cli.js" ] && [ -f "${CONFIG_DIR}/mcp-servers/node_modules/@mozilla/firefox-devtools-mcp/dist/index.js" ]; then
     echo "  [✓] Browser MCP tools ready (playwright-mcp, firefox-devtools-mcp)."
   fi
 fi
@@ -156,6 +160,47 @@ fi
 echo "[3/5] Initializing configuration files..."
 if [ -f "${CONFIG_DIR}/opencode.json.template" ]; then
   sed "s|{{CONFIG_DIR}}|${CONFIG_DIR}|g" "${CONFIG_DIR}/opencode.json.template" > "${CONFIG_DIR}/opencode.json"
+
+  # Validate MCP server availability and cleanly disable missing/unreachable ones
+  python3 -c "
+import json, os, urllib.request
+
+p = '${CONFIG_DIR}/opencode.json'
+if not os.path.isfile(p):
+    exit(0)
+with open(p, 'r', encoding='utf-8') as f:
+    data = json.load(f)
+
+mcp = data.get('mcp', {})
+
+# Graphify remote endpoint check
+graphify_up = False
+try:
+    with urllib.request.urlopen('http://127.0.0.1:8081/mcp', timeout=1) as resp:
+        graphify_up = True
+except Exception as e:
+    if hasattr(e, 'code'):
+        graphify_up = True
+
+if not graphify_up and 'graphify' in mcp:
+    mcp['graphify']['enabled'] = False
+
+# Browser & local MCP checks
+pw_js = '${CONFIG_DIR}/mcp-servers/node_modules/@playwright/mcp/cli.js'
+if not os.path.isfile(pw_js) and 'my-browser' in mcp:
+    mcp['my-browser']['enabled'] = False
+
+ff_js = '${CONFIG_DIR}/mcp-servers/node_modules/@mozilla/firefox-devtools-mcp/dist/index.js'
+if not os.path.isfile(ff_js) and 'my-firefox' in mcp:
+    mcp['my-firefox']['enabled'] = False
+
+camo_js = '${CONFIG_DIR}/mcp-servers/camofox/server.mjs'
+if not os.path.isfile(camo_js) and 'camofox' in mcp:
+    mcp['camofox']['enabled'] = False
+
+with open(p, 'w', encoding='utf-8') as f:
+    json.dump(data, f, indent=2)
+" 2>/dev/null || true
 fi
 
 echo "  [+] Validating OpenCode configuration..."
