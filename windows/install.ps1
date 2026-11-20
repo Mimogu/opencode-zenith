@@ -442,19 +442,54 @@ if (-not $NoOmniRoute) {
     if (Omni-Up) { Ok "OmniRoute is running on http://localhost:$OmniPort" }
 
     Step 'OmniRoute keys'
-    Info 'Choose an admin password for the OmniRoute dashboard (typing is hidden).'
-    while ($true) {
-        $pw1 = Read-Secret 'OmniRoute admin password'
-        if ($pw1.Length -lt 8) { Warn 'Use at least 8 characters.'; continue }
-        $pw2 = Read-Secret 'Repeat the password'
-        if ($pw1 -ne $pw2) { Warn 'The passwords do not match.'; continue }
-        break
+    $omniDb = Join-Path $env:USERPROFILE '.omniroute\storage.sqlite'
+    if ((Test-Path $omniDb) -or (Omni-Up)) {
+        Ok 'Existing OmniRoute setup detected'
+        $pw1 = Read-Secret 'OmniRoute admin password (Enter = keep current password)'
+        if ($pw1) {
+            if ($pw1.Length -lt 8) {
+                Warn 'Password must be at least 8 characters. Keeping current password.'
+            } else {
+                Omni setup --non-interactive --password $pw1
+                if ($LASTEXITCODE -eq 0) { Ok 'admin password updated' } else { Warn "could not update password; keeping current" }
+            }
+        } else {
+            Ok 'Current OmniRoute admin password preserved'
+        }
+        $pw1 = $null
+    } else {
+        Info 'Choose an admin password for the OmniRoute dashboard (typing is hidden).'
+        while ($true) {
+            $pw1 = Read-Secret 'OmniRoute admin password'
+            if ($pw1.Length -lt 8) { Warn 'Use at least 8 characters.'; continue }
+            $pw2 = Read-Secret 'Repeat the password'
+            if ($pw1 -ne $pw2) { Warn 'The passwords do not match.'; continue }
+            break
+        }
+        Omni setup --non-interactive --password $pw1
+        if ($LASTEXITCODE -eq 0) { Ok 'admin password set' } else { Warn "could not set the password (exit $LASTEXITCODE); set it in the dashboard instead" }
+        $pw1 = $null; $pw2 = $null
     }
-    Omni setup --non-interactive --password $pw1
-    if ($LASTEXITCODE -eq 0) { Ok 'admin password set' } else { Warn "could not set the password (exit $LASTEXITCODE); set it in the dashboard instead" }
-    $pw1 = $null; $pw2 = $null
+
+    # Detect existing keys from free-models.env or user environment
+    $envFile = Join-Path $ConfigDir 'free-models.env'
+    $envMap = @{}
+    if (Test-Path $envFile) {
+        foreach ($line in (Get-Content $envFile)) {
+            if ($line -match '^\s*([A-Za-z0-9_]+)=(.*)$') {
+                $val = $Matches[2].Trim()
+                if ($val -and -not $val.StartsWith('sk-your-') -and -not $val.StartsWith('nvapi-your-') -and -not $val.StartsWith('omni-your-')) {
+                    $envMap[$Matches[1]] = $val
+                }
+            }
+        }
+    }
 
     $existingNv = [Environment]::GetEnvironmentVariable('NVIDIA_API_KEY', 'User')
+    if (-not $existingNv -and $envMap.ContainsKey('NVIDIA_API_KEY')) {
+        $existingNv = $envMap['NVIDIA_API_KEY']
+        Set-UserEnv 'NVIDIA_API_KEY' $existingNv
+    }
     if ($existingNv) {
         Ok 'Existing NVIDIA_API_KEY detected and preserved'
     } else {
@@ -466,11 +501,15 @@ if (-not $NoOmniRoute) {
             Set-UserEnv 'NVIDIA_API_KEY' $nvKey
             Ok 'NVIDIA_API_KEY saved for OpenCode'
             Omni setup --non-interactive --add-provider --provider nvidia --provider-name 'NVIDIA NIM' --api-key $nvKey 2>$null | Out-Null
-        } else { Info 'skipped NVIDIA' }
+        } else { Info 'skipped NVIDIA (existing settings preserved)' }
         $nvKey = $null
     }
 
     $existingOr = [Environment]::GetEnvironmentVariable('OPENROUTER_API_KEY', 'User')
+    if (-not $existingOr -and $envMap.ContainsKey('OPENROUTER_API_KEY')) {
+        $existingOr = $envMap['OPENROUTER_API_KEY']
+        Set-UserEnv 'OPENROUTER_API_KEY' $existingOr
+    }
     if ($existingOr) {
         Ok 'Existing OPENROUTER_API_KEY detected and preserved'
     } else {
@@ -483,17 +522,21 @@ if (-not $NoOmniRoute) {
             Ok 'OPENROUTER_API_KEY saved for OpenCode'
             Omni setup --non-interactive --add-provider --provider openrouter --provider-name OpenRouter --api-key $orKey --test-provider
             if ($LASTEXITCODE -eq 0) { Ok 'OpenRouter connected to OmniRoute' } else { Warn 'could not add OpenRouter to OmniRoute; add it in the dashboard' }
-        } else { Info 'skipped OpenRouter' }
+        } else { Info 'skipped OpenRouter (existing settings preserved)' }
         $orKey = $null
     }
 
     $existingOmni = [Environment]::GetEnvironmentVariable('OMNIROUTE_API_KEY', 'User')
+    if (-not $existingOmni -and $envMap.ContainsKey('OMNIROUTE_API_KEY')) {
+        $existingOmni = $envMap['OMNIROUTE_API_KEY']
+        Set-UserEnv 'OMNIROUTE_API_KEY' $existingOmni
+    }
     if ($existingOmni) {
         Ok 'Existing OMNIROUTE_API_KEY detected and preserved'
     } else {
         Write-Host ''
         Info "Now the OmniRoute dashboard opens in your browser (http://localhost:$OmniPort)."
-        Info '  1. Log in with the admin password you just chose.'
+        Info '  1. Log in with your admin password.'
         Info '  2. Optional: Providers -> add the AI accounts you want to route through OmniRoute'
         Info '     (for example Antigravity / Google login). The combos below use those models.'
         Info '  3. API Keys -> create a key, copy it, and come back to this window.'
