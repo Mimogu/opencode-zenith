@@ -124,6 +124,8 @@ if ! has_cmd omniroute; then
 fi
 if has_cmd omniroute; then
   echo "  [✓] OmniRoute gateway ready."
+else
+  echo "  [i] OmniRoute gateway not installed (optional; install anytime via 'npm install -g omniroute')."
 fi
 
 # 2. Backup existing configuration
@@ -137,6 +139,7 @@ fi
 
 mkdir -p "$CONFIG_DIR"
 cp -r "${SCRIPT_DIR}/config/"* "$CONFIG_DIR/"
+rm -rf "${CONFIG_DIR}/__pycache__" "${CONFIG_DIR}/tests/__pycache__"
 
 # 3. Process configuration templates
 echo "[3/5] Initializing configuration files..."
