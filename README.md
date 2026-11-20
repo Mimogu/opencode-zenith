@@ -242,23 +242,8 @@ OpenCode Zenith supports two browser operational modes:
 ---
 
 ## 📚 Complete Skills Catalog (90+ Skills)
-
-OpenCode Zenith bundles **90+ production-grade engineering skills**. All skills operate in **Manual On-Demand Invocation Mode** — they consume **zero token budget** during normal conversation and only load instructions when you explicitly invoke them.
-
+OpenCode Zenith bundles **90 production-grade engineering skills**. All skills operate in **Manual On-Demand Invocation Mode** — they consume **zero token budget** during normal conversation and only load instructions when you explicitly invoke them (`use the <name> skill to...`).
 For the full directory of all 90 skills with decision matrices and prompt recipes, see the comprehensive [Skills Catalog Guide](docs/skills-catalog.md).
-
-### 🌟 Flagship Skills & Upstream Repositories
-
-| Skill | Upstream GitHub Repository | What Scenario It's Used For | Example Prompt / Command |
-| :--- | :--- | :--- | :--- |
-| **`graphify`** | [Graphify-Labs/graphify](https://github.com/Graphify-Labs/graphify) | Mapping entire codebases into an interactive knowledge graph for caller/callee and architecture analysis. | `/graphify query "How does authentication flow through routes?"` |
-| **`markitdown`** | [microsoft/markitdown](https://github.com/microsoft/markitdown) | Converting any document, media, or archive (PDF, Word, Excel, images, audio, ZIP) into clean Markdown. | `use the markitdown skill to convert annual_report.pdf to markdown` |
-| **`ponytail`** | [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) | Radical simplicity, YAGNI enforcement, and eliminating over-engineering before writing code. | `use the ponytail skill to design our session cache without adding dependencies` |
-| **`academic-paper`** | [Imbad0202/academic-research-skills](https://github.com/Imbad0202/academic-research-skills) | 12-agent academic paper drafting, literature reviews, and multi-perspective peer review simulation. | `use the academic-paper skill to draft an IEEE-style paper on our benchmark results` |
-| **`supabase`** | [supabase/cli](https://github.com/supabase/cli) | Designing declarative PostgreSQL schemas, RLS policies, migrations, and Edge Functions. | `use the supabase skill to write an RLS policy for user organization tenancy` |
-| **`browser-automation`**| [microsoft/playwright](https://github.com/microsoft/playwright) | End-to-end browser testing, form interaction, visual screenshots, and DOM scraping via Playwright. | `use the browser-automation skill to test our staging checkout flow` |
-| **`ruflo`** | [ruvnet/ruflo](https://github.com/ruvnet/ruflo) | Multi-agent swarm orchestration, vector pattern learning, and consensus task coordination. | `use the ruflo skill to orchestrate parallel refactoring across modules` |
-| **`docx` / `xlsx` / `pptx`** | [anthropics/skills](https://github.com/anthropics/skills) | Professional document generation (Word `.docx`, Excel `.xlsx` spreadsheets, PowerPoint slide decks). | `use the docx skill to create an executive technical summary report` |
 
 > [!TIP]
 > **Why is Graphify Run On-Demand (and NOT as a Persistent MCP Server)?**  
@@ -266,6 +251,196 @@ For the full directory of all 90 skills with decision matrices and prompt recipe
 > 2. **Multi-Project Workspace Agility**: A persistent server locks to a single static `graph.json` generated in one directory. When switching projects, it serves stale nodes. In contrast, on-demand `/graphify` analyzes the exact repository you are currently working in.  
 > 3. **Cross-Platform & WinApps Portability**: Background HTTP daemons on `127.0.0.1:8081` break inside Windows WinApps/QEMU guest containers without complex network bridging. The on-demand skill runs natively across Linux, macOS, and Windows.  
 > 4. **Session Stability**: Eliminates connection drops and `404 Not Found` reconnect errors caused by long-lived MCP session idle reapers.
+
+---
+
+### 🗂️ All 90 Available Skills & Original Repositories by Category
+
+<details open>
+<summary><b>1. Document, Office & Content Creation</b> (6 skills) — <i>Tools for generating, editing, and converting Word, PowerPoint, Excel, PDF, and Markdown files.</i></summary>
+
+| Skill | Original GitHub Repository | When to Use / Scenario | Example Use / Prompt |
+| :--- | :--- | :--- | :--- |
+| **`docx`** | [anthropics/skills](https://github.com/anthropics/skills) | When you need to generate professional Word reports, transform markdown notes into formatted DOCX files, or edit existing Word docs. | `use the docx skill to create a comprehensive report from these notes and export to report.docx` |
+| **`pptx`** | [anthropics/skills](https://github.com/anthropics/skills) | When you want to turn a project summary, pitch deck, or lecture into a polished PowerPoint slide presentation. | `use the pptx skill to design a 7-slide presentation summarizing our quarterly progress` |
+| **`xlsx`** | [anthropics/skills](https://github.com/anthropics/skills) | When you need to export data tables to Excel, build financial models, or check existing sheets for broken formulas. | `use the xlsx skill to build a monthly budget sheet with auto-sum formulas and formatted headers` |
+| **`pdf`** | [anthropics/skills](https://github.com/anthropics/skills) | When you need to read content out of a PDF file, combine multiple PDFs, or inspect a PDF's visual layout. | `use the pdf skill to extract the text and tables from document.pdf` |
+| **`markitdown`** | [microsoft/markitdown](https://github.com/microsoft/markitdown) | When you have non-text files and want their full contents extracted into plain text or markdown for easy editing and analysis. | `use the markitdown skill to convert annual_report.pdf into clean markdown` |
+| **`canvas-design`** | [anthropics/skills](https://github.com/anthropics/skills) | When you want visually designed certificates, posters, social media banners, or graphical cheat sheets. | `use the canvas-design skill to design a modern minimalist event poster and save as poster.png` |
+
+</details>
+
+<details open>
+<summary><b>2. Web, Frontend & UI/UX Design</b> (7 skills) — <i>Tools and design standards for modern HTML/CSS, UI polish, design systems, and web widgets.</i></summary>
+
+| Skill | Original GitHub Repository | When to Use / Scenario | Example Use / Prompt |
+| :--- | :--- | :--- | :--- |
+| **`modern-web-guidance`** | [anthropics/skills](https://github.com/anthropics/skills) | When building or styling websites and you want modern, accessible, zero-dependency CSS patterns rather than outdated hacks. | `use the modern-web-guidance skill to style this modal dialog using native HTML dialog and modern CSS` |
+| **`frontend-design`** | [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official) | When building new web pages or apps and you want them to look premium, modern, and human-designed rather than generic AI templates. | `use the frontend-design skill to redesign the dashboard landing page with a modern dark theme` |
+| **`web-design-guidelines`** | [anthropics/skills](https://github.com/anthropics/skills) | When reviewing frontend code to ensure it meets accessibility standards and best UX design practices. | `use the web-design-guidelines skill to audit index.html for accessibility and UI flaws` |
+| **`web-artifacts-builder`** | [anthropics/skills](https://github.com/anthropics/skills) | When you need a quick, clickable web tool, interactive prototype, or simulation in a single HTML file. | `use the web-artifacts-builder skill to build an interactive mortgage payment calculator in a single html file` |
+| **`dual-viewport-ui`** | [anthropics/skills](https://github.com/anthropics/skills) | When building 3D product visualizers, interactive maps, or CAD-like tools with side-by-side controls. | `use the dual-viewport-ui skill to create a 3D model viewer with a side property inspector panel` |
+| **`design-quality`** | [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official) | When your UI feels cluttered, misaligned, or visually unappealing and needs a design review. | `use the design-quality skill to review the checkout page layout and suggest design improvements` |
+| **`create-design-md`** | [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official) | When onboarding onto a frontend project or building new pages that must strictly match the existing design tokens. | `use the create-design-md skill to inspect our frontend and write a DESIGN.md design system document` |
+
+</details>
+
+<details open>
+<summary><b>3. Software Architecture, Coding & Refactoring</b> (10 skills) — <i>Engineering principles, minimalist architectures, TypeScript practices, and code cleaners.</i></summary>
+
+| Skill | Original GitHub Repository | When to Use / Scenario | Example Use / Prompt |
+| :--- | :--- | :--- | :--- |
+| **`codebase-onboarding`** | [anthropics/skills](https://github.com/anthropics/skills) | When you first open a new repository and want a fast, high-level map of how everything connects and where to start. | `use the codebase-onboarding skill to analyze this repo and explain the architecture and key components` |
+| **`codebase-design`** | [anthropics/skills](https://github.com/anthropics/skills) | When refactoring messy spaghetti code or designing a new service to prevent tight coupling and high cognitive load. | `use the codebase-design skill to design a clean, decoupled service architecture for user authentication` |
+| **`engineering-principles`** | [anthropics/skills](https://github.com/anthropics/skills) | When reviewing code for bloat, unnecessary abstractions, or overly complex designs. | `use the engineering-principles skill to simplify this module and remove unnecessary boilerplate` |
+| **`ponytail`** | [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) | When you want to stop over-engineering and implement a feature with minimal lines and zero bloated dependencies. | `use the ponytail skill to implement this file watcher with zero third-party packages` |
+| **`ponytail-debt`** | [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) | When planning a cleanup sprint and you want to know all shortcuts taken across the project. | `use the ponytail-debt skill to scan the repository and build a technical debt report` |
+| **`deslop`** | [anthropics/skills](https://github.com/anthropics/skills) | When code written by AI models feels bloated, repetitive, or cluttered with unnecessary defensive checks. | `use the deslop skill to clean up this controller file and remove AI-generated boilerplate` |
+| **`no-comments`** | [anthropics/skills](https://github.com/anthropics/skills) | When code is polluted with comments like '// increment i' or redundant docstrings that obscure the actual logic. | `use the no-comments skill to strip obvious comments and make the code self-documenting` |
+| **`typescript-best-practices`** | [anthropics/skills](https://github.com/anthropics/skills) | When writing or refactoring TypeScript code and you want bulletproof type safety and great autocomplete. | `use the typescript-best-practices skill to refactor these API interfaces to use discriminated unions` |
+| **`schema-to-type`** | [anthropics/skills](https://github.com/anthropics/skills) | When integrating with an external API and you need typed models matching the API's JSON responses. | `use the schema-to-type skill to generate TypeScript types and Zod schemas for this user API payload` |
+| **`chisle`** | [anthropics/skills](https://github.com/anthropics/skills) | When working with low-context or free models and you need focused, fast edits without conversational fluff. | `use the chisle skill to refactor this script with minimal context usage` |
+
+</details>
+
+<details open>
+<summary><b>4. Testing, Verification & Debugging</b> (6 skills) — <i>Root-cause debugging, test suites, benchmarks, and pre-completion proof enforcers.</i></summary>
+
+| Skill | Original GitHub Repository | When to Use / Scenario | Example Use / Prompt |
+| :--- | :--- | :--- | :--- |
+| **`systematic-debugging`** | [anthropics/skills](https://github.com/anthropics/skills) | When an error, test failure, or unexpected bug occurs and you want to fix the real cause instead of guessing. | `use the systematic-debugging skill to investigate why the session authentication fails` |
+| **`test-quality`** | [anthropics/skills](https://github.com/anthropics/skills) | When adding tests for an existing feature, fixing brittle tests, or improving overall test coverage. | `use the test-quality skill to write comprehensive unit and integration tests for user registration` |
+| **`verification-before-completion`** | [anthropics/skills](https://github.com/anthropics/skills) | When you want absolute proof that everything compiles and passes tests before finishing a turn. | `use the verification-before-completion skill to run test suites and verify all checks pass` |
+| **`performance-profiling`** | [anthropics/skills](https://github.com/anthropics/skills) | When your application runs slowly, consumes too much RAM, or suffers from high latency spikes. | `use the performance-profiling skill to find why the data parsing loop is taking 8 seconds` |
+| **`benchmark-checklist`** | [anthropics/skills](https://github.com/anthropics/skills) | When running benchmarks or comparing two implementations to make sure the speed numbers are genuine. | `use the benchmark-checklist skill to audit our latency benchmark methodology` |
+| **`correct`** | [anthropics/skills](https://github.com/anthropics/skills) | When the AI keeps making the same mistake or bad assumption on a specific project. | `use the correct skill to diagnose our recurring build failures and add guardrails against them` |
+
+</details>
+
+<details open>
+<summary><b>5. Code Review, Auditing & Security</b> (7 skills) — <i>Deep branch audits, OWASP security checks, impact analysis, and critical objective reviews.</i></summary>
+
+| Skill | Original GitHub Repository | When to Use / Scenario | Example Use / Prompt |
+| :--- | :--- | :--- | :--- |
+| **`code-review`** | [anthropics/skills](https://github.com/anthropics/skills) | When preparing a pull request or reviewing changes before merging into your main branch. | `use the code-review skill to review the changes between main and feature-branch` |
+| **`thermo-nuclear-review`** | [anthropics/skills](https://github.com/anthropics/skills) | When reviewing mission-critical code changes where security or stability failures are unacceptable. | `use the thermo-nuclear-review skill to audit our payment processing branch before deployment` |
+| **`thermo-nuclear-code-quality-review`** | [anthropics/skills](https://github.com/anthropics/skills) | When reviewing code for long-term health and architectural cleanliness before it becomes tech debt. | `use the thermo-nuclear-code-quality-review skill to audit this new backend module` |
+| **`thermos`** | [anthropics/skills](https://github.com/anthropics/skills) | When you want the ultimate, all-angles review of a major feature branch in one pass. | `use the thermos skill to perform a comprehensive audit of the latest pull request` |
+| **`owasp-security`** | [anthropics/skills](https://github.com/anthropics/skills) | When writing security-sensitive code (auth, payment, sessions, APIs) or doing a security hardening sweep. | `use the owasp-security skill to audit our API endpoints for SQL injection and auth bypass risks` |
+| **`blast-radius`** | [anthropics/skills](https://github.com/anthropics/skills) | When modifying shared database schemas, common utilities, or core API contracts. | `use the blast-radius skill to check what parts of the app will be affected if we change User.id to UUID` |
+| **`anti-sycophancy`** | [anthropics/skills](https://github.com/anthropics/skills) | When you want an honest, unvarnished critical assessment of an idea, design, or architecture plan. | `use the anti-sycophancy skill to critically evaluate this database migration strategy` |
+
+</details>
+
+<details open>
+<summary><b>6. Git, DevOps, Containers & Deployment</b> (7 skills) — <i>Git workflows, merge conflict resolutions, Docker optimization, and CI/CD pipelines.</i></summary>
+
+| Skill | Original GitHub Repository | When to Use / Scenario | Example Use / Prompt |
+| :--- | :--- | :--- | :--- |
+| **`git-workflow`** | [anthropics/skills](https://github.com/anthropics/skills) | When organizing git commits, setting up git branching workflows, or preparing a clean PR history. | `use the git-workflow skill to organize our staged commits into conventional commit format` |
+| **`git-conflict-resolver`** | [anthropics/skills](https://github.com/anthropics/skills) | When git rebase or merge runs into gnarly file conflicts with lots of overlapping changes. | `use the git-conflict-resolver skill to resolve the merge conflict in src/app.ts` |
+| **`using-git-worktrees`** | [anthropics/skills](https://github.com/anthropics/skills) | When you need to review a bug fix or test a branch without interrupting your active working directory. | `use the using-git-worktrees skill to create an isolated worktree for bugfix-auth` |
+| **`docker-infra`** | [anthropics/skills](https://github.com/anthropics/skills) | When containerizing a new application, reducing huge image sizes, or configuring local development compose setups. | `use the docker-infra skill to write a multi-stage Dockerfile and docker-compose.yml for this FastAPI app` |
+| **`deployment-patterns`** | [anthropics/skills](https://github.com/anthropics/skills) | When setting up continuous integration/continuous deployment (CI/CD) pipelines from scratch. | `use the deployment-patterns skill to create a GitHub Actions workflow that tests and builds our app` |
+| **`publishing-release`** | [anthropics/skills](https://github.com/anthropics/skills) | When your code is tested and ready to release as a new version or package. | `use the publishing-release skill to prepare a v1.2.0 release with a generated changelog` |
+| **`production-hardening`** | [anthropics/skills](https://github.com/anthropics/skills) | When taking a prototype to real production traffic and ensuring it won't crash or leak sensitive data. | `use the production-hardening skill to audit this web service for production readiness` |
+
+</details>
+
+<details open>
+<summary><b>7. Database, Backend & Cloud</b> (4 skills) — <i>Safe migrations, high-performance SQL, query tuning, and Supabase integrations.</i></summary>
+
+| Skill | Original GitHub Repository | When to Use / Scenario | Example Use / Prompt |
+| :--- | :--- | :--- | :--- |
+| **`database-migrations`** | [anthropics/skills](https://github.com/anthropics/skills) | When altering production database tables, adding foreign keys, or altering large tables without downtime. | `use the database-migrations skill to create a zero-downtime migration for adding email_verified to users table` |
+| **`data-sql-queries`** | [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official) | When writing complex joins, window functions, CTEs, or aggregations for reports and backend queries. | `use the data-sql-queries skill to write a PostgreSQL query calculating 30-day user retention cohorts` |
+| **`data-write-query`** | [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official) | When a database query takes too long to run and needs to be optimized for low latency. | `use the data-write-query skill to optimize this slow orders report query` |
+| **`supabase`** | [supabase/cli](https://github.com/supabase/cli) | When building apps with Supabase, setting up RLS policies, configuring Auth, or debugging Supabase client libraries. | `use the supabase skill to configure Row-Level Security policies for our multi-tenant notes table` |
+
+</details>
+
+<details open>
+<summary><b>8. Data Science, Analytics & Visualizations</b> (12 skills) — <i>Exploratory data analysis, statistics, A/B testing, dashboards, machine learning, and plotting.</i></summary>
+
+| Skill | Original GitHub Repository | When to Use / Scenario | Example Use / Prompt |
+| :--- | :--- | :--- | :--- |
+| **`data-analyze`** | [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official) | When you have a dataset and need actionable answers, business summaries, or pattern discoveries. | `use the data-analyze skill to analyze customer_churn.csv and identify the top drivers of churn` |
+| **`data-explore-data`** | [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official) | When you receive a new dataset and want to understand what is inside before starting any modeling or reporting. | `use the data-explore-data skill to profile sales_data.csv and summarize missing values and distributions` |
+| **`data-statistical-analysis`** | [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official) | When you need to mathematically prove whether differences in data are statistically significant. | `use the data-statistical-analysis skill to test if conversion rates between version A and B are statistically significant` |
+| **`experiment-and-inference`** | [anthropics/skills](https://github.com/anthropics/skills) | When designing an experiment or interpreting A/B test results without falling for statistical traps. | `use the experiment-and-inference skill to calculate the sample size required for a 5% detectable lift` |
+| **`data-validate-data`** | [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official) | When you want to verify that an analysis or executive report is mathematically sound and error-free. | `use the data-validate-data skill to QA our customer segmentation findings before the executive meeting` |
+| **`data-visualization`** | [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official) | When creating charts for reports, articles, or presentations using Python. | `use the data-visualization skill to plot monthly revenue growth using Seaborn with a clean theme` |
+| **`data-create-viz`** | [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official) | When you want a quick visual representation of a table or series without manual plotting setup. | `use the data-create-viz skill to generate a histogram of user session durations` |
+| **`data-build-dashboard`** | [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official) | When you want to deliver an interactive reporting tool to stakeholders that runs without requiring a backend server. | `use the data-build-dashboard skill to build an interactive sales dashboard from monthly_sales.csv` |
+| **`ml-workflow`** | [anthropics/skills](https://github.com/anthropics/skills) | When building predictive models (classification, regression) without data leakage. | `use the ml-workflow skill to train an XGBoost model predicting customer churn with cross-validation` |
+| **`portfolio-project-builder`** | [anthropics/skills](https://github.com/anthropics/skills) | When assembling showcase projects for job applications, resumes, or public GitHub portfolios. | `use the portfolio-project-builder skill to outline a portfolio project analyzing public bike share data` |
+| **`data-science-tutor`** | [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official) | When learning a complex statistical or machine learning concept and you want plain-English explanations. | `use the data-science-tutor skill to explain how gradient descent works in simple terms` |
+| **`data-context-extractor`** | [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official) | When documenting data warehouse schemas and metric calculation rules for a company or project. | `use the data-context-extractor skill to document our company data warehouse business definitions` |
+
+</details>
+
+<details open>
+<summary><b>9. Web Research, Academic & Document Intelligence</b> (8 skills) — <i>Web queries, deep research dossiers, academic paper pipelines, and photo geolocation.</i></summary>
+
+| Skill | Original GitHub Repository | When to Use / Scenario | Example Use / Prompt |
+| :--- | :--- | :--- | :--- |
+| **`web-research`** | [anthropics/skills](https://github.com/anthropics/skills) | When you need to look up current documentation, pricing, release notes, or factual answers from the internet. | `use the web-research skill to find the latest pricing and features of Supabase vs Firebase` |
+| **`deep-research`** | [Imbad0202/academic-research-skills](https://github.com/Imbad0202/academic-research-skills) | When preparing a comprehensive research brief, market analysis, or deep technical investigation. | `use the deep-research skill to research state-of-the-art methods in local LLM quantization` |
+| **`academic-paper`** | [Imbad0202/academic-research-skills](https://github.com/Imbad0202/academic-research-skills) | When writing or formatting academic papers, journal submissions, or conference responses. | `use the academic-paper skill to draft the literature review section for our graph neural network paper` |
+| **`academic-paper-reviewer`** | [Imbad0202/academic-research-skills](https://github.com/Imbad0202/academic-research-skills) | When you want harsh, realistic feedback on an academic paper draft before submitting to a real journal or conference. | `use the academic-paper-reviewer skill to simulate a peer review of draft.pdf` |
+| **`academic-pipeline`** | [Imbad0202/academic-research-skills](https://github.com/Imbad0202/academic-research-skills) | When embarking on an end-to-end research paper project from initial idea to final submission-ready PDF. | `use the academic-pipeline skill to coordinate researching, writing, and reviewing our research topic` |
+| **`sr-screener`** | [anthropics/skills](https://github.com/anthropics/skills) | When conducting medical, clinical, or scientific systematic literature reviews. | `use the sr-screener skill to screen these 50 paper abstracts against our inclusion criteria` |
+| **`geo-sleuth`** | [anthropics/skills](https://github.com/anthropics/skills) | When you have a photo and want to pinpoint where or at what time of day it was taken. | `use the geo-sleuth skill to identify the location of this photo photo.jpg` |
+| **`documentation-lookup`** | [anthropics/skills](https://github.com/anthropics/skills) | When using new library versions, recently changed APIs, or SDKs that change frequently. | `use the documentation-lookup skill to check the latest Next.js 15 App Router caching API` |
+
+</details>
+
+<details open>
+<summary><b>10. Autonomous Multi-Agent & Orchestration</b> (7 skills) — <i>Lifecycle planning, subagent task execution, prompt sharpening, and structured ideation.</i></summary>
+
+| Skill | Original GitHub Repository | When to Use / Scenario | Example Use / Prompt |
+| :--- | :--- | :--- | :--- |
+| **`agentskills`** | [agentskills/agentskills](https://github.com/agentskills/agentskills) | When managing complex software projects across multiple stages. | `use the agentskills skill to route this new feature through planning, coding, and verification` |
+| **`subagent-driven-development`** | [anthropics/skills](https://github.com/anthropics/skills) | When tackling large multi-file refactors or implementations that benefit from modular execution. | `use the subagent-driven-development skill to execute the tasks outlined in PLAN.md` |
+| **`ruflo`** | [ruvnet/ruflo](https://github.com/ruvnet/ruflo) | When running multi-agent swarms using the local Ruflo command-line tool. | `use the ruflo skill to coordinate a multi-agent review of the repository` |
+| **`rea`** | [rea-agent/rea](https://github.com/rea-agent/rea) | When benchmarking agent performance or evaluating system metrics. | `use the rea skill to run evaluation benchmarks on our current setup` |
+| **`plans`** | [anthropics/skills](https://github.com/anthropics/skills) | When starting a non-trivial project or complex refactor and you want to align on the blueprint first. | `/plan design and implement a token-bucket rate limiter for our API` |
+| **`sharpen`** | [anthropics/skills](https://github.com/anthropics/skills) | When you have a rough idea and want the AI to refine it into a crystal-clear, high-quality prompt. | `use the sharpen skill to turn my rough idea 'make a dashboard' into a detailed specification` |
+| **`brainstorming`** | [anthropics/skills](https://github.com/anthropics/skills) | When exploring alternative architectural patterns or feature designs before committing to code. | `use the brainstorming skill to explore options for caching database queries` |
+
+</details>
+
+<details open>
+<summary><b>11. Creative, Media, Gaming & 3D</b> (7 skills) — <i>AI image/video generation, programmatic film direction, Godot 4, generative art, and 3D voxels.</i></summary>
+
+| Skill | Original GitHub Repository | When to Use / Scenario | Example Use / Prompt |
+| :--- | :--- | :--- | :--- |
+| **`image-gen`** | [anthropics/skills](https://github.com/anthropics/skills) | When you need an image, avatar, illustration, or visual asset generated from a prompt. | `use the image-gen skill to generate an illustration of a cozy cyberpunk coffee shop` |
+| **`video-gen`** | [anthropics/skills](https://github.com/anthropics/skills) | When you need a short motion clip or visual video asset. | `use the video-gen skill to generate a 5-second video of ocean waves crashing at sunset` |
+| **`lemo-opuscar`** | [anthropics/skills](https://github.com/anthropics/skills) | When creating programmatic video explainers, educational animations, or artistic short films. | `use the lemo-opuscar skill to direct a short animation explaining gravity in watercolor style` |
+| **`algorithmic-art`** | [anthropics/skills](https://github.com/anthropics/skills) | When creating creative coding projects, generative backgrounds, or interactive math visualizers. | `use the algorithmic-art skill to create an interactive flow field particle simulation in p5.js` |
+| **`godot4-dev`** | [godotengine/godot](https://github.com/godotengine/godot) | When developing 2D or 3D games, mechanics, or UI inside the Godot 4 engine. | `use the godot4-dev skill to create a character controller script with double-jump in GDScript` |
+| **`voxel-craft-cad`** | [anthropics/skills](https://github.com/anthropics/skills) | When building procedural voxel worlds, 3D structures, or algorithmic building generators. | `use the voxel-craft-cad skill to generate a procedural spiral castle tower in voxels` |
+| **`mcfunction-builder`** | [anthropics/skills](https://github.com/anthropics/skills) | When planning large Minecraft survival construction projects and calculating required stacks. | `use the mcfunction-builder skill to calculate how many shulker boxes of cobblestone are needed for a 50x50 pyramid` |
+
+</details>
+
+<details open>
+<summary><b>12. System, Desktop, Browser & Tooling</b> (9 skills) — <i>Linux desktop control, browser automation, knowledge graphs, MCP builders, and memory tools.</i></summary>
+
+| Skill | Original GitHub Repository | When to Use / Scenario | Example Use / Prompt |
+| :--- | :--- | :--- | :--- |
+| **`desktop-control`** | [anthropics/anthropic-quickstarts](https://github.com/anthropics/anthropic-quickstarts) | When you want the AI to interact directly with desktop GUI applications on your Linux desktop. | `use the desktop-control skill to take a screenshot of the active window and inspect its UI` |
+| **`browser-automation`** | [microsoft/playwright](https://github.com/microsoft/playwright) | When automating web tasks, scraping dynamic web pages, or testing web application interactions. | `use the browser-automation skill to open our staging site and verify the login flow` |
+| **`graphify`** | [Graphify-Labs/graphify](https://github.com/Graphify-Labs/graphify) | When exploring a huge project and you need to query caller/callee graphs or circular dependencies. | `use the graphify skill to build a knowledge graph of this repository and find the key hub nodes` |
+| **`mcp-builder`** | [modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers) | When developing a new MCP server or tool integration to connect external services to OpenCode. | `use the mcp-builder skill to build a Python MCP server that provides weather tools` |
+| **`memory-import`** | [anthropics/skills](https://github.com/anthropics/skills) | When migrating to OpenCode from another assistant and you want to bring over your personal preferences and context. | `use the memory-import skill to import my exported ChatGPT memories from memories.json` |
+| **`find-skills`** | [agentskills/agentskills](https://github.com/agentskills/agentskills) | When you need a specialized capability that isn't currently installed and want to search for community skills. | `use the find-skills skill to search for skills related to Rust web development` |
+| **`skill-creator`** | [anthropics/skills](https://github.com/anthropics/skills) | When building a brand new custom skill for OpenCode to automate a recurring workflow. | `use the skill-creator skill to scaffold a new skill for managing local Kubernetes clusters` |
+| **`context-budget`** | [anthropics/skills](https://github.com/anthropics/skills) | When tuning your setup for low-context free models and checking where your token budget is spent. | `use the context-budget skill to audit our active configuration and report token consumption` |
+| **`output-skill`** | [anthropics/skills](https://github.com/anthropics/skills) | When requesting very large outputs and you want to prevent the model from stopping halfway or truncating code. | `use the output-skill skill to ensure the full 500-line configuration file is output without truncation` |
+
+</details>
 
 ---
 
