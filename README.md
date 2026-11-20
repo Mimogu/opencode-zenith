@@ -193,15 +193,15 @@ opencode
 
 ### Essential Slash Commands (`/command`)
 
-| Slash Command | What It Does | When to Use It |
-| :--- | :--- | :--- |
-| **`/plan <task>`** | Researches the codebase, creates a step-by-step design plan with risk analysis, and **halts for your confirmation** before writing any code. | Use before starting any major feature or multi-file refactor. |
-| **`/goal <task>`** | Autonomous objective loop. Keeps testing, diagnosing, and iterating autonomously until the task is verifiably complete. | Use for complex or overnight tasks where you want the agent to solve all errors without stopping. |
-| **`/grill-me <idea>`** | Interactive design interview. Asks 3–5 sharp architectural questions to stress-test decisions before coding. | Use to resolve edge cases and UX trade-offs before building. |
-| **`/debug <issue>`** | 4-phase systematic root-cause debugging (Evidence → Isolation → Surgical Fix → Verification). | Use whenever an error or unexpected behavior occurs in code. |
-| **`/verify`** | Executes comprehensive validation across type-checks (`tsc`), linters, unit tests, and build scripts. | Use before committing or declaring work finished. |
-| **`/explore <topic>`** | Fast, read-only survey of repository structure and key entry points without modifying files. | Use when exploring a new or unfamiliar codebase. |
-| **`/status`** | Displays live benchmark scores, active model ladders, and router health. | Use to check current model rankings and server status. |
+| Slash Command | What It Does | When to Use It | Example Prompt |
+| :--- | :--- | :--- | :--- |
+| **`/plan <task>`** | Researches the codebase, creates a step-by-step design plan with risk analysis, and **halts for your confirmation** before writing any code. | Use before starting any major feature or multi-file refactor. | `/plan build a REST API endpoint for user profile pictures` |
+| **`/goal <task>`** | Autonomous objective loop. Keeps testing, diagnosing, and iterating autonomously until the task is verifiably complete. | Use for complex or overnight tasks where you want the agent to solve all errors without stopping. | `/goal fix all failing tests in the auth test suite and ensure clean build` |
+| **`/grill-me <idea>`** | Interactive design interview. Asks 3–5 sharp architectural questions to stress-test decisions before coding. | Use to resolve edge cases and UX trade-offs before building. | `/grill-me migrate our state management from Redux to Zustand` |
+| **`/debug <issue>`** | 4-phase systematic root-cause debugging (Evidence → Isolation → Surgical Fix → Verification). | Use whenever an error or unexpected behavior occurs in code. | `/debug why does the session token expire immediately on reload?` |
+| **`/verify`** | Executes comprehensive validation across type-checks (`tsc`), linters, unit tests, and build scripts. | Use before committing or declaring work finished. | `/verify ensure all TypeScript types and unit tests pass cleanly` |
+| **`/explore <topic>`** | Fast, read-only survey of repository structure and key entry points without modifying files. | Use when exploring a new or unfamiliar codebase. | `/explore find where user permissions are checked in the backend` |
+| **`/status`** | Displays live benchmark scores, active model ladders, and router health. | Use to check current model rankings and server status. | `/status` |
 
 ---
 
