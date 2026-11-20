@@ -226,6 +226,16 @@ $PythonW = Join-Path (Split-Path $Python) 'pythonw.exe'
 if (-not (Test-Path $PythonW)) { $PythonW = $Python }
 Ok "Python: $Python"
 
+# Ensure graphify CLI is available for on-demand knowledge graph extraction
+if (-not (Have 'graphify')) {
+    Info "installing Graphify CLI for on-demand codebase knowledge graphs..."
+    try {
+        & $Python -m pip install -q --user graphifyy 2>$null
+        Refresh-Path
+    } catch {}
+}
+if (Have 'graphify') { Ok "Graphify CLI ready (on-demand /graphify skill)" }
+
 # ----------------------------------------------------------------- opencode
 Step 'OpenCode'
 
@@ -423,23 +433,9 @@ mcp = data.get('mcp', {})
 if 'servers' in mcp:
     mcp = mcp['servers']
 
-# Graphify remote endpoint check (only register when the endpoint is active, as OpenCode attempts connection for all remote MCPs)
-graphify_up = False
-try:
-    req = urllib.request.Request('http://127.0.0.1:8081/mcp', method='GET')
-    with urllib.request.urlopen(req, timeout=1) as resp:
-        graphify_up = True
-except Exception as e:
-    if hasattr(e, 'code'):
-        graphify_up = True
-
-if graphify_up:
-    mcp['graphify'] = {
-        'type': 'remote',
-        'url': 'http://127.0.0.1:8081/mcp',
-        'enabled': True
-    }
-elif 'graphify' in mcp:
+# Graphify is strictly operated on-demand via the /graphify skill (not as a persistent MCP server)
+# to avoid token-taxing tool schema bloat on every turn, single-project locking, and port conflicts.
+if 'graphify' in mcp:
     del mcp['graphify']
 
 # Check browser MCP binaries

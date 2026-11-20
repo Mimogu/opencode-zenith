@@ -127,6 +127,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-canvas-design"></a>
 #### `canvas-design` — Visual Art & Poster Designer (PNG/PDF)
 - **Source Folder:** [canvas-design](../config/skills/canvas-design)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Generates visual artwork, posters, infographics, and book covers rendered into high-resolution PNG or PDF files.
 - **When to Use:** When you want visually designed certificates, posters, social media banners, or graphical cheat sheets.
 - **Example Prompt:**
@@ -137,6 +138,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-docx"></a>
 #### `docx` — Word Document (.docx) Creator & Editor
 - **Source Folder:** [docx](../config/skills/docx)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Creates, formats, reads, and updates Microsoft Word (.docx) documents with clean typography, styled headings, tables, callout boxes, and headers/footers.
 - **When to Use:** When you need to generate professional Word reports, transform markdown notes into formatted DOCX files, or edit existing Word docs.
 - **Example Prompt:**
@@ -147,6 +149,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-markitdown"></a>
 #### `markitdown` — Universal File to Markdown Converter
 - **Source Folder:** [markitdown](../config/skills/markitdown)
+- **Upstream Repository:** [microsoft/markitdown](https://github.com/microsoft/markitdown)
 - **What It Does:** Converts virtually any document or media format (PDF, Word, PPTX, Excel, HTML, CSV, audio, images, ZIP) into clean, readable Markdown.
 - **When to Use:** When you have non-text files and want their full contents extracted into plain text or markdown for easy editing and analysis.
 - **Example Prompt:**
@@ -157,6 +160,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-pdf"></a>
 #### `pdf` — PDF Document Inspector & Tools
 - **Source Folder:** [pdf](../config/skills/pdf)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Inspects PDF documents, extracts text and tables, merges or splits pages, fills forms, and renders visual previews of pages.
 - **When to Use:** When you need to read content out of a PDF file, combine multiple PDFs, or inspect a PDF's visual layout.
 - **Example Prompt:**
@@ -167,6 +171,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-pptx"></a>
 #### `pptx` — PowerPoint Presentation (.pptx) Designer
 - **Source Folder:** [pptx](../config/skills/pptx)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Designs high-quality PowerPoint slide decks (.pptx) from scratch or edits existing presentations with consistent color palettes, visual hierarchies, and modern layouts.
 - **When to Use:** When you want to turn a project summary, pitch deck, or lecture into a polished PowerPoint slide presentation.
 - **Example Prompt:**
@@ -177,6 +182,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-xlsx"></a>
 #### `xlsx` — Excel Spreadsheet (.xlsx) Specialist
 - **Source Folder:** [xlsx](../config/skills/xlsx)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Builds and audits Excel spreadsheets (.xlsx) with clean formulas, formatted headers, zebra striping, currency/date number formatting, and multi-sheet workbooks.
 - **When to Use:** When you need to export data tables to Excel, build financial models, or check existing sheets for broken formulas.
 - **Example Prompt:**
@@ -207,6 +213,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-create-design-md"></a>
 #### `create-design-md` — Design System Extractor (DESIGN.md)
 - **Source Folder:** [create-design-md](../config/skills/create-design-md)
+- **Upstream Repository:** [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official)
 - **What It Does:** Inspects an existing website or code repository and generates a comprehensive DESIGN.md documenting its typography, colors, spacing, and components.
 - **When to Use:** When onboarding onto a frontend project or building new pages that must strictly match the existing design tokens.
 - **Example Prompt:**
@@ -217,6 +224,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-design-quality"></a>
 #### `design-quality` — Unified Visual Artifact & UI Quality Review
 - **Source Folder:** [design-quality](../config/skills/design-quality)
+- **Upstream Repository:** [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official)
 - **What It Does:** Audits, critiques, and refines visual components, UI layouts, color palettes, and typography to eliminate amateurish design flaws.
 - **When to Use:** When your UI feels cluttered, misaligned, or visually unappealing and needs a design review.
 - **Example Prompt:**
@@ -227,6 +235,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-dual-viewport-ui"></a>
 #### `dual-viewport-ui` — 3D + 2D Synchronized Dual-Viewport UI
 - **Source Folder:** [dual-viewport-ui](../config/skills/dual-viewport-ui)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Architects synchronized dual-pane web interfaces that combine an interactive 3D WebGL scene with a reactive 2D parameter control panel.
 - **When to Use:** When building 3D product visualizers, interactive maps, or CAD-like tools with side-by-side controls.
 - **Example Prompt:**
@@ -237,6 +246,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-frontend-design"></a>
 #### `frontend-design` — Distinctive Frontend & UI Design
 - **Source Folder:** [frontend-design](../config/skills/frontend-design)
+- **Upstream Repository:** [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official)
 - **What It Does:** Helps create visually distinctive, polished, and personality-driven web interfaces with cohesive color schemes, micro-interactions, and typography.
 - **When to Use:** When building new web pages or apps and you want them to look premium, modern, and human-designed rather than generic AI templates.
 - **Example Prompt:**
@@ -247,6 +257,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-modern-web-guidance"></a>
 #### `modern-web-guidance` — Modern Web & CSS Standards Guide
 - **Source Folder:** [modern-web-guidance](../config/skills/modern-web-guidance)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Provides cutting-edge standards for HTML, CSS, and modern browser APIs (dialogs, popovers, view transitions, container queries, :has selectors).
 - **When to Use:** When building or styling websites and you want modern, accessible, zero-dependency CSS patterns rather than outdated hacks.
 - **Example Prompt:**
@@ -257,6 +268,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-web-artifacts-builder"></a>
 #### `web-artifacts-builder` — Interactive Single-File Web Widget Builder
 - **Source Folder:** [web-artifacts-builder](../config/skills/web-artifacts-builder)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Builds standalone, self-contained single-page HTML/JS applications, calculators, visualizers, and interactive prototypes that run directly in any browser.
 - **When to Use:** When you need a quick, clickable web tool, interactive prototype, or simulation in a single HTML file.
 - **Example Prompt:**
@@ -267,6 +279,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-web-design-guidelines"></a>
 #### `web-design-guidelines` — Web UI Best Practices & Accessibility Auditor
 - **Source Folder:** [web-design-guidelines](../config/skills/web-design-guidelines)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Audits website code against official Web Interface Guidelines, checking accessibility (contrast, keyboard focus, screen readers) and UX design standards.
 - **When to Use:** When reviewing frontend code to ensure it meets accessibility standards and best UX design practices.
 - **Example Prompt:**
@@ -300,6 +313,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-chisle"></a>
 #### `chisle` — High-Efficiency Minimalist Dev Mode
 - **Source Folder:** [chisle](../config/skills/chisle)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** A hyper-efficient, minimal-overhead development and audit mode designed to execute changes cleanly with the least tokens possible.
 - **When to Use:** When working with low-context or free models and you need focused, fast edits without conversational fluff.
 - **Example Prompt:**
@@ -310,6 +324,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-codebase-design"></a>
 #### `codebase-design` — Deep Module & Clean Architecture Designer
 - **Source Folder:** [codebase-design](../config/skills/codebase-design)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Guides the design of deep classes and modules (simple public interfaces hiding powerful internal complexity) based on clean architecture principles.
 - **When to Use:** When refactoring messy spaghetti code or designing a new service to prevent tight coupling and high cognitive load.
 - **Example Prompt:**
@@ -320,6 +335,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-codebase-onboarding"></a>
 #### `codebase-onboarding` — Codebase Architecture & Onboarding Guide
 - **Source Folder:** [codebase-onboarding](../config/skills/codebase-onboarding)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Scans an unfamiliar codebase, maps its architecture, entry points, data flows, and key abstractions, and writes a clear developer onboarding guide.
 - **When to Use:** When you first open a new repository and want a fast, high-level map of how everything connects and where to start.
 - **Example Prompt:**
@@ -330,6 +346,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-deslop"></a>
 #### `deslop` — AI Code Slop & Boilerplate Cleaner
 - **Source Folder:** [deslop](../config/skills/deslop)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Cleans up repetitive, overly verbose, or hallucinated AI boilerplate, restoring idiomatic patterns and concise, clean coding style.
 - **When to Use:** When code written by AI models feels bloated, repetitive, or cluttered with unnecessary defensive checks.
 - **Example Prompt:**
@@ -340,6 +357,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-engineering-principles"></a>
 #### `engineering-principles` — Clean, Debloated Code Engineering Principles
 - **Source Folder:** [engineering-principles](../config/skills/engineering-principles)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Enforces pragmatic software craftsmanship: subtract unnecessary code before adding, fix root causes, avoid over-engineering, and keep codebase lean.
 - **When to Use:** When reviewing code for bloat, unnecessary abstractions, or overly complex designs.
 - **Example Prompt:**
@@ -350,6 +368,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-no-comments"></a>
 #### `no-comments` — Useless Comment Remover & Clean Code Polisher
 - **Source Folder:** [no-comments](../config/skills/no-comments)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Finds and deletes redundant, obvious, or noisy comments that state what code clearly does, keeping only indispensable architectural explanations.
 - **When to Use:** When code is polluted with comments like '// increment i' or redundant docstrings that obscure the actual logic.
 - **Example Prompt:**
@@ -360,6 +379,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-ponytail"></a>
 #### `ponytail` — Radical Simplicity & YAGNI Architecture
 - **Source Folder:** [ponytail](../config/skills/ponytail)
+- **Upstream Repository:** [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail)
 - **What It Does:** Forces the simplest, laziest working solution: standard library first, zero extra dependencies, native platform features, and one line before fifty.
 - **When to Use:** When you want to stop over-engineering and implement a feature with minimal lines and zero bloated dependencies.
 - **Example Prompt:**
@@ -370,6 +390,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-ponytail-debt"></a>
 #### `ponytail-debt` — Technical Debt & Shortcut Ledger
 - **Source Folder:** [ponytail-debt](../config/skills/ponytail-debt)
+- **Upstream Repository:** [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail)
 - **What It Does:** Scans the codebase for deliberate shortcuts (e.g., `# ponytail:` comments) and compiles them into a prioritized technical debt roadmap.
 - **When to Use:** When planning a cleanup sprint and you want to know all shortcuts taken across the project.
 - **Example Prompt:**
@@ -380,6 +401,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-schema-to-type"></a>
 #### `schema-to-type` — Schema to Strongly-Typed Code Generator
 - **Source Folder:** [schema-to-type](../config/skills/schema-to-type)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Converts raw JSON data, OpenAPI specifications, or database schemas into type-safe code structures (TypeScript interfaces, Zod schemas, or Pydantic models).
 - **When to Use:** When integrating with an external API and you need typed models matching the API's JSON responses.
 - **Example Prompt:**
@@ -390,6 +412,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-typescript-best-practices"></a>
 #### `typescript-best-practices` — TypeScript Idioms & Type Safety Guide
 - **Source Folder:** [typescript-best-practices](../config/skills/typescript-best-practices)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Enforces strict, idiomatic TypeScript practices: eliminating 'any', proper discriminated unions, type narrowing, and sound async error handling.
 - **When to Use:** When writing or refactoring TypeScript code and you want bulletproof type safety and great autocomplete.
 - **Example Prompt:**
@@ -419,6 +442,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-benchmark-checklist"></a>
 #### `benchmark-checklist` — Rigorous Benchmark & Perf Audit Checklist
 - **Source Folder:** [benchmark-checklist](../config/skills/benchmark-checklist)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Vets performance measurements against systematic criteria: warm-up runs, system limits, measurement noise, and statistical significance.
 - **When to Use:** When running benchmarks or comparing two implementations to make sure the speed numbers are genuine.
 - **Example Prompt:**
@@ -429,6 +453,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-correct"></a>
 #### `correct` — Repeated Mistake Prevention & Rule Guard
 - **Source Folder:** [correct](../config/skills/correct)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Analyzes recurring coding or configuration errors made by AI agents in your repository and encodes preventative rules so they never happen again.
 - **When to Use:** When the AI keeps making the same mistake or bad assumption on a specific project.
 - **Example Prompt:**
@@ -439,6 +464,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-performance-profiling"></a>
 #### `performance-profiling` — Performance Profiling & Bottleneck Analyzer
 - **Source Folder:** [performance-profiling](../config/skills/performance-profiling)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Diagnoses CPU hotspots, memory leaks, event loop delays, and unoptimized I/O loops using profilers and flamegraphs.
 - **When to Use:** When your application runs slowly, consumes too much RAM, or suffers from high latency spikes.
 - **Example Prompt:**
@@ -449,6 +475,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-systematic-debugging"></a>
 #### `systematic-debugging` — Root-Cause Systematic Debugger
 - **Source Folder:** [systematic-debugging](../config/skills/systematic-debugging)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Enforces disciplined debugging: reproduce the issue first, form testable hypotheses, isolate root cause, and verify fixes before writing code.
 - **When to Use:** When an error, test failure, or unexpected bug occurs and you want to fix the real cause instead of guessing.
 - **Example Prompt:**
@@ -459,6 +486,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-test-quality"></a>
 #### `test-quality` — Comprehensive Test Suite & Mocking Specialist
 - **Source Folder:** [test-quality](../config/skills/test-quality)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Designs and writes high-coverage unit, integration, and end-to-end tests with realistic edge cases, clean fixtures, and proper mocking.
 - **When to Use:** When adding tests for an existing feature, fixing brittle tests, or improving overall test coverage.
 - **Example Prompt:**
@@ -469,6 +497,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-verification-before-completion"></a>
 #### `verification-before-completion` — Strict Pre-Completion Proof Enforcer
 - **Source Folder:** [verification-before-completion](../config/skills/verification-before-completion)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Requires running tests, linters, or build commands and verifying positive output before asserting that a task is finished or working.
 - **When to Use:** When you want absolute proof that everything compiles and passes tests before finishing a turn.
 - **Example Prompt:**
@@ -499,6 +528,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-anti-sycophancy"></a>
 #### `anti-sycophancy` — Objective Critical Thinker & Truth Enforcer
 - **Source Folder:** [anti-sycophancy](../config/skills/anti-sycophancy)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Forces the assistant to remain rigorously truthful, challenging flawed assumptions, false claims, and invalid logic instead of politely agreeing.
 - **When to Use:** When you want an honest, unvarnished critical assessment of an idea, design, or architecture plan.
 - **Example Prompt:**
@@ -509,6 +539,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-blast-radius"></a>
 #### `blast-radius` — Change Impact & Blast Radius Calculator
 - **Source Folder:** [blast-radius](../config/skills/blast-radius)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Calculates downstream dependencies and side effects of a code change to reveal what elsewhere could break before you ship.
 - **When to Use:** When modifying shared database schemas, common utilities, or core API contracts.
 - **Example Prompt:**
@@ -519,6 +550,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-code-review"></a>
 #### `code-review` — Two-Sided Peer Code Reviewer
 - **Source Folder:** [code-review](../config/skills/code-review)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Conducts thorough code reviews examining correctness, security vulnerabilities, edge cases, maintainability, and code style.
 - **When to Use:** When preparing a pull request or reviewing changes before merging into your main branch.
 - **Example Prompt:**
@@ -529,6 +561,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-owasp-security"></a>
 #### `owasp-security` — OWASP Top 10 Security & Vulnerability Auditor
 - **Source Folder:** [owasp-security](../config/skills/owasp-security)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Audits application code against OWASP Top 10 vulnerabilities: injection, broken authentication, sensitive data exposure, and security misconfigurations.
 - **When to Use:** When writing security-sensitive code (auth, payment, sessions, APIs) or doing a security hardening sweep.
 - **Example Prompt:**
@@ -539,6 +572,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-thermo-nuclear-code-quality-review"></a>
 #### `thermo-nuclear-code-quality-review` — Extreme Maintainability & Abstraction Review
 - **Source Folder:** [thermo-nuclear-code-quality-review](../config/skills/thermo-nuclear-code-quality-review)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** A ruthless code maintainability review hunting down oversized files, abstraction sprawl, god objects, and unneeded complexity.
 - **When to Use:** When reviewing code for long-term health and architectural cleanliness before it becomes tech debt.
 - **Example Prompt:**
@@ -549,6 +583,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-thermo-nuclear-review"></a>
 #### `thermo-nuclear-review` — Deep Security & Correctness Branch Auditor
 - **Source Folder:** [thermo-nuclear-review](../config/skills/thermo-nuclear-review)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** An exhaustive, uncompromising audit of git branch diffs looking for hidden race conditions, auth bypasses, resource leaks, and data hazards.
 - **When to Use:** When reviewing mission-critical code changes where security or stability failures are unacceptable.
 - **Example Prompt:**
@@ -559,6 +594,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-thermos"></a>
 #### `thermos` — Dual-Auditor Parallel Security & Quality Review
 - **Source Folder:** [thermos](../config/skills/thermos)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Runs both thermo-nuclear security and code-quality reviews in parallel, synthesizing their findings into a single prioritized report.
 - **When to Use:** When you want the ultimate, all-angles review of a major feature branch in one pass.
 - **Example Prompt:**
@@ -589,6 +625,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-deployment-patterns"></a>
 #### `deployment-patterns` — CI/CD Pipelines & Deployment Architectures
 - **Source Folder:** [deployment-patterns](../config/skills/deployment-patterns)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Configures end-to-end deployment workflows: GitHub Actions, automated testing pipelines, Docker publishing, and blue/green deployments.
 - **When to Use:** When setting up continuous integration/continuous deployment (CI/CD) pipelines from scratch.
 - **Example Prompt:**
@@ -599,6 +636,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-docker-infra"></a>
 #### `docker-infra` — Docker, Compose & Container Infrastructure
 - **Source Folder:** [docker-infra](../config/skills/docker-infra)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Creates and optimizes production-ready Dockerfiles, multi-stage builds, docker-compose.yml files, and health checks with minimal image size.
 - **When to Use:** When containerizing a new application, reducing huge image sizes, or configuring local development compose setups.
 - **Example Prompt:**
@@ -609,6 +647,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-git-conflict-resolver"></a>
 #### `git-conflict-resolver` — Git Merge Conflict & Rebase Resolver
 - **Source Folder:** [git-conflict-resolver](../config/skills/git-conflict-resolver)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Resolves complex git merge conflicts, rebase collisions, and detached HEAD states systematically without losing code changes.
 - **When to Use:** When git rebase or merge runs into gnarly file conflicts with lots of overlapping changes.
 - **Example Prompt:**
@@ -619,6 +658,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-git-workflow"></a>
 #### `git-workflow` — Git Branching, Commit Conventions & PRs
 - **Source Folder:** [git-workflow](../config/skills/git-workflow)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Guides clean Git practices: conventional commit messages, feature branch workflows, PR templates, and maintaining clean git history.
 - **When to Use:** When organizing git commits, setting up git branching workflows, or preparing a clean PR history.
 - **Example Prompt:**
@@ -629,6 +669,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-production-hardening"></a>
 #### `production-hardening` — Production Readiness & Hardening Audit
 - **Source Folder:** [production-hardening](../config/skills/production-hardening)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Audits applications before production launch: configuring crash recovery, rate limiting, secure HTTP headers, timeouts, and error handling.
 - **When to Use:** When taking a prototype to real production traffic and ensuring it won't crash or leak sensitive data.
 - **Example Prompt:**
@@ -639,6 +680,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-publishing-release"></a>
 #### `publishing-release` — Software Release & Publishing Checklist
 - **Source Folder:** [publishing-release](../config/skills/publishing-release)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Automates the release process: version bumping (SemVer), changelog generation from git commits, git tagging, and package publishing.
 - **When to Use:** When your code is tested and ready to release as a new version or package.
 - **Example Prompt:**
@@ -649,6 +691,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-using-git-worktrees"></a>
 #### `using-git-worktrees` — Git Worktrees Parallel Branch Manager
 - **Source Folder:** [using-git-worktrees](../config/skills/using-git-worktrees)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Sets up and manages Git worktrees to work on multiple branches simultaneously in isolated directories without stashing or switching branches.
 - **When to Use:** When you need to review a bug fix or test a branch without interrupting your active working directory.
 - **Example Prompt:**
@@ -676,6 +719,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-data-sql-queries"></a>
 #### `data-sql-queries` — Multi-Dialect SQL Query Specialist
 - **Source Folder:** [data-sql-queries](../config/skills/data-sql-queries)
+- **Upstream Repository:** [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official)
 - **What It Does:** Writes accurate, high-performance SQL queries across major database engines (PostgreSQL, MySQL, SQLite, Snowflake, BigQuery, DuckDB).
 - **When to Use:** When writing complex joins, window functions, CTEs, or aggregations for reports and backend queries.
 - **Example Prompt:**
@@ -686,6 +730,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-data-write-query"></a>
 #### `data-write-query` — SQL Query Optimization & Performance Tuning
 - **Source Folder:** [data-write-query](../config/skills/data-write-query)
+- **Upstream Repository:** [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official)
 - **What It Does:** Diagnoses slow SQL queries using query execution plans (EXPLAIN ANALYZE), missing indexes, and query restructuring.
 - **When to Use:** When a database query takes too long to run and needs to be optimized for low latency.
 - **Example Prompt:**
@@ -696,6 +741,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-database-migrations"></a>
 #### `database-migrations` — Safe Database Schema Migrations
 - **Source Folder:** [database-migrations](../config/skills/database-migrations)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Designs safe, non-locking database migrations with zero downtime, proper rollback scripts, column defaults, and index creation.
 - **When to Use:** When altering production database tables, adding foreign keys, or altering large tables without downtime.
 - **Example Prompt:**
@@ -706,6 +752,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-supabase"></a>
 #### `supabase` — Supabase Backend & Database Platform
 - **Source Folder:** [supabase](../config/skills/supabase)
+- **Upstream Repository:** [supabase/cli](https://github.com/supabase/cli)
 - **What It Does:** Comprehensive guide for Supabase: PostgreSQL database, Auth, Row-Level Security (RLS) policies, Realtime, Storage, and Edge Functions.
 - **When to Use:** When building apps with Supabase, setting up RLS policies, configuring Auth, or debugging Supabase client libraries.
 - **Example Prompt:**
@@ -741,6 +788,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-data-analyze"></a>
 #### `data-analyze` — End-to-End Data Analysis Specialist
 - **Source Folder:** [data-analyze](../config/skills/data-analyze)
+- **Upstream Repository:** [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official)
 - **What It Does:** Conducts complete data analyses from raw CSV/database records: data cleaning, summarization, trend detection, and answering business questions.
 - **When to Use:** When you have a dataset and need actionable answers, business summaries, or pattern discoveries.
 - **Example Prompt:**
@@ -751,6 +799,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-data-build-dashboard"></a>
 #### `data-build-dashboard` — Interactive HTML Analytics Dashboard
 - **Source Folder:** [data-build-dashboard](../config/skills/data-build-dashboard)
+- **Upstream Repository:** [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official)
 - **What It Does:** Builds interactive, self-contained HTML dashboards containing charts, date range filters, KPI cards, and sortable data tables.
 - **When to Use:** When you want to deliver an interactive reporting tool to stakeholders that runs without requiring a backend server.
 - **Example Prompt:**
@@ -761,6 +810,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-data-context-extractor"></a>
 #### `data-context-extractor` — Domain Knowledge & Warehouse Context Extractor
 - **Source Folder:** [data-context-extractor](../config/skills/data-context-extractor)
+- **Upstream Repository:** [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official)
 - **What It Does:** Extracts organizational tribal knowledge, table definitions, and business logic from analysts into a reusable domain skill.
 - **When to Use:** When documenting data warehouse schemas and metric calculation rules for a company or project.
 - **Example Prompt:**
@@ -771,6 +821,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-data-create-viz"></a>
 #### `data-create-viz` — Fast Python Visual Chart Generator
 - **Source Folder:** [data-create-viz](../config/skills/data-create-viz)
+- **Upstream Repository:** [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official)
 - **What It Does:** Quickly generates focused charts and plots for data exploration and reporting with minimal code.
 - **When to Use:** When you want a quick visual representation of a table or series without manual plotting setup.
 - **Example Prompt:**
@@ -781,6 +832,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-data-explore-data"></a>
 #### `data-explore-data` — Exploratory Data Analysis (EDA) & Profiling
 - **Source Folder:** [data-explore-data](../config/skills/data-explore-data)
+- **Upstream Repository:** [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official)
 - **What It Does:** Profiles raw datasets to inspect shapes, null values, distributions, anomalies, data types, and correlation structures.
 - **When to Use:** When you receive a new dataset and want to understand what is inside before starting any modeling or reporting.
 - **Example Prompt:**
@@ -791,6 +843,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-data-science-tutor"></a>
 #### `data-science-tutor` — Personal Data Science & Statistics Tutor
 - **Source Folder:** [data-science-tutor](../config/skills/data-science-tutor)
+- **Upstream Repository:** [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official)
 - **What It Does:** An interactive tutor that explains machine learning, math, and data science concepts in simple, intuitive terms with practical examples.
 - **When to Use:** When learning a complex statistical or machine learning concept and you want plain-English explanations.
 - **Example Prompt:**
@@ -801,6 +854,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-data-statistical-analysis"></a>
 #### `data-statistical-analysis` — Rigorous Statistical Analysis & Testing
 - **Source Folder:** [data-statistical-analysis](../config/skills/data-statistical-analysis)
+- **Upstream Repository:** [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official)
 - **What It Does:** Applies classical and modern statistical methods: hypothesis testing (t-tests, chi-square), ANOVA, regression models, and confidence intervals.
 - **When to Use:** When you need to mathematically prove whether differences in data are statistically significant.
 - **Example Prompt:**
@@ -811,6 +865,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-data-validate-data"></a>
 #### `data-validate-data` — Data Analysis QA & Bias Check
 - **Source Folder:** [data-validate-data](../config/skills/data-validate-data)
+- **Upstream Repository:** [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official)
 - **What It Does:** Audits data conclusions and methodologies before sharing: checks for sampling bias, survivorship bias, metric calculation errors, and outliers.
 - **When to Use:** When you want to verify that an analysis or executive report is mathematically sound and error-free.
 - **Example Prompt:**
@@ -821,6 +876,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-data-visualization"></a>
 #### `data-visualization` — Data Visualization Expert (Matplotlib, Seaborn, Plotly)
 - **Source Folder:** [data-visualization](../config/skills/data-visualization)
+- **Upstream Repository:** [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official)
 - **What It Does:** Builds clear, publication-ready charts and graphs in Python with proper labels, legible axes, clean color scales, and high DPI.
 - **When to Use:** When creating charts for reports, articles, or presentations using Python.
 - **Example Prompt:**
@@ -831,6 +887,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-experiment-and-inference"></a>
 #### `experiment-and-inference` — A/B Testing & Causal Inference Design
 - **Source Folder:** [experiment-and-inference](../config/skills/experiment-and-inference)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Designs controlled experiments and A/B tests: sample size calculations, power analysis, randomization, and causal effect estimation.
 - **When to Use:** When designing an experiment or interpreting A/B test results without falling for statistical traps.
 - **Example Prompt:**
@@ -841,6 +898,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-ml-workflow"></a>
 #### `ml-workflow` — Machine Learning Pipeline (Scikit-Learn / XGBoost)
 - **Source Folder:** [ml-workflow](../config/skills/ml-workflow)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Guides sound machine learning workflows: feature engineering, train/validation/test splits, cross-validation, hyperparameter tuning, and metric evaluation.
 - **When to Use:** When building predictive models (classification, regression) without data leakage.
 - **Example Prompt:**
@@ -851,6 +909,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-portfolio-project-builder"></a>
 #### `portfolio-project-builder` — Data Analyst Portfolio Project Builder
 - **Source Folder:** [portfolio-project-builder](../config/skills/portfolio-project-builder)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Helps build end-to-end, interview-ready data science and analytics portfolio projects with clean code, READMEs, and executive summaries.
 - **When to Use:** When assembling showcase projects for job applications, resumes, or public GitHub portfolios.
 - **Example Prompt:**
@@ -882,6 +941,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-academic-paper"></a>
 #### `academic-paper` — 12-Agent Academic Paper Writing Pipeline
 - **Source Folder:** [academic-paper](../config/skills/academic-paper)
+- **Upstream Repository:** [Imbad0202/academic-research-skills](https://github.com/Imbad0202/academic-research-skills)
 - **What It Does:** Full academic manuscript writing assistant supporting 11 modes (literature reviews, outlines, drafts, citations, LaTeX/Pandoc formatting).
 - **When to Use:** When writing or formatting academic papers, journal submissions, or conference responses.
 - **Example Prompt:**
@@ -892,6 +952,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-academic-paper-reviewer"></a>
 #### `academic-paper-reviewer` — Multi-Perspective Peer Review Simulator
 - **Source Folder:** [academic-paper-reviewer](../config/skills/academic-paper-reviewer)
+- **Upstream Repository:** [Imbad0202/academic-research-skills](https://github.com/Imbad0202/academic-research-skills)
 - **What It Does:** Simulates a rigorous 5-seat journal peer review panel (Journal-Fit Reviewer + 3 domain experts + Devil's Advocate) providing actionable critiques.
 - **When to Use:** When you want harsh, realistic feedback on an academic paper draft before submitting to a real journal or conference.
 - **Example Prompt:**
@@ -902,6 +963,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-academic-pipeline"></a>
 #### `academic-pipeline` — End-to-End Academic Research Pipeline
 - **Source Folder:** [academic-pipeline](../config/skills/academic-pipeline)
+- **Upstream Repository:** [Imbad0202/academic-research-skills](https://github.com/Imbad0202/academic-research-skills)
 - **What It Does:** Orchestrates the entire academic journey: literature search, paper drafting, integrity/citation checks, peer review simulation, and revision.
 - **When to Use:** When embarking on an end-to-end research paper project from initial idea to final submission-ready PDF.
 - **Example Prompt:**
@@ -912,6 +974,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-deep-research"></a>
 #### `deep-research` — Deep Topic Research & Multi-Source Synthesis
 - **Source Folder:** [deep-research](../config/skills/deep-research)
+- **Upstream Repository:** [Imbad0202/academic-research-skills](https://github.com/Imbad0202/academic-research-skills)
 - **What It Does:** Executes thorough, exhaustive research on complex topics, cross-referencing multiple authoritative sources to produce a structured dossier.
 - **When to Use:** When preparing a comprehensive research brief, market analysis, or deep technical investigation.
 - **Example Prompt:**
@@ -922,6 +985,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-documentation-lookup"></a>
 #### `documentation-lookup` — Up-to-Date Official Documentation Lookup
 - **Source Folder:** [documentation-lookup](../config/skills/documentation-lookup)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Fetches current, up-to-date documentation for libraries, frameworks, and APIs directly instead of relying on outdated training memory.
 - **When to Use:** When using new library versions, recently changed APIs, or SDKs that change frequently.
 - **Example Prompt:**
@@ -932,6 +996,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-geo-sleuth"></a>
 #### `geo-sleuth` — Photo Geolocation & Chronolocation Sleuth
 - **Source Folder:** [geo-sleuth](../config/skills/geo-sleuth)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Geolocates or chronolocates photos using tool-verified evidence: camera metadata (EXIF), landmarks, sun shadow math, street view, and OCR signs.
 - **When to Use:** When you have a photo and want to pinpoint where or at what time of day it was taken.
 - **Example Prompt:**
@@ -942,6 +1007,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-sr-screener"></a>
 #### `sr-screener` — Systematic & Scoping Review Study Screener
 - **Source Folder:** [sr-screener](../config/skills/sr-screener)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Screen scientific studies and papers against strict inclusion/exclusion criteria according to PRISMA protocols for systematic reviews.
 - **When to Use:** When conducting medical, clinical, or scientific systematic literature reviews.
 - **Example Prompt:**
@@ -952,6 +1018,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-web-research"></a>
 #### `web-research` — Fast Web Research & Information Gathering
 - **Source Folder:** [web-research](../config/skills/web-research)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Searches the web across multiple sources, extracts key facts, and compiles concise, cited summaries with direct source URLs.
 - **When to Use:** When you need to look up current documentation, pricing, release notes, or factual answers from the internet.
 - **Example Prompt:**
@@ -982,6 +1049,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-agentskills"></a>
 #### `agentskills` — Universal Software Lifecycle (SDLC) Router
 - **Source Folder:** [agentskills](../config/skills/agentskills)
+- **Upstream Repository:** [agentskills/agentskills](https://github.com/agentskills/agentskills)
 - **What It Does:** Orchestrates the software development lifecycle: detects whether you are Planning, Coding, Testing, or Releasing and applies the right disciplined workflow.
 - **When to Use:** When managing complex software projects across multiple stages.
 - **Example Prompt:**
@@ -992,6 +1060,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-brainstorming"></a>
 #### `brainstorming` — Structured Design Ideation & Tradeoff Explorer
 - **Source Folder:** [brainstorming](../config/skills/brainstorming)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Facilitates structured brainstorming: explores multiple technical approaches, weighs pros and cons, and clarifies requirements before deciding.
 - **When to Use:** When exploring alternative architectural patterns or feature designs before committing to code.
 - **Example Prompt:**
@@ -1002,6 +1071,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-plans"></a>
 #### `plans` — Detailed Implementation Plan Creator
 - **Source Folder:** [plans](../config/skills/plans)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Drafts structured, phased implementation plans before writing any code: outlines architectural decisions, risks, steps, and verification criteria.
 - **When to Use:** When starting a non-trivial project or complex refactor and you want to align on the blueprint first.
 - **Example Prompt:**
@@ -1012,6 +1082,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-rea"></a>
 #### `rea` — REA Evaluation & Verification Engine
 - **Source Folder:** [rea](../config/skills/rea)
+- **Upstream Repository:** [rea-agent/rea](https://github.com/rea-agent/rea)
 - **What It Does:** Runs automated evaluations, test suites, and capability verification benchmarks via the REA CLI tool.
 - **When to Use:** When benchmarking agent performance or evaluating system metrics.
 - **Example Prompt:**
@@ -1022,6 +1093,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-ruflo"></a>
 #### `ruflo` — Ruflo Multi-Agent Swarm Orchestrator
 - **Source Folder:** [ruflo](../config/skills/ruflo)
+- **Upstream Repository:** [ruvnet/ruflo](https://github.com/ruvnet/ruflo)
 - **What It Does:** Invokes the Ruflo multi-agent CLI system to coordinate agent teams for complex parallel tasks.
 - **When to Use:** When running multi-agent swarms using the local Ruflo command-line tool.
 - **Example Prompt:**
@@ -1032,6 +1104,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-sharpen"></a>
 #### `sharpen` — Prompt Sharpener & Task Depth Enhancer
 - **Source Folder:** [sharpen](../config/skills/sharpen)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Takes vague or broad prompts and sharpens them into concrete, actionable, deeply detailed specifications with defined boundaries.
 - **When to Use:** When you have a rough idea and want the AI to refine it into a crystal-clear, high-quality prompt.
 - **Example Prompt:**
@@ -1042,6 +1115,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-subagent-driven-development"></a>
 #### `subagent-driven-development` — Subagent Task Decomposition & Execution
 - **Source Folder:** [subagent-driven-development](../config/skills/subagent-driven-development)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Takes an implementation plan and executes it by dispatching focused, independent subagents for each subtask with strict verification gates.
 - **When to Use:** When tackling large multi-file refactors or implementations that benefit from modular execution.
 - **Example Prompt:**
@@ -1072,6 +1146,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-algorithmic-art"></a>
 #### `algorithmic-art` — Generative & Algorithmic Art (p5.js)
 - **Source Folder:** [algorithmic-art](../config/skills/algorithmic-art)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Creates interactive generative art, flow fields, particle simulations, and geometric patterns using p5.js and canvas code.
 - **When to Use:** When creating creative coding projects, generative backgrounds, or interactive math visualizers.
 - **Example Prompt:**
@@ -1082,6 +1157,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-godot4-dev"></a>
 #### `godot4-dev` — Godot 4 Game Engine & GDScript 2.0
 - **Source Folder:** [godot4-dev](../config/skills/godot4-dev)
+- **Upstream Repository:** [godotengine/godot](https://github.com/godotengine/godot)
 - **What It Does:** Engineering guidelines and best practices for Godot 4: GDScript 2.0 static typing, scene hierarchy, state machines, physics, and shader code.
 - **When to Use:** When developing 2D or 3D games, mechanics, or UI inside the Godot 4 engine.
 - **Example Prompt:**
@@ -1092,6 +1168,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-image-gen"></a>
 #### `image-gen` — AI Image Generation via Free Backends
 - **Source Folder:** [image-gen](../config/skills/image-gen)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Generates images from text prompts using available free backend providers (e.g., OVH AI, Pollinations, HuggingFace Flux/SD).
 - **When to Use:** When you need an image, avatar, illustration, or visual asset generated from a prompt.
 - **Example Prompt:**
@@ -1102,6 +1179,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-lemo-opuscar"></a>
 #### `lemo-opuscar` — Programmatic Short Film & Animation Director
 - **Source Folder:** [lemo-opuscar](../config/skills/lemo-opuscar)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Directs and renders short films entirely through code in distinct artistic styles (Oil Painting, Watercolor, Ukiyo-e, Exploded Teardown, Satellite Briefing).
 - **When to Use:** When creating programmatic video explainers, educational animations, or artistic short films.
 - **Example Prompt:**
@@ -1112,6 +1190,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-mcfunction-builder"></a>
 #### `mcfunction-builder` — Minecraft Inventory & Survival Math Calculator
 - **Source Folder:** [mcfunction-builder](../config/skills/mcfunction-builder)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Calculates Minecraft survival crafting stacks (64-item base stacks + remainders), chest layout math, and resource gathering quantities.
 - **When to Use:** When planning large Minecraft survival construction projects and calculating required stacks.
 - **Example Prompt:**
@@ -1122,6 +1201,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-video-gen"></a>
 #### `video-gen` — AI Video Clip Generator
 - **Source Folder:** [video-gen](../config/skills/video-gen)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Generates short animated video clips from text prompts using tiered video generation models in OmniRoute.
 - **When to Use:** When you need a short motion clip or visual video asset.
 - **Example Prompt:**
@@ -1132,6 +1212,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-voxel-craft-cad"></a>
 #### `voxel-craft-cad` — Procedural Voxel Generation & 3D CAD Modeling
 - **Source Folder:** [voxel-craft-cad](../config/skills/voxel-craft-cad)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Writes parametric math code to generate procedural 3D voxel structures, architectural blueprints, and voxel models.
 - **When to Use:** When building procedural voxel worlds, 3D structures, or algorithmic building generators.
 - **Example Prompt:**
@@ -1164,6 +1245,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-browser-automation"></a>
 #### `browser-automation` — Browser Driving & Automation (Playwright/Chrome)
 - **Source Folder:** [browser-automation](../config/skills/browser-automation)
+- **Upstream Repository:** [microsoft/playwright](https://github.com/microsoft/playwright)
 - **What It Does:** Controls a headless or visible Chromium browser using Playwright: navigates web pages, fills forms, clicks elements, and takes full-page screenshots.
 - **When to Use:** When automating web tasks, scraping dynamic web pages, or testing web application interactions.
 - **Example Prompt:**
@@ -1174,6 +1256,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-context-budget"></a>
 #### `context-budget` — OpenCode Context Overhead & Token Auditor
 - **Source Folder:** [context-budget](../config/skills/context-budget)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Audits token overhead consumed by system prompts, AGENTS.md, active skills, tools, and commands, providing optimization tips for smaller models.
 - **When to Use:** When tuning your setup for low-context free models and checking where your token budget is spent.
 - **Example Prompt:**
@@ -1184,6 +1267,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-desktop-control"></a>
 #### `desktop-control` — Linux Desktop Automation (Wayland/Hyprland)
 - **Source Folder:** [desktop-control](../config/skills/desktop-control)
+- **Upstream Repository:** [anthropics/anthropic-quickstarts](https://github.com/anthropics/anthropic-quickstarts)
 - **What It Does:** Inspects and operates the Linux desktop: captures screen regions, manipulates windows (Hyprland/Wayland), clicks buttons, and types keys.
 - **When to Use:** When you want the AI to interact directly with desktop GUI applications on your Linux desktop.
 - **Example Prompt:**
@@ -1194,6 +1278,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-find-skills"></a>
 #### `find-skills` — Skill Discovery & Online Installer
 - **Source Folder:** [find-skills](../config/skills/find-skills)
+- **Upstream Repository:** [agentskills/agentskills](https://github.com/agentskills/agentskills)
 - **What It Does:** Discovers and installs new agent skills from online repositories (skills.sh, GitHub) matching tasks you want to accomplish.
 - **When to Use:** When you need a specialized capability that isn't currently installed and want to search for community skills.
 - **Example Prompt:**
@@ -1204,6 +1289,8 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-graphify"></a>
 #### `graphify` — Codebase Knowledge Graph & Architecture Map
 - **Source Folder:** [graphify](../config/skills/graphify)
+- **Upstream Repository:** [Graphify-Labs/graphify](https://github.com/Graphify-Labs/graphify)
+- **Execution Mode:** On-Demand Skill (`/graphify`) — *Operated strictly on-demand (not as a background MCP server) to eliminate context window token schema bloat, multi-project locking, and port conflicts.*
 - **What It Does:** Converts an entire codebase into a persistent knowledge graph mapping all functions, classes, imports, and calls for fast architectural queries.
 - **When to Use:** When exploring a huge project and you need to query caller/callee graphs or circular dependencies.
 - **Example Prompt:**
@@ -1214,6 +1301,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-mcp-builder"></a>
 #### `mcp-builder` — Model Context Protocol (MCP) Server Builder
 - **Source Folder:** [mcp-builder](../config/skills/mcp-builder)
+- **Upstream Repository:** [modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers)
 - **What It Does:** Guides the creation of robust, standard-compliant Model Context Protocol (MCP) servers (Python/Node.js) to give AI agents custom tools and resources.
 - **When to Use:** When developing a new MCP server or tool integration to connect external services to OpenCode.
 - **Example Prompt:**
@@ -1224,6 +1312,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-memory-import"></a>
 #### `memory-import` — AI Assistant Memory & History Importer
 - **Source Folder:** [memory-import](../config/skills/memory-import)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Imports exported memories and chat histories from ChatGPT, Claude, or Gemini into OpenCode's local long-term memory engine.
 - **When to Use:** When migrating to OpenCode from another assistant and you want to bring over your personal preferences and context.
 - **Example Prompt:**
@@ -1234,6 +1323,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-output-skill"></a>
 #### `output-skill` — LLM Truncation Override & Long Output Handler
 - **Source Folder:** [output-skill](../config/skills/output-skill)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Overrides default model truncation behavior when generating massive code files or lengthy reports to ensure nothing gets cut off.
 - **When to Use:** When requesting very large outputs and you want to prevent the model from stopping halfway or truncating code.
 - **Example Prompt:**
@@ -1244,6 +1334,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="skill-skill-creator"></a>
 #### `skill-creator` — New Skill Authoring & Benchmarking Kit
 - **Source Folder:** [skill-creator](../config/skills/skill-creator)
+- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
 - **What It Does:** Guides creating new SKILL.md packages, structuring tools and scripts, writing clear triggers, and benchmarking skill performance.
 - **When to Use:** When building a brand new custom skill for OpenCode to automate a recurring workflow.
 - **Example Prompt:**

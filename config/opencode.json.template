@@ -222,12 +222,14 @@
       "context7": {
         "type": "remote",
         "url": "https://mcp.context7.com/mcp",
-        "enabled": true
+        "enabled": true,
+        "timeout": 30000
       },
       "exa": {
         "type": "remote",
         "url": "https://mcp.exa.ai/mcp",
-        "enabled": true
+        "enabled": true,
+        "timeout": 30000
       },
       "my-browser": {
         "type": "local",

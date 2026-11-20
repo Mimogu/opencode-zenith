@@ -243,15 +243,29 @@ OpenCode Zenith supports two browser operational modes:
 
 ## 📚 Complete Skills Catalog (90+ Skills)
 
-For the complete directory of all 90 bundled skills with decision matrices and copy-paste prompt examples, see the [Skills Catalog Guide](docs/skills-catalog.md).
+OpenCode Zenith bundles **90+ production-grade engineering skills**. All skills operate in **Manual On-Demand Invocation Mode** — they consume **zero token budget** during normal conversation and only load instructions when you explicitly invoke them.
 
-Categories include:
-* **Documents & Office**: Word (`docx`), PowerPoint (`pptx`), Excel (`xlsx`), PDF tools, MarkItDown.
-* **Architecture & Clean Code**: Clean code refactoring, schema generation, TypeScript best practices, ponytail minimalism.
-* **Testing & Verification**: Systematic debugging, test quality, pre-completion proof enforcement.
-* **Security & Audits**: OWASP security scans, blast-radius analysis, PR code reviews.
-* **Data Science & ML**: Statistical analysis, feature engineering, A/B testing, machine learning workflows.
-* **Creative & Media**: Programmatic film direction, image/video generation, 3D voxel CAD, Godot 4.
+For the full directory of all 90 skills with decision matrices and prompt recipes, see the comprehensive [Skills Catalog Guide](docs/skills-catalog.md).
+
+### 🌟 Flagship Skills & Upstream Repositories
+
+| Skill | Upstream GitHub Repository | What Scenario It's Used For | Example Prompt / Command |
+| :--- | :--- | :--- | :--- |
+| **`graphify`** | [Graphify-Labs/graphify](https://github.com/Graphify-Labs/graphify) | Mapping entire codebases into an interactive knowledge graph for caller/callee and architecture analysis. | `/graphify query "How does authentication flow through routes?"` |
+| **`markitdown`** | [microsoft/markitdown](https://github.com/microsoft/markitdown) | Converting any document, media, or archive (PDF, Word, Excel, images, audio, ZIP) into clean Markdown. | `use the markitdown skill to convert annual_report.pdf to markdown` |
+| **`ponytail`** | [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) | Radical simplicity, YAGNI enforcement, and eliminating over-engineering before writing code. | `use the ponytail skill to design our session cache without adding dependencies` |
+| **`academic-paper`** | [Imbad0202/academic-research-skills](https://github.com/Imbad0202/academic-research-skills) | 12-agent academic paper drafting, literature reviews, and multi-perspective peer review simulation. | `use the academic-paper skill to draft an IEEE-style paper on our benchmark results` |
+| **`supabase`** | [supabase/cli](https://github.com/supabase/cli) | Designing declarative PostgreSQL schemas, RLS policies, migrations, and Edge Functions. | `use the supabase skill to write an RLS policy for user organization tenancy` |
+| **`browser-automation`**| [microsoft/playwright](https://github.com/microsoft/playwright) | End-to-end browser testing, form interaction, visual screenshots, and DOM scraping via Playwright. | `use the browser-automation skill to test our staging checkout flow` |
+| **`ruflo`** | [ruvnet/ruflo](https://github.com/ruvnet/ruflo) | Multi-agent swarm orchestration, vector pattern learning, and consensus task coordination. | `use the ruflo skill to orchestrate parallel refactoring across modules` |
+| **`docx` / `xlsx` / `pptx`** | [anthropics/skills](https://github.com/anthropics/skills) | Professional document generation (Word `.docx`, Excel `.xlsx` spreadsheets, PowerPoint slide decks). | `use the docx skill to create an executive technical summary report` |
+
+> [!TIP]
+> **Why is Graphify Run On-Demand (and NOT as a Persistent MCP Server)?**  
+> 1. **Token Efficiency**: Graphify exposes 10+ tool definitions (`query`, `path`, `explain`, `extract`, `cluster`, etc.). Registering it as a persistent MCP server permanently inflates every prompt turn with large schemas, consuming precious context tokens even on basic 1-line queries.  
+> 2. **Multi-Project Workspace Agility**: A persistent server locks to a single static `graph.json` generated in one directory. When switching projects, it serves stale nodes. In contrast, on-demand `/graphify` analyzes the exact repository you are currently working in.  
+> 3. **Cross-Platform & WinApps Portability**: Background HTTP daemons on `127.0.0.1:8081` break inside Windows WinApps/QEMU guest containers without complex network bridging. The on-demand skill runs natively across Linux, macOS, and Windows.  
+> 4. **Session Stability**: Eliminates connection drops and `404 Not Found` reconnect errors caused by long-lived MCP session idle reapers.
 
 ---
 
