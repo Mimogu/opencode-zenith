@@ -643,5 +643,7 @@ Info 'To remove everything later, run uninstall.bat from this folder.'
 if ($TempDownload -and (Test-Path $TempDownload)) {
     Remove-Item -Path $TempDownload -Recurse -Force -ErrorAction SilentlyContinue
 }
-Stop-Transcript | Out-Null
-exit 0
+Stop-Transcript -ErrorAction SilentlyContinue | Out-Null
+if (-not [string]::IsNullOrWhiteSpace($PSScriptRoot)) {
+    exit 0
+}
