@@ -9,7 +9,26 @@ echo "          Opencode Zenith Setup (Linux)           "
 echo "=================================================="
 
 CONFIG_DIR="${HOME}/.config/opencode"
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CLEANUP_TEMP=false
+SCRIPT_DIR=""
+
+if [ -n "${BASH_SOURCE[0]:-}" ] && [ -f "${BASH_SOURCE[0]}" ]; then
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+fi
+
+if [ -z "$SCRIPT_DIR" ] || [ ! -d "${SCRIPT_DIR}/config" ]; then
+  echo "  [+] Fetching Opencode Zenith bundle..."
+  TMP_DIR="$(mktemp -d -t opencode-zenith-XXXXXX)"
+  if command -v git >/dev/null 2>&1; then
+    git clone --depth=1 https://github.com/Mimogu/opencode-zenith.git "$TMP_DIR" >/dev/null 2>&1 || {
+      curl -fsSL https://github.com/Mimogu/opencode-zenith/archive/refs/heads/main.tar.gz | tar -xz -C "$TMP_DIR" --strip-components=1
+    }
+  else
+    curl -fsSL https://github.com/Mimogu/opencode-zenith/archive/refs/heads/main.tar.gz | tar -xz -C "$TMP_DIR" --strip-components=1
+  fi
+  SCRIPT_DIR="$TMP_DIR"
+  CLEANUP_TEMP=true
+fi
 
 has_cmd() {
   command -v "$1" >/dev/null 2>&1
@@ -40,7 +59,12 @@ if ! has_cmd opencode; then
     npm install -g opencode-ai
   fi
 else
-  echo "  [✓] opencode found"
+  echo "  [✓] opencode found. Ensuring latest version..."
+  if has_cmd bun; then
+    bun install -g opencode-ai >/dev/null 2>&1 || true
+  elif has_cmd npm; then
+    npm install -g opencode-ai >/dev/null 2>&1 || true
+  fi
 fi
 
 # 2. Backup existing configuration
@@ -76,6 +100,8 @@ if [ ! -f "${CONFIG_DIR}/free-models.env" ]; then
   echo "To connect free models, edit ${CONFIG_DIR}/free-models.env and add your API keys:"
   echo "  - OpenRouter: https://openrouter.ai/keys"
   echo "  - NVIDIA NIM: https://build.nvidia.com"
+else
+  echo "  [✓] Existing free-models.env preserved (your API keys are safe)."
 fi
 
 # 6. Service templates
@@ -86,6 +112,10 @@ if [ -d "${SCRIPT_DIR}/systemd" ] && has_cmd systemctl; then
   systemctl --user daemon-reload 2>/dev/null || true
   systemctl --user enable --now opencode-benchmark.timer 2>/dev/null || true
   echo "  [✓] Systemd user timer opencode-benchmark.timer configured."
+fi
+
+if [ "$CLEANUP_TEMP" = true ]; then
+  rm -rf "$SCRIPT_DIR"
 fi
 
 echo ""
