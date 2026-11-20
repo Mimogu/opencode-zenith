@@ -58,14 +58,14 @@ Theories developed in one field are adapted and applied in another.
 
 | Theory | Origin | Migration |
 |--------|--------|-----------|
-| Disruptive Innovation (Christensen) | Business → Education, Healthcare |
-| Actor-Network Theory (Latour) | Sociology of Science → Information Systems, Education |
-| Ecological Systems (Bronfenbrenner) | Developmental Psychology → Education, Social Work |
-| Diffusion of Innovations (Rogers) | Communication → Health, Technology, Education |
-| Institutional Theory (DiMaggio/Powell) | Sociology → Management, Education Policy |
-| Complex Adaptive Systems | Biology → Management, Healthcare, Education |
-| Game Theory | Mathematics → Economics, Political Science, Biology |
-| Nudge Theory (Thaler/Sunstein) | Behavioral Economics → Public Policy, Health, Education |
+| Disruptive Innovation (Christensen) | Business | Education, Healthcare |
+| Actor-Network Theory (Latour) | Sociology of Science | Information Systems, Education |
+| Ecological Systems (Bronfenbrenner) | Developmental Psychology | Education, Social Work |
+| Diffusion of Innovations (Rogers) | Communication | Health, Technology, Education |
+| Institutional Theory (DiMaggio/Powell) | Sociology | Management, Education Policy |
+| Complex Adaptive Systems | Biology | Management, Healthcare, Education |
+| Game Theory | Mathematics | Economics, Political Science, Biology |
+| Nudge Theory (Thaler/Sunstein) | Behavioral Economics | Public Policy, Health, Education |
 
 ## How to Use Interdisciplinary Bridges
 

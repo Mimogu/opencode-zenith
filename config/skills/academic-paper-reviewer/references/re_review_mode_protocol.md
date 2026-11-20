@@ -4,7 +4,7 @@ Re-review mode is the dedicated mode for Pipeline Stage 3', designed to **verify
 
 Since #576 Spec B, this mode is governed by the **three-gate evidence-before-persuasion contract** (`shared/contracts/re_review/` + `scripts/check_re_review_synthesis.py`): criteria are committed before the revision is seen, evidence verdicts are committed before the author's persuasion is seen, and every later verdict change rides a typed, evidence-bound adjustment record. The pre-contract single-pass behaviour survives only behind `ARS_RE_REVIEW_LEGACY=1` (§ Legacy Mode).
 
-### How It Works
+## How It Works
 
 ```
 Input:
@@ -26,13 +26,13 @@ Phase 2B: Claim matching (letter revealed) -> [MATRIX-COMMITTED]
 Then: checker (scripts/check_re_review_synthesis.py) -> decision derivation -> New Decision (or deferral / abort)
 ```
 
-### Yardstick Continuity (Reviewer Configuration Freeze)
+## Yardstick Continuity (Reviewer Configuration Freeze)
 
 Re-review MUST reuse the Round-1 Reviewer Configuration Cards whenever they are available. `field_analyst_agent` is **not** re-invoked at Stage 3' (sole exception: the marked regeneration fallback below): re-running it over the revised manuscript would regenerate the field analysis and reviewer focus from the post-revision text, silently changing the yardstick between rounds — Round-2 verdicts would then be judged against a different configuration than the one that produced the Roadmap being verified. The same freeze applies to the target venue: a changed target venue is a new review, not a re-review.
 
 **Fallback (cards unavailable, any invocation path):** when the Round-1 cards are unavailable — standalone invocation without the Round-1 review package, a mid-entry pipeline run whose Round 1 happened outside ARS, or lost artifacts — `field_analyst_agent` may be re-run over the ORIGINAL (pre-revision) manuscript, which current contract 1.1 hard-requires, and the Judge Record's Reviewer-configuration line MUST carry the visible marker `[YARDSTICK-REGENERATED: original manuscript — <reason cards were unavailable>]`. The `revised manuscript` marker remains valid only for an explicit archived-1.0 or fresh-full-review path outside current contract replay. Advisory, not a block: the marker makes the continuity break visible to the decision-maker and the user instead of hiding it. Silent regeneration (no marker) is a protocol violation on every path.
 
-### Three-Gate Orchestration (#576 Spec B)
+## Three-Gate Orchestration (#576 Spec B)
 
 Three sequential fenced calls, dispatched by the orchestrating layer (main session / pipeline orchestrator — per #523 the dispatching layer, not a fenced agent, executes any API calls), plus zero or more SCOPED Phase 2B′ re-verification dispatches inside the deferral loop (§ Decision Derivation). Each gate's output is validated (schema + lint) before the next gate is dispatched. Contract-governed default re-review invokes neither `eic_agent` nor `editorial_synthesizer_agent` as an agent-file worker: Phase 1/2A use the routed frozen-card personas within their dedicated calls, and Phase 2B is one dedicated integration call; Journal-Fit Reviewer / `EIC` there is persona and wire compatibility. This roster statement does not govern the separate post-decision Socratic coaching sub-stage or the explicit legacy single-pass path. Phase-numbered data delimiters mirror the v3.6.2 `<phase1_output>` pattern. This orchestration REPLACES the pre-contract read-letter-first Traceability Rule ("read the author's claim, navigate to the stated location, verify"): the Response to Reviewers is a document written to persuade the verifier, and reading it before fixing what counts as addressed invites claim-anchored verification.
 
@@ -54,7 +54,7 @@ Three sequential fenced calls, dispatched by the orchestrating layer (main sessi
 
 No revised-manuscript metadata reaches Phase 1 (a post-revision section list already reveals where the revision happened, contradicting revision-blindness); `expected_change_surface` must stay a hypothesis derived from Round-1 artifacts.
 
-#### Phase 1 — criteria commitment (revision-blind)
+### Phase 1 — criteria commitment (revision-blind)
 
 For each must_fix (`must_fix`) roadmap item — and each should_fix (`should_fix`) item in lighter form — the verifier emits a pre-commitment record (`precommitment.schema.json`) that OPERATIONALIZES the inherited criterion:
 
@@ -74,7 +74,7 @@ For each must_fix (`must_fix`) roadmap item — and each should_fix (`should_fix
 
 **Retry:** one Phase 1 retry on lint failure, with the specific lint gap hinted in the system prompt (the v3.6.2 rule — safe because Phase 1 sees no manuscript, so the hint can leak nothing). Second failure → `[RE-REVIEW-ABORT: phase1_lint_failed]`, fail closed.
 
-#### Phase 2A — evidence verdict (persuasion-blind)
+### Phase 2A — evidence verdict (persuasion-blind)
 
 Inputs add the original manuscript, the revised manuscript, and the patch/apply report(s); the Phase 1 output rides fenced as `<phase1_output>` (data, not instructions). The Response Letter is still withheld.
 
@@ -94,7 +94,7 @@ New issues discovered while reading the revised manuscript are recorded as new-i
 
 **No retry.** The v3.6.2 no-Phase-2-retry discipline applies unchanged once the revised manuscript has been seen: a lint-guided regeneration after evidence exposure is exactly the channel the no-retry rule closes. A 2A lint failure → `[RE-REVIEW-ABORT: phase2a_lint_failed]`, fail closed. Phase 2B / 2B′ lint failure likewise aborts without retry (`phase2b_lint_failed`).
 
-#### Phase 2B — claim matching (letter revealed)
+### Phase 2B — claim matching (letter revealed)
 
 Inputs add the Response to Reviewers, fenced as UNTRUSTED author-authored persuasion (#574 A6 class). The committed 2A verdicts ride as `<phase2a_output>`.
 
@@ -116,7 +116,7 @@ Phase 2B produces the final traceability matrix (Schema 11 + machine-readable si
 
 Ends with `[MATRIX-COMMITTED]`. After 2B the dispatching layer runs the three post-2B passes in NORMATIVE ORDER (critical-rebuttal judgments → dissent adjudications → divergence intents/dispatches — see the pipeline orchestrator's Stage 3' step), persists the sidecar, and invokes the checker BEFORE any outcome surfaces.
 
-### Decision Derivation (verdict → decision)
+## Decision Derivation (verdict → decision)
 
 Output domain: `decision_state ∈ {Accept, Minor Revision, Major Revision, user_review_required}` or a fail-closed abort — **`Reject` is NOT a Stage 3' decision** (the state machine gives Stage 3' exactly two exits: Accept/Minor → 4.5, Major → 4'); severity-flagged cases set `reject_recommended` instead. Declared decision order for floor arithmetic: `Accept < Minor Revision < Major Revision`.
 
@@ -159,17 +159,17 @@ Notes:
 
 **Checker (MANDATORY runtime step):** the orchestrating layer invokes `scripts/check_re_review_synthesis.py` with the current manifest, precommitment, verdict, traceability, immutable roadmap, exact `--author-adjudication`, exact `--revision-evidence-bundle`, and its explicit `--revision-evidence-root` immediately after Phase 2B persistence and BEFORE any outcome surfaces; ordered letter/report flags follow manifest presence. Re-run it on every deferral-loop iteration. The checker hash-loads and fully replays the bundle, binds its final draft to the revised manuscript and its current round to the exact roadmap/author pair, then validates raw roadmap/base sidecar bindings and exact per-row author-field copies before deriving any decision.
 
-### Escalation Exception (the ONLY path around the goalpost guard)
+## Escalation Exception (the ONLY path around the goalpost guard)
 
 Closed class set: `{research_integrity, ethics, safety, legal_compliance, fatal_validity}`. Emitted at Phase 2A with `approval_state: pending`; requires an original-manuscript evidence anchor (proving the problem existed in Round 1 — revision-introduced content is a `regression` instead), `why_round1_missed_it`, and `mechanical_decision_impact ∈ {Minor Revision, Major Revision}` (a Step-3 floor). A `pending` exception is a G2 state: the decision defers until the user answers at the Stage 3' checkpoint. `rejected` contributes no floor. An APPROVED `research_integrity`-class exception additionally sets `reject_recommended`. Stage 4.5's integrity gate independently sees the exception record (it travels in the passport).
 
-### Dissent Records and Bounds
+## Dissent Records and Bounds
 
 A dissent is the Phase 2A discovery that a pre-committed operationalization cannot be applied as written. It is NOT a verdict-relaxation channel — it swaps the criterion, visibly, before the verdict. `reason_code` ∈ `{criterion_ambiguous, criterion_infeasible_as_written, evidence_surface_moved, criterion_error}`; the item's verdict record then carries `applied_criterion: "dissented:<dissent_id>"`.
 
 **Bounds:** dissent on a must_fix item, or dissents on > ⌈N/3⌉ of all items, triggers independent adjudication of EVERY dissent record in the round — after the 2A verdicts are committed, before the decision derivation accepts them as final. When cross-model is active, must_fix dissents are judge-adjudicated (blind-apply the ORIGINAL criterion first, then separately adjudicate the replacement — two calls, so the replacement cannot anchor the original's application); should_fix dissents always take the user path. When cross-model is not active, every dissent covered by a tripped bound defers to the user at the checkpoint (never an abort-before-asking); dissents below the bound stand unadjudicated by design. `replacement_approved` lets the dissented criterion stand (no adjustment — the 2A verdict was already made under it); `original_upheld` mandates re-applying the original criterion, any verdict change riding an adjustment record — witnessed on a dissent-ONLY item under active cross-model by the judge's own §9.3 blind application recorded as the `ReapplicationRecord` (the judge-output shortcut, no extra call), on every other shape (user-adjudicated dissents, coalesced dissent+divergence items) by a scoped seat-verifier 2B′ call.
 
-### New-Issue Attribution and the Goalpost Guard
+## New-Issue Attribution and the Goalpost Guard
 
 Every issue found during Phase 2A that is not traceable to a roadmap item gets a `NewIssueRecord` with typed fields (description, location anchor, Schema 6 severity, `found_by` seat label, confidence, competence basis, attribution, attribution evidence, `nearest_roadmap_item` + `non_match_rationale` — the typed non-match witness). `attribution` (closed):
 
@@ -179,7 +179,7 @@ Every issue found during Phase 2A that is not traceable to a roadmap item gets a
 
 The guard is enforceable exactly because Phase 1 fixed the item baseline: "not traceable to a pre-committed item" is a mechanical check (no matching `item_id`), not a judgment call.
 
-### Verifier Routing (item-centric competence)
+## Verifier Routing (item-centric competence)
 
 Items are verified by competence, not by a single Journal-Fit Reviewer persona. Each pre-commitment record carries `source_reviewer` (verbatim) + `source_reviewer_labels` (normalized by the §10 grammar: strip parentheticals, then em-dash tails, then split on `{",", "/", ";", " and ", "&"}`, whole-token exact match into `{EIC, R1, R2, R3, DA}`; unrecognized tokens dropped, never guessed — an all-dropped non-empty string is a PARSE FAILURE, distinct from a legitimately empty list). An item routes to the seat of the FIRST label mapping to a non-DA scoring seat; if none does, it routes to `EIC` (the stable wire label for the Journal-Fit Reviewer). consider items route to `EIC` by definition. Seat personas come from the frozen Round-1 cards; the matrix's `verified_by` records the seat. The DA seat is never a verification persona.
 
@@ -187,7 +187,7 @@ Items are verified by competence, not by a single Journal-Fit Reviewer persona. 
 
 Routing visibility is a DEDICATED run-level Judge Record `Routing` line (orthogonal to `Reviewer configuration`): `card_mapped` only when every routed must_fix/should_fix item's first non-DA label found its card seat; otherwise `[ROUTING-DEGRADED: unmapped labels — <payload>]` (payload names labels + item ids, plus `unparsed <item_id> "<raw>"` groups), `[ROUTING-DEGRADED: cards unparsable]`, or `[ROUTING-DEGRADED: no round-1 cards]`. The dedicated integration call builds the matrix, runs Phase 2B, and derives the candidate decision under the closed rules; the checker recomputes it before surfacing. No persona overrides a specialist verdict except through the recorded adjustment/dissent channels.
 
-### Input Manifest (hash-bound, freshness-checked)
+## Input Manifest (hash-bound, freshness-checked)
 
 The dispatching layer emits current `input_manifest.schema.json` version 1.1 BEFORE Phase 1; its hash rides through the artifact chain. It carries exactly eleven keys. `original_manuscript`, `revised_manuscript`, `revision_roadmap`, `author_adjudication`, and `revision_evidence_bundle` are hard-required; absence, raw hash drift, or any mixed 1.0/1.1 artifact fails closed. The bundle already carries the exact matched round's pre draft, so a current caller cannot discard it to weaken regression or attribution evidence. Other optional inputs retain visible absence policies:
 
@@ -200,7 +200,7 @@ The dispatching layer emits current `input_manifest.schema.json` version 1.1 BEF
 
 **Apply-chain witness:** current contract 1.1 hard-requires the original manuscript and the ordered-chain rule (Input item 8 above) yields the closed composite `apply_chain_witness ∈ {pass, fail, not_run_no_reports}` (precedence `fail > not_run_no_reports > pass`), carried in `DecisionInputs` and on the Judge Record's `Apply-report chain` line. `first_link_not_run` belongs only to archived 1.0 artifacts; a current manifest cannot discard the exact pre-round draft already carried by the required bundle.
 
-### Criterion Inheritance
+## Criterion Inheritance
 
 The yardstick, in precedence order — each level only OPERATIONALIZES the level above, never extends it:
 
@@ -211,7 +211,7 @@ The yardstick, in precedence order — each level only OPERATIONALIZES the level
 
 A Phase-1 operationalization that cannot be traced to levels 1-4 for its item is a `new_standard`, advisory.
 
-### Contract Inputs and Producer Obligations
+## Contract Inputs and Producer Obligations
 
 The checker consumes two Round-1 producer surfaces whose grammar is therefore a PRODUCER OBLIGATION, not a checker preference (the producing surfaces are the editorial synthesizer + decision-letter template at Stage 3):
 
@@ -219,11 +219,11 @@ The checker consumes two Round-1 producer surfaces whose grammar is therefore a 
 - **Author sidecar:** validate the exact raw-hash-bound sidecar and copy `author_triage`, conditional reason, targets, and claim authorizations into Schema 11 without inference. A user display permutation is presentation-only.
 - **Letter grammar:** Required Item Details carry contiguous `R<n>` transport references derived from immutable source order filtered to `must_fix`, never author view or triage.
 
-### Legacy Mode (`ARS_RE_REVIEW_LEGACY=1`)
+## Legacy Mode (`ARS_RE_REVIEW_LEGACY=1`)
 
 Contract-governed re-review is the Stage 3' default. Current artifacts are version 1.1 and the current checker rejects 1.0 or mixed chains. Only explicit `ARS_RE_REVIEW_LEGACY=1` dispatches the archived schemas/checker under `shared/contracts/re_review/legacy/v1_0/` and `scripts/legacy/`; every such output begins `[LEGACY-NO-CONTRACT]` and carries no current author/bundle witness. There is no silent fallback.
 
-### Judge Provenance and Correlated-Error Boundary (#539/#740)
+## Judge Provenance and Correlated-Error Boundary (#539/#740)
 
 The re-review judges revisions on the same model family that drove them — an analogous correlated-judge configuration to the one Ren et al. (2026, arXiv:2607.13104 §8.1.2) warn about (their warning addresses the identical evaluation operator driving updates AND reporting final results; here the correlation is family-level), with the same failure direction: the revision loop can converge on "what this judge likes" instead of quality.
 
@@ -237,7 +237,7 @@ The re-review judges revisions on the same model family that drove them — an a
 
 **Judge identity recording (both cases):** the Re-Review Output's Judge Record block records the judge configuration — the verification judge's actual family/id and the exact Round-1 Schema 6 `review_panel_provenance` carrier: artifact reference, raw artifact SHA-256, normalized-manifest SHA-256, execution-topology SHA-256, and all six axes. The Editorial Decision Letter is display-only and never reconstructs this carrier. Replay-validate the referenced bytes before copying; when the carrier or artifact is absent, unreachable, digest-mismatched, schema-invalid, or replay-invalid, use the closed invalid form and keep all Round-1 axes unknown. Schema 6 carries these as the optional `judge_record` field (plus the #576 optional fields `precommitment_hash`, `routing_status`, `apply_chain_witness`).
 
-### Commitment Ledger Verification (Kong A1 / v3.11)
+## Commitment Ledger Verification (Kong A1 / v3.11)
 
 This step runs **for every Schema 11 row** (any obligation_class) that carries a non-empty `commitment_extracted` list from `revision_coach_agent` Step 3.5. It is independent of the must_fix/should_fix/consider verification above — every parsed reviewer comment may produce commitments, and every commitment must be verified, regardless of the parent concern's obligation_class. Under the three-gate contract this pass runs at Phase 2B (its evidence source for `acknowledgment_only` IS the letter).
 
@@ -257,7 +257,7 @@ For any commitment object with `fulfillment_status` ∈ `{partial, not-fulfilled
 
 This section is the verification analog of `revision_coach_agent` Step 3.5 (Kong A1). Per-commitment lifecycle gating is what closes the Kong §7.4.3 commitment-fulfillment gap.
 
-### Socratic Guidance After Re-Review
+## Socratic Guidance After Re-Review
 
 ```
 If Re-Review Decision = Major Revision:
@@ -271,11 +271,11 @@ If Re-Review Decision = Major Revision:
   -> User can say "just fix it" to skip guidance
 ```
 
-### Declined items and the next roadmap (#927)
+## Declined items and the next roadmap (#927)
 
 When `scripts/check_re_review_synthesis.py` reports `declined-only Major (#927)`, the Major comes only from must_fix items the author declined (`wont_address` or `not_on_point`) and the verifier judged `NOT_ADDRESSED`: counted as addressed, the decision would fall below Major. The verdicts and the decision stand. Each such item enters the next immutable roadmap with a `proposed_targets` entry in the paper's limitations section (an existing limitations block with `replace_block`, or `insert_after` that section's last block; with no limitations section, `insert_after` the last block of the Discussion, or of the final body section when there is no Discussion, to start one) and a `suggested_action` to state the concern as a limitation. Its other targets stay; when it already targets that block, add the operation to that target instead of a second entry for the same block. The reviewer side proposes this alternative; the author authorizes it, or not, at the Stage 4' author checkpoint.
 
-### Re-Review Output Format
+## Re-Review Output Format
 
 ```markdown
 # Verification Review Report

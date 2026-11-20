@@ -240,7 +240,7 @@ Options:
 | Aspect | Before | After |
 |--------|--------|-------|
 | Text (Section 1, para 2) | "The EU invested EUR 2.1 billion in digital infrastructure for higher education." | "The EU allocated approximately EUR 2.0 billion to digital education initiatives across all sectors through the Erasmus+ programme for 2021-2027 (European Commission, 2020)." |
-| Rationale | Corrected amount, removed "higher education" exclusivity claim, added programme name for precision |
+| Rationale | -- | Corrected amount, removed "higher education" exclusivity claim, added programme name for precision |
 | Status | -- | **FIXED** |
 
 #### Issue 6 (MINOR): Ref 19 — Selwyn Year and Volume
@@ -263,7 +263,7 @@ Options:
 | Aspect | Before | After |
 |--------|--------|-------|
 | Text (Section 2.4, para 1) | "Wong and Liu (2024) demonstrated that blockchain micro-credentials improved employer trust in non-traditional qualifications by 41%." | "Wong and Liu (2023) found that blockchain-verified micro-credentials increased the likelihood of favorable initial employer screening decisions by 41% compared to unverified digital badges (p. 621, Table 3)." |
-| Rationale | "Employer trust" was overly broad; corrected to the specific construct measured in the source |
+| Rationale | -- | "Employer trust" was overly broad; corrected to the specific construct measured in the source |
 | Status | -- | **FIXED** |
 
 #### Issue 9 (MINOR): Outdated CDO Statistic
@@ -271,7 +271,7 @@ Options:
 | Aspect | Before | After |
 |--------|--------|-------|
 | Text (Section 5, para 2) | "Only 12% of European universities have a dedicated Chief Digital Officer." | "As of 2019, approximately 11% of surveyed European institutions reported having a Chief Digital Officer or equivalent role (Rampelt et al., 2019), a figure that may have since changed given accelerated digital transformation efforts." |
-| Rationale | Added temporal qualifier and acknowledged potential data staleness |
+| Rationale | -- | Added temporal qualifier and acknowledged potential data staleness |
 | Status | -- | **FIXED** |
 
 ---

@@ -158,7 +158,7 @@ In Socratic mode the deliverable shifts from producing the RQ to helping the use
   starting points. Do not treat them as user-derived insights or silently
   resume Socratic mode.
 
-#### FINER Guiding Questions
+### FINER Guiding Questions
 
 **Feasible (Feasibility)**:
 - Can you obtain the data needed to answer this question? Where is the data?

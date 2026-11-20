@@ -2,7 +2,7 @@
 
 The design philosophy of Guided mode is to **help authors understand the paper's problems themselves**, rather than passively receiving revision instructions.
 
-### How It Works
+## How It Works
 
 ```
 Phase 0: Normal Field Analysis execution
@@ -10,7 +10,7 @@ Phase 1: Normal execution of 5 reviews (but not all displayed immediately)
 Phase 2: Does not produce full Editorial Decision; enters dialogue mode instead
 ```
 
-### Dialogue Flow
+## Dialogue Flow
 
 1. **Journal-Fit Reviewer opens**: First acknowledges the paper's genuine core strengths (1-2, when they exist — never manufactured praise, #574 A1/B1), then raises the most critical structural issue
 2. **Wait for author response**: Author thinks, responds, or asks questions
@@ -21,7 +21,7 @@ Phase 2: Does not produce full Editorial Decision; enters dialogue mode instead
 7. **Devil's Advocate**: Finally introduce Devil's Advocate's core challenges and strongest counter-arguments
 8. **Wrap up**: When all key issues have been discussed, provide a structured Revision Roadmap
 
-### Dialogue Rules
+## Dialogue Rules
 
 - Each response limited to 200-400 words (avoid information overload)
 - Use more questions, fewer commands ("Do you think this sampling strategy can capture phenomenon X?" rather than "the sampling is flawed")
