@@ -283,36 +283,84 @@ If you want deep semantic vector embeddings for memory and skill matching:
 * Alternatively, you can install <a href="https://ollama.com">Ollama</a> anytime and run: <code>ollama pull embeddinggemma</code>. Zenith will automatically detect it on <code>http://127.0.0.1:11434</code> and activate semantic vector search.
 </details>
 
-<details>
-<summary><b>How do I uninstall OpenCode Zenith?</b></summary>
+---
 
-Uninstallation safely stops background services (OmniRoute and Sentinel), removes scheduled timers, and removes the configuration folder after prompting you. Base system packages (Git, Node, Bun, Python) remain untouched.
+## 🗑️ How to Uninstall (All 3 Methods)
 
-* **Method 1: One-Line Uninstaller (Automated)**
-  * **Linux**:
-    ```bash
-    curl -fsSL https://raw.githubusercontent.com/Mimogu/opencode-zenith/main/uninstall.sh | bash
-    ```
-  * **Windows (PowerShell)**:
-    ```powershell
-    irm https://raw.githubusercontent.com/Mimogu/opencode-zenith/main/windows/uninstall.ps1 | iex
-    ```
+Uninstallation is completely clean, transparent, and reversible. It safely stops background services (`omniroute` and `sentinel`), deletes background scheduled tasks and systemd user timers, and prompts you before removing the configuration folder (`~/.config/opencode` or `%USERPROFILE%\.config\opencode`).
 
-* **Method 2: Windows ZIP Download**
-  * Open the extracted `opencode-zenith` folder and double-click **`uninstall.bat`** (or `windows\uninstall.bat`).
-  * It will ask for confirmation before removing config files and saved keys.
+> [!NOTE]
+> Base runtime programs (**Git, Python, Node.js, Bun**) and the `opencode` CLI remain installed on your machine so none of your other developer tools or workflows are disrupted.
 
-* **Method 3: Standard Git Clone**
-  * In your cloned `opencode-zenith` directory, run:
-    * **Linux**:
-      ```bash
-      ./uninstall.sh
-      ```
-    * **Windows**:
-      ```cmd
-      uninstall.bat
-      ```
-</details>
+### Method 1: The 1-Line Uninstaller (Automated)
+
+* **On Linux (Ubuntu, Debian, Arch, Fedora)**:
+  Open your terminal and run:
+  ```bash
+  curl -fsSL https://raw.githubusercontent.com/Mimogu/opencode-zenith/main/uninstall.sh | bash
+  ```
+  *Stops user systemd services, removes `browser-ctl`, and prompts before cleaning `~/.config/opencode`.*
+
+* **On Windows (PowerShell)**:
+  Open PowerShell and run:
+  ```powershell
+  irm https://raw.githubusercontent.com/Mimogu/opencode-zenith/main/windows/uninstall.ps1 | iex
+  ```
+  *Stops running background processes, removes the login startup launcher and Model Lab scheduled task, and prompts before cleaning the configuration folder and environment keys.*
+
+---
+
+### Method 2: Windows ZIP Download (Double-Click)
+
+1. Open your extracted `opencode-zenith` folder.
+2. Double-click **`uninstall.bat`** (located in the root folder or inside `windows\uninstall.bat`).
+3. Follow the interactive prompts in the window:
+   * Confirms `[y/N]` before deleting `%USERPROFILE%\.config\opencode`.
+   * Confirms `[y/N]` before clearing saved environment keys (`NVIDIA_API_KEY`, `OPENROUTER_API_KEY`, `OMNIROUTE_API_KEY`).
+
+---
+
+### Method 3: Standard Git Clone
+
+Open your terminal inside your cloned `opencode-zenith` directory and run:
+
+* **On Linux**:
+  ```bash
+  ./uninstall.sh
+  ```
+* **On Windows (Command Prompt or PowerShell)**:
+  ```cmd
+  uninstall.bat
+  ```
+
+After the uninstaller finishes, you can safely delete the cloned repository directory:
+```bash
+# Linux
+rm -rf ~/opencode-zenith
+
+# Windows (Command Prompt)
+rmdir /s /q opencode-zenith
+```
+
+---
+
+### Optional: Completely Removing Global CLI Packages
+
+If you also wish to remove the OpenCode and OmniRoute CLI tools from your system:
+
+* **Linux / macOS**:
+  ```bash
+  npm uninstall -g @opencode/cli omniroute
+  # or if installed via bun:
+  bun remove -g @opencode/cli omniroute
+  ```
+
+* **Windows**:
+  Run in PowerShell or Command Prompt:
+  ```cmd
+  npm uninstall -g @opencode/cli omniroute
+  ```
+  *(Or uninstall OpenCode via Windows **Settings > Apps > Installed apps**).*
 
 ---
 

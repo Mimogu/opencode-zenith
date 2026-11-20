@@ -25,6 +25,7 @@ How to install
 2. Open the extracted folder and double-click install.bat.
 3. Answer the questions:
    - OmniRoute admin password (you choose it, at least 8 characters)
+   - NVIDIA NIM API key: optional, free at https://build.nvidia.com
    - OpenRouter API key: optional, free at https://openrouter.ai/keys
    - OmniRoute API key: the dashboard opens in your browser. Log in, optionally
      add AI accounts under Providers, create a key under API Keys, paste it.
@@ -34,6 +35,7 @@ How to install
 Adding a key later
 ------------------
 Open PowerShell and run (replace the value):
+  [Environment]::SetEnvironmentVariable('NVIDIA_API_KEY', 'your-key', 'User')
   [Environment]::SetEnvironmentVariable('OPENROUTER_API_KEY', 'your-key', 'User')
   [Environment]::SetEnvironmentVariable('OMNIROUTE_API_KEY', 'your-key', 'User')
 Then open a new terminal.
