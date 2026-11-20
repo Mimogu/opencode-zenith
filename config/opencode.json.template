@@ -256,8 +256,8 @@
     "camofox": {
       "type": "local",
       "command": [
-        "/usr/bin/node",
-        "/home/mimogu/.local/opt/camofox-browser/mcp/server.mjs"
+        "node",
+        "{{CONFIG_DIR}}/mcp-servers/camofox/server.mjs"
       ],
       "environment": {
         "CAMOFOX_URL": "http://127.0.0.1:9377"

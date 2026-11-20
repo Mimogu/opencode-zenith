@@ -60,10 +60,18 @@ if ! has_cmd opencode; then
   fi
 else
   echo "  [✓] opencode found. Ensuring latest version..."
-  if has_cmd bun; then
-    bun install -g opencode-ai >/dev/null 2>&1 || true
-  elif has_cmd npm; then
-    npm install -g opencode-ai >/dev/null 2>&1 || true
+  if has_cmd timeout; then
+    if has_cmd bun; then
+      timeout 15 bun install -g opencode-ai >/dev/null 2>&1 || true
+    elif has_cmd npm; then
+      timeout 15 npm install -g opencode-ai >/dev/null 2>&1 || true
+    fi
+  else
+    if has_cmd bun; then
+      bun install -g opencode-ai >/dev/null 2>&1 || true
+    elif has_cmd npm; then
+      npm install -g opencode-ai >/dev/null 2>&1 || true
+    fi
   fi
 fi
 
