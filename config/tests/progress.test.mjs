@@ -1,3 +1,4 @@
+delete process.env.OPENCODE_SILENT_EVERY;
 import { test, expect } from "bun:test";
 import { addProgressNotes, isNarration, SILENT_EVERY, CANCEL_REQUEST, CANCEL_REPLY_NOTE } from "../plugins/context-engine/progress.mjs";
 

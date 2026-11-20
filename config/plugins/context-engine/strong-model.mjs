@@ -12,7 +12,9 @@ const DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..
 
 function declaredModels(provider = "omniroute") {
   try {
-    const cfg = JSON.parse(fs.readFileSync(path.join(DIR, "opencode.json"), "utf-8"));
+    let p = path.join(DIR, "opencode.json");
+    if (!fs.existsSync(p)) p = path.join(DIR, "opencode.json.template");
+    const cfg = JSON.parse(fs.readFileSync(p, "utf-8"));
     return new Set(Object.keys(cfg.providers?.[provider]?.models || {}).map((m) => `${provider}/${m}`));
   } catch { return new Set(); }
 }

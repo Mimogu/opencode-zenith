@@ -1,0 +1,1441 @@
+{
+  "schema_version": 2,
+  "updated": "2026-11-19T04:11:57+0200",
+  "categories": {
+    "build": [
+      "nvidia/nvidia/nemotron-3.5-super-vl-120b-a12b",
+      "nvidia/nvidia/nemotron-3-ultra-550b-a55b",
+      "opencode/deepseek-v4.1-flash-free",
+      "opencode/beam-free",
+      "opencode/iceman-free",
+      "opencode/longcat-2.5-free",
+      "opencode/flint-40b-free",
+      "opencode/inkling-2-small-free",
+      "opencode/mimo-v2.6-flash-free",
+      "nvidia/nvidia/nemotron-3.5-lightning-30b-a3b",
+      "opencode/nemotron-3.5-super-vl-free",
+      "nvidia/stepfun-ai/step-5-preview",
+      "openrouter/particle-ai/particle-1:free",
+      "openrouter/baidu/ernie-5.5-flash-preview:free",
+      "nvidia/poolside/laguna-xs-2.1",
+      "opencode/hy4-flash-free",
+      "openrouter/thinkingmachines/inkling-2-small:free",
+      "opencode/tidepool-alpha-free",
+      "openrouter/recursive/flint-v1.0:free",
+      "omniroute/auto/fast",
+      "omniroute/openrouter/nvidia/nemotron-3.5-lightning:free",
+      "opencode/nemotron-3.5-lightning-free",
+      "omniroute/auto/best-reasoning",
+      "openrouter/nvidia/nemotron-3.5-super-vl:free",
+      "openrouter/cohere/north-mini-code:free",
+      "omniroute/omni-quick",
+      "openrouter/liquid/lfm-3-1.7b:free",
+      "omniroute/antigravity/gemini-3.5-flash-lite",
+      "omniroute/auto/best-coding",
+      "omniroute/auto/best-fast",
+      "openrouter/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+      "omniroute/agnes/agnes-3.0-flash",
+      "openrouter/nvidia/nemotron-3.5-lightning:free",
+      "omniroute/openrouter/nvidia/nemotron-3.5-super-vl:free",
+      "omniroute/agy/claude-sonnet-4-6",
+      "omniroute/antigravity/gemini-3.8-flash-tiered",
+      "omniroute/antigravity/claude-sonnet-4-6",
+      "omniroute/omni-explore",
+      "openrouter/inclusionai/ling-3.2-flash:free",
+      "omniroute/omni-review",
+      "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free",
+      "omniroute/antigravity/claude-opus-4-6-thinking",
+      "omniroute/omni-code"
+    ],
+    "plan": [
+      "nvidia/nvidia/nemotron-3.5-super-vl-120b-a12b",
+      "opencode/deepseek-v4.1-flash-free",
+      "opencode/beam-free",
+      "opencode/flint-40b-free",
+      "opencode/longcat-2.5-free",
+      "nvidia/nvidia/nemotron-3-ultra-550b-a55b",
+      "opencode/iceman-free",
+      "opencode/inkling-2-small-free",
+      "opencode/mimo-v2.6-flash-free",
+      "opencode/nemotron-3.5-super-vl-free",
+      "openrouter/particle-ai/particle-1:free",
+      "openrouter/baidu/ernie-5.5-flash-preview:free",
+      "nvidia/stepfun-ai/step-5-preview",
+      "openrouter/thinkingmachines/inkling-2-small:free",
+      "openrouter/recursive/flint-v1.0:free",
+      "omniroute/auto/fast",
+      "opencode/hy4-flash-free",
+      "opencode/tidepool-alpha-free",
+      "openrouter/nvidia/nemotron-3.5-super-vl:free",
+      "omniroute/antigravity/gemini-3.5-flash-lite",
+      "omniroute/antigravity/gemini-3.8-flash-tiered",
+      "omniroute/antigravity/claude-sonnet-4-6",
+      "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free",
+      "nvidia/nvidia/nemotron-3.5-lightning-30b-a3b",
+      "omniroute/openrouter/nvidia/nemotron-3.5-lightning:free",
+      "omniroute/auto/best-reasoning",
+      "nvidia/poolside/laguna-xs-2.1",
+      "opencode/nemotron-3.5-lightning-free",
+      "omniroute/auto/best-coding",
+      "openrouter/liquid/lfm-3-1.7b:free",
+      "omniroute/auto/best-fast",
+      "omniroute/agnes/agnes-3.0-flash",
+      "openrouter/inclusionai/ling-3.2-flash:free",
+      "omniroute/omni-quick",
+      "omniroute/openrouter/nvidia/nemotron-3.5-super-vl:free",
+      "omniroute/agy/claude-sonnet-4-6",
+      "openrouter/cohere/north-mini-code:free",
+      "openrouter/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+      "openrouter/nvidia/nemotron-3.5-lightning:free",
+      "omniroute/omni-explore",
+      "omniroute/omni-review",
+      "omniroute/antigravity/claude-opus-4-6-thinking",
+      "omniroute/omni-code"
+    ],
+    "explore": [
+      "nvidia/nvidia/nemotron-3.5-super-vl-120b-a12b",
+      "nvidia/nvidia/nemotron-3-ultra-550b-a55b",
+      "opencode/deepseek-v4.1-flash-free",
+      "opencode/flint-40b-free",
+      "opencode/beam-free",
+      "opencode/iceman-free",
+      "opencode/longcat-2.5-free",
+      "opencode/inkling-2-small-free",
+      "nvidia/nvidia/nemotron-3.5-lightning-30b-a3b",
+      "opencode/mimo-v2.6-flash-free",
+      "opencode/nemotron-3.5-super-vl-free",
+      "nvidia/stepfun-ai/step-5-preview",
+      "nvidia/poolside/laguna-xs-2.1",
+      "openrouter/particle-ai/particle-1:free",
+      "opencode/hy4-flash-free",
+      "openrouter/baidu/ernie-5.5-flash-preview:free",
+      "opencode/tidepool-alpha-free",
+      "omniroute/auto/fast",
+      "omniroute/openrouter/nvidia/nemotron-3.5-lightning:free",
+      "omniroute/omni-quick",
+      "openrouter/thinkingmachines/inkling-2-small:free",
+      "omniroute/auto/best-reasoning",
+      "openrouter/cohere/north-mini-code:free",
+      "openrouter/recursive/flint-v1.0:free",
+      "opencode/nemotron-3.5-lightning-free",
+      "openrouter/nvidia/nemotron-3.5-super-vl:free",
+      "openrouter/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+      "omniroute/antigravity/gemini-3.5-flash-lite",
+      "omniroute/auto/best-coding",
+      "openrouter/liquid/lfm-3-1.7b:free",
+      "omniroute/antigravity/gemini-3.8-flash-tiered",
+      "omniroute/auto/best-fast",
+      "omniroute/agnes/agnes-3.0-flash",
+      "omniroute/openrouter/nvidia/nemotron-3.5-super-vl:free",
+      "openrouter/nvidia/nemotron-3.5-lightning:free",
+      "omniroute/agy/claude-sonnet-4-6",
+      "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free",
+      "omniroute/antigravity/claude-sonnet-4-6",
+      "omniroute/omni-explore",
+      "openrouter/inclusionai/ling-3.2-flash:free",
+      "omniroute/omni-review",
+      "omniroute/antigravity/claude-opus-4-6-thinking",
+      "omniroute/omni-code"
+    ],
+    "review": [
+      "nvidia/nvidia/nemotron-3.5-super-vl-120b-a12b",
+      "opencode/deepseek-v4.1-flash-free",
+      "opencode/beam-free",
+      "opencode/flint-40b-free",
+      "opencode/iceman-free",
+      "opencode/longcat-2.5-free",
+      "opencode/inkling-2-small-free",
+      "opencode/mimo-v2.6-flash-free",
+      "openrouter/particle-ai/particle-1:free",
+      "openrouter/baidu/ernie-5.5-flash-preview:free",
+      "opencode/hy4-flash-free",
+      "openrouter/thinkingmachines/inkling-2-small:free",
+      "nvidia/nvidia/nemotron-3-ultra-550b-a55b",
+      "openrouter/recursive/flint-v1.0:free",
+      "opencode/tidepool-alpha-free",
+      "opencode/nemotron-3.5-super-vl-free",
+      "omniroute/auto/fast",
+      "omniroute/antigravity/gemini-3.5-flash-lite",
+      "nvidia/stepfun-ai/step-5-preview",
+      "omniroute/openrouter/nvidia/nemotron-3.5-lightning:free",
+      "omniroute/antigravity/gemini-3.8-flash-tiered",
+      "nvidia/nvidia/nemotron-3.5-lightning-30b-a3b",
+      "omniroute/auto/best-reasoning",
+      "omniroute/antigravity/claude-sonnet-4-6",
+      "openrouter/liquid/lfm-3-1.7b:free",
+      "omniroute/auto/best-coding",
+      "omniroute/agnes/agnes-3.0-flash",
+      "omniroute/auto/best-fast",
+      "nvidia/poolside/laguna-xs-2.1",
+      "omniroute/agy/claude-sonnet-4-6",
+      "omniroute/omni-quick",
+      "omniroute/openrouter/nvidia/nemotron-3.5-super-vl:free",
+      "openrouter/nvidia/nemotron-3.5-super-vl:free",
+      "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free",
+      "opencode/nemotron-3.5-lightning-free",
+      "openrouter/inclusionai/ling-3.2-flash:free",
+      "omniroute/omni-review",
+      "openrouter/cohere/north-mini-code:free",
+      "omniroute/omni-explore",
+      "omniroute/antigravity/claude-opus-4-6-thinking",
+      "omniroute/omni-code",
+      "openrouter/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+      "openrouter/nvidia/nemotron-3.5-lightning:free"
+    ],
+    "quick": [
+      "nvidia/nvidia/nemotron-3.5-super-vl-120b-a12b",
+      "nvidia/nvidia/nemotron-3-ultra-550b-a55b",
+      "opencode/deepseek-v4.1-flash-free",
+      "opencode/beam-free",
+      "opencode/iceman-free",
+      "opencode/inkling-2-small-free",
+      "openrouter/particle-ai/particle-1:free",
+      "openrouter/baidu/ernie-5.5-flash-preview:free",
+      "opencode/longcat-2.5-free",
+      "opencode/hy4-flash-free",
+      "opencode/mimo-v2.6-flash-free",
+      "opencode/tidepool-alpha-free",
+      "openrouter/thinkingmachines/inkling-2-small:free",
+      "opencode/flint-40b-free",
+      "opencode/nemotron-3.5-super-vl-free",
+      "openrouter/liquid/lfm-3-1.7b:free",
+      "nvidia/poolside/laguna-xs-2.1",
+      "omniroute/auto/fast",
+      "omniroute/antigravity/gemini-3.8-flash-tiered",
+      "omniroute/openrouter/nvidia/nemotron-3.5-lightning:free",
+      "nvidia/stepfun-ai/step-5-preview",
+      "nvidia/nvidia/nemotron-3.5-lightning-30b-a3b",
+      "omniroute/agy/claude-sonnet-4-6",
+      "openrouter/nvidia/nemotron-3.5-super-vl:free",
+      "openrouter/cohere/north-mini-code:free",
+      "omniroute/antigravity/gemini-3.5-flash-lite",
+      "omniroute/antigravity/claude-sonnet-4-6",
+      "openrouter/recursive/flint-v1.0:free",
+      "openrouter/inclusionai/ling-3.2-flash:free",
+      "omniroute/auto/best-coding",
+      "omniroute/agnes/agnes-3.0-flash",
+      "omniroute/auto/best-reasoning",
+      "omniroute/antigravity/claude-opus-4-6-thinking",
+      "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free",
+      "omniroute/omni-code",
+      "omniroute/auto/best-fast",
+      "omniroute/omni-explore",
+      "omniroute/omni-quick",
+      "omniroute/openrouter/nvidia/nemotron-3.5-super-vl:free",
+      "opencode/nemotron-3.5-lightning-free",
+      "openrouter/nvidia/nemotron-3.5-lightning:free",
+      "openrouter/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+      "omniroute/omni-review"
+    ]
+  },
+  "scores": {
+    "opencode/nemotron-3.5-super-vl-free": {
+      "per_category": {
+        "build": 73.3,
+        "plan": 71.3,
+        "explore": 73.4,
+        "review": 60.3,
+        "quick": 67.5
+      },
+      "latency": 28.0,
+      "tokens": 0,
+      "cost": 0.0,
+      "runs": 5
+    },
+    "opencode/deepseek-v4.1-flash-free": {
+      "per_category": {
+        "build": 80.5,
+        "plan": 81.6,
+        "explore": 80.3,
+        "review": 81.2,
+        "quick": 78.1
+      },
+      "latency": 18.5,
+      "tokens": 25078,
+      "cost": 0.0,
+      "runs": 2
+    },
+    "opencode/glm-5.3-flash-free": {
+      "per_category": {
+        "build": 75.8,
+        "plan": 61.5,
+        "explore": 77.7,
+        "review": 71.8,
+        "quick": 75.5
+      },
+      "latency": 20.0,
+      "tokens": 24168,
+      "cost": 0.0,
+      "runs": 2
+    },
+    "opencode/beam-free": {
+      "per_category": {
+        "build": 78.3,
+        "plan": 78.4,
+        "explore": 76.8,
+        "review": 78.7,
+        "quick": 72.8
+      },
+      "latency": 21.2,
+      "tokens": 52170,
+      "cost": 0.0,
+      "runs": 3
+    },
+    "opencode/flint-40b-free": {
+      "per_category": {
+        "build": 79.5,
+        "plan": 81.1,
+        "explore": 79.9,
+        "review": 80.9,
+        "quick": 79.1
+      },
+      "latency": 67.2,
+      "tokens": 0,
+      "cost": 0.0,
+      "runs": 2
+    },
+    "opencode/nemotron-3.5-lightning-free": {
+      "per_category": {
+        "build": 63.4,
+        "plan": 47.8,
+        "explore": 60.6,
+        "review": 48.6,
+        "quick": 53.9
+      },
+      "latency": 174.4,
+      "tokens": 0,
+      "cost": 0.0,
+      "runs": 2
+    },
+    "ollama/qwen3.5:4b": {
+      "per_category": {
+        "build": 60.8,
+        "plan": 54.4,
+        "explore": 59.4,
+        "review": 57.7,
+        "quick": 58.0
+      }
+    },
+    "ollama/qwen35-bench": {
+      "per_category": {
+        "build": 48.1,
+        "plan": 44.9,
+        "explore": 45.4,
+        "review": 46.4,
+        "quick": 43.5
+      }
+    },
+    "opencode/mimo-v2.6-flash-free": {
+      "per_category": {
+        "build": 75.2,
+        "plan": 75.2,
+        "explore": 73.9,
+        "review": 75.5,
+        "quick": 71.2
+      }
+    },
+    "omniroute/omni-quick": {
+      "per_category": {
+        "build": 68.5,
+        "plan": 53.5,
+        "explore": 71.6,
+        "review": 60.3,
+        "quick": 65.5
+      },
+      "latency": 116.1,
+      "tokens": 0,
+      "cost": 0.0,
+      "runs": 2
+    },
+    "openrouter/nvidia/nemotron-3.5-super-vl:free": {
+      "per_category": {
+        "build": 70.1,
+        "plan": 68.7,
+        "explore": 68.7,
+        "review": 58.9,
+        "quick": 64.0
+      },
+      "latency": 23.1,
+      "tokens": 75345,
+      "cost": 0.0,
+      "runs": 4
+    },
+    "openrouter/nvidia/nemotron-3.5-lightning:free": {
+      "per_category": {
+        "build": 68.9,
+        "plan": 51.1,
+        "explore": 65.3,
+        "review": 52.8,
+        "quick": 63.3
+      },
+      "latency": 68.7,
+      "tokens": 0,
+      "cost": 0.0,
+      "runs": 4
+    },
+    "openrouter/cohere/north-mini-code:free": {
+      "per_category": {
+        "build": 69.1,
+        "plan": 52.0,
+        "explore": 70.7,
+        "review": 53.1,
+        "quick": 60.1
+      },
+      "latency": 14.4,
+      "tokens": 91869,
+      "cost": 0.0,
+      "runs": 4
+    },
+    "omniroute/omni-code": {
+      "per_category": {
+        "build": 51.5,
+        "plan": 42.6,
+        "explore": 42.2,
+        "review": 50.8,
+        "quick": 48.1
+      },
+      "latency": 91.4,
+      "tokens": 510,
+      "cost": 0.0,
+      "runs": 3
+    },
+    "omniroute/antigravity/claude-sonnet-4-6": {
+      "per_category": {
+        "build": 59.7,
+        "plan": 64.1,
+        "explore": 59.3,
+        "review": 60.1,
+        "quick": 53.7
+      },
+      "latency": 50.6,
+      "tokens": 0,
+      "cost": 0.0,
+      "runs": 3
+    },
+    "omniroute/auto/best-reasoning": {
+      "per_category": {
+        "build": 70.9,
+        "plan": 56.6,
+        "explore": 71.1,
+        "review": 63.1,
+        "quick": 68.2
+      },
+      "latency": 76.0,
+      "tokens": 52005,
+      "cost": 0.0,
+      "runs": 4
+    },
+    "omniroute/agnes/agnes-3.0-flash": {
+      "per_category": {
+        "build": 65.9,
+        "plan": 53.0,
+        "explore": 63.4,
+        "review": 59.9,
+        "quick": 62.5
+      },
+      "latency": 38.9,
+      "tokens": 24883,
+      "cost": 0.0,
+      "runs": 3
+    },
+    "omniroute/auto/best-fast": {
+      "per_category": {
+        "build": 67.4,
+        "plan": 54.5,
+        "explore": 65.0,
+        "review": 60.9,
+        "quick": 66.2
+      },
+      "latency": 82.5,
+      "tokens": 0,
+      "cost": 0.0,
+      "runs": 2
+    },
+    "omniroute/antigravity/gemini-3.5-flash-lite": {
+      "per_category": {
+        "build": 66.3,
+        "plan": 66.2,
+        "explore": 63.8,
+        "review": 64.2,
+        "quick": 59.3
+      },
+      "latency": 20.1,
+      "tokens": 0,
+      "cost": 0.0,
+      "runs": 2
+    },
+    "omniroute/auto/best-coding": {
+      "per_category": {
+        "build": 67.4,
+        "plan": 54.5,
+        "explore": 65.0,
+        "review": 60.9,
+        "quick": 66.2
+      },
+      "latency": 48.8,
+      "tokens": 0,
+      "cost": 0.0,
+      "runs": 3
+    },
+    "omniroute/omni-review": {
+      "per_category": {
+        "build": 56.3,
+        "plan": 45.9,
+        "explore": 55.8,
+        "review": 53.9,
+        "quick": 49.5
+      },
+      "latency": 106.3,
+      "tokens": 0,
+      "cost": 0.0,
+      "runs": 2
+    },
+    "omniroute/antigravity/gemini-3.8-flash-tiered": {
+      "per_category": {
+        "build": 64.1,
+        "plan": 66.2,
+        "explore": 63.8,
+        "review": 63.0,
+        "quick": 64.9
+      },
+      "latency": 67.5,
+      "tokens": 41592,
+      "cost": 0.0,
+      "runs": 1
+    },
+    "omniroute/openrouter/nvidia/nemotron-3.5-super-vl:free": {
+      "per_category": {
+        "build": 65.9,
+        "plan": 53.0,
+        "explore": 63.4,
+        "review": 59.9,
+        "quick": 62.5
+      },
+      "latency": 57.1,
+      "tokens": 24820,
+      "cost": 0.0,
+      "runs": 3
+    },
+    "openrouter/google/gemma-4-26b-a4b-it:free": {
+      "per_category": {
+        "build": 41.7,
+        "plan": 37.8,
+        "explore": 37.6,
+        "review": 44.9,
+        "quick": 46.7
+      },
+      "latency": 92.0,
+      "tokens": 0,
+      "cost": 0.0,
+      "runs": 3
+    },
+    "openrouter/google/gemma-4-31b-it:free": {
+      "per_category": {
+        "build": 34.8,
+        "plan": 34.9,
+        "explore": 32.5,
+        "review": 40.7,
+        "quick": 41.1
+      },
+      "latency": 95.5,
+      "tokens": 0,
+      "cost": 0.0,
+      "runs": 3
+    },
+    "openrouter/liquid/lfm-2.5-2.6b:free": {
+      "per_category": {
+        "build": 59.5,
+        "plan": 51.7,
+        "explore": 59.3,
+        "review": 56.3,
+        "quick": 57.8
+      }
+    },
+    "opencode/pulse-alpha-free": {
+      "per_category": {
+        "build": 57.0,
+        "plan": 54.3,
+        "explore": 57.5,
+        "review": 55.2,
+        "quick": 55.3
+      }
+    },
+    "omniroute/openrouter/google/gemma-4-31b-it:free": {
+      "per_category": {
+        "build": 50.2,
+        "plan": 40.7,
+        "explore": 42.1,
+        "review": 49.9,
+        "quick": 47.2
+      },
+      "latency": 90.0,
+      "tokens": 0,
+      "cost": 0.0,
+      "runs": 1
+    },
+    "omniroute/agy/claude-sonnet-4-6": {
+      "per_category": {
+        "build": 63.0,
+        "plan": 50.2,
+        "explore": 60.4,
+        "review": 58.1,
+        "quick": 55.1
+      },
+      "latency": 22.6,
+      "tokens": 0,
+      "cost": 0.0,
+      "runs": 1
+    },
+    "openrouter/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": {
+      "per_category": {
+        "build": 69.4,
+        "plan": 52.5,
+        "explore": 69.4,
+        "review": 53.1,
+        "quick": 62.6
+      },
+      "latency": 87.4,
+      "tokens": 0,
+      "cost": 0.0,
+      "runs": 3
+    },
+    "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free": {
+      "per_category": {
+        "build": 55.5,
+        "plan": 64.2,
+        "explore": 62.9,
+        "review": 58.7,
+        "quick": 64.5
+      },
+      "latency": 46.1,
+      "tokens": 0,
+      "cost": 0.0,
+      "runs": 2
+    },
+    "openrouter/recursive/flint-v1.0:free": {
+      "per_category": {
+        "build": 75.1,
+        "plan": 75.2,
+        "explore": 71.0,
+        "review": 75.4,
+        "quick": 75.1
+      },
+      "latency": 71.4,
+      "tokens": 0,
+      "cost": 0.0,
+      "runs": 3
+    },
+    "opencode/crouton-alpha-free": {
+      "per_category": {
+        "build": 57.0,
+        "plan": 54.2,
+        "explore": 56.4,
+        "review": 55.1,
+        "quick": 56.9
+      }
+    },
+    "opencode/iceman-free": {
+      "per_category": {
+        "build": 81.6,
+        "plan": 80.7,
+        "explore": 79.8,
+        "review": 80.7,
+        "quick": 79.9
+      },
+      "latency": 22.1,
+      "tokens": 24687,
+      "cost": 0.0,
+      "runs": 4
+    },
+    "opencode/inkling-2-small-free": {
+      "per_category": {
+        "build": 75.2,
+        "plan": 76.5,
+        "explore": 75.4,
+        "review": 75.8,
+        "quick": 75.4
+      },
+      "latency": 10.2,
+      "tokens": 0,
+      "cost": 0.0,
+      "runs": 1
+    },
+    "omniroute/antigravity/claude-opus-4-6-thinking": {
+      "per_category": {
+        "build": 51.5,
+        "plan": 42.6,
+        "explore": 42.2,
+        "review": 50.8,
+        "quick": 48.1
+      },
+      "latency": 49.3,
+      "tokens": 28036,
+      "cost": 0.0,
+      "runs": 3
+    },
+    "openrouter/xingchen-agi/xing4.0-29b-a4b:free": {
+      "per_category": {
+        "build": 61.8,
+        "plan": 62.9,
+        "explore": 61.7,
+        "review": 60.6,
+        "quick": 60.7
+      }
+    },
+    "openrouter/liquid/lfm-3-1.7b:free": {
+      "per_category": {
+        "build": 67.5,
+        "plan": 53.8,
+        "explore": 64.2,
+        "review": 60.7,
+        "quick": 65.2
+      },
+      "latency": 36.1,
+      "tokens": 91635,
+      "cost": 0.0,
+      "runs": 4
+    },
+    "omniroute/omni-explore": {
+      "per_category": {
+        "build": 67.4,
+        "plan": 54.5,
+        "explore": 65.0,
+        "review": 60.9,
+        "quick": 66.2
+      },
+      "latency": 58.8,
+      "tokens": 588,
+      "cost": 0.0,
+      "runs": 4
+    },
+    "omniroute/auto/fast": {
+      "per_category": {
+        "build": 70.9,
+        "plan": 71.1,
+        "explore": 71.7,
+        "review": 67.2,
+        "quick": 69.6
+      },
+      "latency": 20.6,
+      "tokens": 52546,
+      "cost": 0.0,
+      "runs": 3
+    },
+    "omniroute/openrouter/nvidia/nemotron-3.5-lightning:free": {
+      "per_category": {
+        "build": 69.2,
+        "plan": 55.1,
+        "explore": 69.4,
+        "review": 62.1,
+        "quick": 64.2
+      },
+      "latency": 10.0,
+      "tokens": 52378,
+      "cost": 0.0,
+      "runs": 2
+    },
+    "omniroute/cloudflare-ai/@cf/meta/llama-3.3-70b-instruct-fp8-fast": {
+      "per_category": {
+        "build": 50.2,
+        "plan": 40.7,
+        "explore": 42.1,
+        "review": 49.9,
+        "quick": 47.2
+      },
+      "latency": 55.2,
+      "tokens": 0,
+      "cost": 0.0,
+      "runs": 2
+    },
+    "opencode/longcat-2.5-free": {
+      "per_category": {
+        "build": 78.7,
+        "plan": 78.7,
+        "explore": 77.4,
+        "review": 78.4,
+        "quick": 77.3
+      },
+      "latency": 33.1,
+      "tokens": 0,
+      "cost": 0.0,
+      "runs": 5
+    },
+    "openrouter/thinkingmachines/inkling-2-small:free": {
+      "per_category": {
+        "build": 75.1,
+        "plan": 75.2,
+        "explore": 71.0,
+        "review": 75.4,
+        "quick": 75.1
+      },
+      "latency": 17.7,
+      "tokens": 0,
+      "cost": 0.0,
+      "runs": 4
+    },
+    "omniroute/cloudflare-ai/@cf/qwen/qwen2.5-coder-32b-instruct": {
+      "per_category": {
+        "build": 50.2,
+        "plan": 40.7,
+        "explore": 42.1,
+        "review": 49.9,
+        "quick": 47.2
+      },
+      "latency": 14.8,
+      "tokens": 0,
+      "cost": 0.0,
+      "runs": 2
+    },
+    "omniroute/cloudflare-ai/@cf/zai-org/glm-4.7-flash": {
+      "per_category": {
+        "build": 50.2,
+        "plan": 40.7,
+        "explore": 42.1,
+        "review": 49.9,
+        "quick": 47.2
+      },
+      "latency": 98.6,
+      "tokens": 0,
+      "cost": 0.0,
+      "runs": 3
+    },
+    "omniroute/sambanova/gpt-oss-120b": {
+      "per_category": {
+        "build": 50.2,
+        "plan": 40.7,
+        "explore": 42.1,
+        "review": 49.9,
+        "quick": 47.2
+      },
+      "latency": 11.8,
+      "tokens": 0,
+      "cost": 0.0,
+      "runs": 3
+    },
+    "nvidia/nvidia/nemotron-3-ultra-550b-a55b": {
+      "per_category": {
+        "build": 83.5,
+        "plan": 81.0,
+        "explore": 85.2,
+        "review": 68.4,
+        "quick": 78.2
+      },
+      "latency": 45.4,
+      "tokens": 145448,
+      "cost": 0.0,
+      "runs": 8
+    },
+    "nvidia/nvidia/nemotron-3.5-super-vl-120b-a12b": {
+      "per_category": {
+        "build": 87.9,
+        "plan": 88.0,
+        "explore": 87.8,
+        "review": 88.6,
+        "quick": 84.8
+      },
+      "latency": 18.1,
+      "tokens": 188632,
+      "cost": 0.0,
+      "runs": 5
+    },
+    "nvidia/nvidia/nemotron-3.5-lightning-30b-a3b": {
+      "per_category": {
+        "build": 78.9,
+        "plan": 58.6,
+        "explore": 80.4,
+        "review": 59.8,
+        "quick": 72.4
+      },
+      "latency": 125.2,
+      "tokens": 0,
+      "cost": 0.0,
+      "runs": 2
+    },
+    "nvidia/stepfun-ai/step-5-preview": {
+      "per_category": {
+        "build": 83.5,
+        "plan": 81.0,
+        "explore": 85.2,
+        "review": 68.4,
+        "quick": 78.2
+      },
+      "latency": 107.3,
+      "tokens": 24818,
+      "cost": 0.0,
+      "runs": 2
+    },
+    "nvidia/poolside/laguna-xs-2.1": {
+      "per_category": {
+        "build": 72.2,
+        "plan": 49.8,
+        "explore": 73.4,
+        "review": 54.1,
+        "quick": 61.3
+      },
+      "latency": 6.6,
+      "tokens": 23699,
+      "cost": 0.0,
+      "runs": 1
+    },
+    "opencode/minimax-m3.1-flash-free": {
+      "per_category": {
+        "build": 71.6,
+        "plan": 58.3,
+        "explore": 70.8,
+        "review": 68.8,
+        "quick": 69.6
+      },
+      "latency": 34.3,
+      "tokens": 0,
+      "cost": 0.0,
+      "runs": 5
+    },
+    "openrouter/baidu/ernie-5.5-flash-preview:free": {
+      "per_category": {
+        "build": 78.7,
+        "plan": 78.7,
+        "explore": 77.4,
+        "review": 78.4,
+        "quick": 77.3
+      },
+      "latency": 20.9,
+      "tokens": 22862,
+      "cost": 0.0,
+      "runs": 6
+    },
+    "openrouter/particle-ai/particle-1:free": {
+      "per_category": {
+        "build": 78.7,
+        "plan": 78.7,
+        "explore": 77.4,
+        "review": 78.4,
+        "quick": 77.3
+      },
+      "latency": 15.7,
+      "tokens": 49848,
+      "cost": 0.0,
+      "runs": 6
+    },
+    "omniroute/sambanova/Meta-Llama-3.3-70B-Instruct": {
+      "per_category": {
+        "build": 54.5,
+        "plan": 46.0,
+        "explore": 54.4,
+        "review": 52.8,
+        "quick": 48.6
+      },
+      "latency": 34.7,
+      "tokens": 0,
+      "cost": 0.0,
+      "runs": 3
+    },
+    "omniroute/sambanova/MiniMax-M3.1-Flash": {
+      "per_category": {
+        "build": 54.5,
+        "plan": 46.0,
+        "explore": 54.4,
+        "review": 52.8,
+        "quick": 48.6
+      },
+      "latency": 7.1,
+      "tokens": 0,
+      "cost": 0.0,
+      "runs": 3
+    },
+    "opencode/hy4-flash-free": {
+      "per_category": {
+        "build": 67.0,
+        "plan": 61.7,
+        "explore": 67.2,
+        "review": 66.6,
+        "quick": 64.7
+      },
+      "latency": 21.1,
+      "tokens": 71971,
+      "cost": 0.0,
+      "runs": 3
+    },
+    "openrouter/inclusionai/ling-3.2-flash:free": {
+      "per_category": {
+        "build": 62.3,
+        "plan": 57.1,
+        "explore": 60.3,
+        "review": 58.8,
+        "quick": 61.1
+      },
+      "latency": 92.7,
+      "tokens": 119234,
+      "cost": 0.0,
+      "runs": 2
+    },
+    "opencode/tidepool-alpha-free": {
+      "per_category": {
+        "build": 62.4,
+        "plan": 57.6,
+        "explore": 62.8,
+        "review": 59.0,
+        "quick": 59.4
+      },
+      "latency": 21.5,
+      "tokens": 98652,
+      "cost": 0.0,
+      "runs": 2
+    }
+  },
+  "settings": {
+    "test_paid": false,
+    "test_omniroute": true,
+    "providers": [
+      "opencode",
+      "openrouter",
+      "omniroute",
+      "nvidia"
+    ],
+    "budgets": {
+      "opencode": 14,
+      "openrouter": 20,
+      "omniroute": 24,
+      "nvidia": 60
+    },
+    "provider_bias": {
+      "opencode": 8.0,
+      "omniroute": 0.0,
+      "openrouter": -2.0,
+      "nvidia": 4.0
+    }
+  },
+  "meta": {
+    "opencode/nemotron-3.5-lightning-free": {
+      "context": 262144,
+      "output": 262144,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": false
+    },
+    "opencode/beam-free": {
+      "context": 1048576,
+      "output": 131072,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": false
+    },
+    "opencode/flint-40b-free": {
+      "context": 262144,
+      "output": 65536,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": false
+    },
+    "opencode/mimo-v2.6-flash-free": {
+      "context": 200000,
+      "output": 32000,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": true
+    },
+    "opencode/nemotron-3.5-super-vl-free": {
+      "context": 1048576,
+      "output": 131072,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": true
+    },
+    "opencode/deepseek-v4.1-flash-free": {
+      "context": 200000,
+      "output": 32000,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": true
+    },
+    "opencode/glm-5.3-flash-free": {
+      "context": 200000,
+      "output": 32000,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": true
+    },
+    "omniroute/omni-code": {
+      "context": 1000000,
+      "output": 16384,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": false
+    },
+    "omniroute/auto/best-coding": {
+      "context": 1000000,
+      "output": 16384,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": false
+    },
+    "omniroute/auto/best-reasoning": {
+      "context": 1000000,
+      "output": 16384,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": false
+    },
+    "omniroute/auto/fast": {
+      "context": 1000000,
+      "output": 16384,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": false
+    },
+    "omniroute/omni-explore": {
+      "context": 1000000,
+      "output": 16384,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": false
+    },
+    "omniroute/omni-review": {
+      "context": 1000000,
+      "output": 16384,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": false
+    },
+    "omniroute/omni-quick": {
+      "context": 1000000,
+      "output": 16384,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": false
+    },
+    "openrouter/nvidia/nemotron-3.5-super-vl:free": {
+      "context": 1000000,
+      "output": 131072,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": true
+    },
+    "openrouter/nvidia/nemotron-3.5-lightning:free": {
+      "context": 1000000,
+      "output": 65536,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": false
+    },
+    "omniroute/auto/best-fast": {
+      "context": 1000000,
+      "output": 16384,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": false
+    },
+    "omniroute/antigravity/claude-sonnet-4-6": {
+      "context": 1000000,
+      "output": 16384,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": false
+    },
+    "omniroute/antigravity/claude-opus-4-6-thinking": {
+      "context": 1000000,
+      "output": 16384,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": false
+    },
+    "omniroute/antigravity/gemini-3.5-flash-lite": {
+      "context": 1000000,
+      "output": 16384,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": false
+    },
+    "omniroute/agnes/agnes-3.0-flash": {
+      "context": 524288,
+      "output": 16384,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": false
+    },
+    "openrouter/cohere/north-mini-code:free": {
+      "context": 256000,
+      "output": 64000,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": false
+    },
+    "openrouter/google/gemma-4-26b-a4b-it:free": {
+      "context": 262144,
+      "output": 32768,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": true
+    },
+    "openrouter/google/gemma-4-31b-it:free": {
+      "context": 262144,
+      "output": 32768,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": true
+    },
+    "openrouter/liquid/lfm-2.5-2.6b:free": {
+      "context": 65536,
+      "output": 8192,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": false
+    },
+    "opencode/pulse-alpha-free": {
+      "context": 1048576,
+      "output": 131072,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": true
+    },
+    "openrouter/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": {
+      "context": 256000,
+      "output": 65536,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": true
+    },
+    "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free": {
+      "context": 1000000,
+      "output": 65536,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": false
+    },
+    "openrouter/recursive/flint-v1.0:free": {
+      "context": 262144,
+      "output": 235929,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": false
+    },
+    "openrouter/xingchen-agi/xing4.0-29b-a4b:free": {
+      "context": 262144,
+      "output": 235929,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": false
+    },
+    "opencode/crouton-alpha-free": {
+      "context": 1048576,
+      "output": 270000,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": true
+    },
+    "opencode/iceman-free": {
+      "context": 262144,
+      "output": 131072,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": false
+    },
+    "opencode/inkling-2-small-free": {
+      "context": 1048576,
+      "output": 131072,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": true
+    },
+    "openrouter/liquid/lfm-3-1.7b:free": {
+      "context": 262144,
+      "output": 8192,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": false
+    },
+    "opencode/longcat-2.5-free": {
+      "context": 1000000,
+      "output": 262144,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": true
+    },
+    "openrouter/thinkingmachines/inkling-2-small:free": {
+      "context": 1048576,
+      "output": 131072,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": true
+    },
+    "nvidia/nvidia/nemotron-3-ultra-550b-a55b": {
+      "context": 1000000,
+      "output": 65536,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": false
+    },
+    "nvidia/nvidia/nemotron-3.5-super-vl-120b-a12b": {
+      "context": 1048576,
+      "output": 8192,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": true
+    },
+    "nvidia/nvidia/nemotron-3.5-lightning-30b-a3b": {
+      "context": 262144,
+      "output": 262144,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": false
+    },
+    "nvidia/stepfun-ai/step-5-preview": {
+      "context": 1048576,
+      "output": 1048576,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": true
+    },
+    "nvidia/poolside/laguna-xs-2.1": {
+      "context": 262144,
+      "output": 16384,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": false
+    },
+    "openrouter/apodex/apodex-1.1-mini:free": {
+      "context": 262144,
+      "output": 235929,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": false
+    },
+    "opencode/minimax-m3.1-flash-free": {
+      "context": 1000000,
+      "output": 512000,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": true
+    },
+    "openrouter/baidu/ernie-5.5-flash-preview:free": {
+      "context": 1024000,
+      "output": 921600,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": false
+    },
+    "openrouter/particle-ai/particle-1:free": {
+      "context": 1048576,
+      "output": 131072,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": true
+    },
+    "opencode/hy4-flash-free": {
+      "context": 1048576,
+      "output": 65536,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": true
+    },
+    "openrouter/inclusionai/ling-3.2-flash:free": {
+      "context": 1048576,
+      "output": 262144,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": true
+    },
+    "opencode/tidepool-alpha-free": {
+      "context": 1048576,
+      "output": 131072,
+      "cost_input": 0,
+      "cost_output": 0,
+      "reasoning": true,
+      "tool_call": true,
+      "attachment": false
+    }
+  }
+}
