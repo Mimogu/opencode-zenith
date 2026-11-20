@@ -24,32 +24,41 @@ param(
 # use -ErrorAction Stop explicitly and every native call checks $LASTEXITCODE.
 $ErrorActionPreference = 'Continue'
 $ProgressPreference = 'SilentlyContinue'
-$Here = if ($PSScriptRoot) { $PSScriptRoot } else { Get-Location }
+$Here = if ([string]::IsNullOrWhiteSpace($PSScriptRoot)) { (Get-Location).ProviderPath } else { $PSScriptRoot }
+if ([string]::IsNullOrWhiteSpace($Here)) { $Here = $env:TEMP }
+
 $ConfigSrc = Join-Path $Here '..\config'
 $TempDownload = $null
 $Stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
 
 if (-not (Test-Path (Join-Path $ConfigSrc 'opencode.json.template'))) {
-    if (Test-Path (Join-Path $Here 'payload\opencode\opencode.json')) {
-        $ConfigSrc = Join-Path $Here 'payload\opencode'
-    } else {
-        Write-Host "    [+] Fetching latest Opencode Zenith release..." -ForegroundColor Cyan
-        $TempZip = Join-Path $env:TEMP "opencode-zenith-$Stamp.zip"
-        $TempFolder = Join-Path $env:TEMP "opencode-zenith-$Stamp"
+    Write-Host "    [+] Fetching latest Opencode Zenith release..." -ForegroundColor Cyan
+    $TempZip = Join-Path $env:TEMP "opencode-zenith-$Stamp.zip"
+    $TempFolder = Join-Path $env:TEMP "opencode-zenith-$Stamp"
+    try {
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
         Invoke-WebRequest -Uri "https://github.com/Mimogu/opencode-zenith/archive/refs/heads/main.zip" -OutFile $TempZip
         Expand-Archive -Path $TempZip -DestinationPath $TempFolder -Force
         Remove-Item -Force $TempZip -ErrorAction SilentlyContinue
-        $ConfigSrc = Join-Path $TempFolder "opencode-zenith-main\config"
+
+        $found = Get-ChildItem -Path $TempFolder -Filter 'opencode.json.template' -Recurse -File -ErrorAction SilentlyContinue | Select-Object -First 1
+        if ($found) {
+            $ConfigSrc = $found.DirectoryName
+        } else {
+            $ConfigSrc = Join-Path $TempFolder "opencode-zenith-main\config"
+        }
         $TempDownload = $TempFolder
+    } catch {
+        Write-Host "    FAIL Could not download Opencode Zenith release: $($_.Exception.Message)" -ForegroundColor Red
+        if ([string]::IsNullOrWhiteSpace($PSScriptRoot)) {
+            throw "Installation failed: $($_.Exception.Message)"
+        } else {
+            exit 1
+        }
     }
 }
 
-$Payload = Join-Path $Here 'payload'
 $OmniRouteVersion = 'latest'
-if (Test-Path (Join-Path $Payload 'omniroute-version.txt')) {
-    $OmniRouteVersion = (Get-Content (Join-Path $Payload 'omniroute-version.txt') -ErrorAction SilentlyContinue | Select-Object -First 1)
-    if (-not $OmniRouteVersion) { $OmniRouteVersion = 'latest' }
-}
 $OmniPort = 20128
 $LogFile = Join-Path $env:TEMP "opencode-setup-$Stamp.log"
 Start-Transcript -Path $LogFile -Append | Out-Null
@@ -61,8 +70,12 @@ function Warn($m)  { Write-Host "    WARN $m" -ForegroundColor Yellow }
 function Fail($m)  {
     Write-Host "    FAIL $m" -ForegroundColor Red
     Write-Host "    Full log: $LogFile"
-    Stop-Transcript | Out-Null
-    exit 1
+    Stop-Transcript -ErrorAction SilentlyContinue | Out-Null
+    if ([string]::IsNullOrWhiteSpace($PSScriptRoot)) {
+        throw "Setup stopped: $m"
+    } else {
+        exit 1
+    }
 }
 function Have($cmd) { [bool](Get-Command $cmd -ErrorAction SilentlyContinue) }
 function Ask-YesNo([string]$q, [bool]$default = $true) {
@@ -103,7 +116,7 @@ Step 'Checking the bundle'
 if (-not (Test-Path $ConfigSrc)) {
     Fail "Configuration bundle could not be found at $ConfigSrc. Extract the whole zip, then run install.bat from the extracted folder."
 }
-Get-ChildItem -Path $Here -Recurse -File | Unblock-File -ErrorAction SilentlyContinue
+if (Test-Path $ConfigSrc) { Get-ChildItem -Path $ConfigSrc -Recurse -File -ErrorAction SilentlyContinue | Unblock-File -ErrorAction SilentlyContinue }
 Ok "bundle found at $ConfigSrc"
 Info "log file: $LogFile"
 
@@ -317,7 +330,7 @@ if (-not $NoOmniRoute) {
     }
 
     Step 'OmniRoute combos'
-    $combosFile = Join-Path $Payload 'omniroute-combos.json'
+    $combosFile = Join-Path $ConfigSrc 'omniroute-combos.json'
     if ((Test-Path $combosFile) -and $env:OMNIROUTE_API_KEY) {
         $existing = @()
         try { $existing = @((Omni combo list --output json 2>$null | Out-String | ConvertFrom-Json) | ForEach-Object { $_.name }) } catch {}
