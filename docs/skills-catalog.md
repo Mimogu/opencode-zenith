@@ -91,16 +91,17 @@ When you want OpenCode to quietly browse documentation, search for bug fixes, or
 
 OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill prompts do not consume valuable token budget until you explicitly ask for them.
 
-1. **Direct Invocation:** Simply write `"use the <name> skill to..."`:
+1. **Direct Invocation:** Simply mention the skill using `@<skill-name>`:
    ```text
-   use the docx skill to create a summary report from notes.txt
-   use the code-review skill to review my branch diff
-   use the systematic-debugging skill to find why the login fails
+   @docx create a summary report from notes.txt
+   @code-review review my branch diff
+   @systematic-debugging find why the login fails
+   @web-research search for the latest release notes of Astro 5.0
    ```
 2. **Combining Slash Commands & Skills:**
    ```text
-   /plan use the docx skill to create an executive financial report
-   /goal use the ponytail skill to simplify and refactor our auth middleware
+   /plan @docx create an executive financial report
+   /goal @ponytail simplify and refactor our auth middleware
    ```
 
 ---
@@ -131,12 +132,12 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 
 | If your goal is... | Choose this skill | Copy-Paste Example Prompt |
 | :--- | :--- | :--- |
-| Need to create, edit, or format a Word document? | [`docx`](#skill-docx) | `use the docx skill to create a formatted report` |
-| Need to build a PowerPoint presentation or pitch deck? | [`pptx`](#skill-pptx) | `use the pptx skill to design a 6-slide presentation` |
-| Need an Excel spreadsheet with clean formulas and headers? | [`xlsx`](#skill-xlsx) | `use the xlsx skill to build a financial model` |
-| Need to read, inspect, split, or merge PDF documents? | [`pdf`](#skill-pdf) | `use the pdf skill to extract tables from annual_report.pdf` |
-| Need to convert ANY file (PDF, Word, PPTX, image, audio) into clean Markdown? | [`markitdown`](#skill-markitdown) | `use the markitdown skill to convert file.pdf to markdown` |
-| Need to design visual graphics, posters, or certificates (PNG/PDF)? | [`canvas-design`](#skill-canvas-design) | `use the canvas-design skill to design a minimalist event poster` |
+| Need to create, edit, or format a Word document? | [`docx`](#skill-docx) | `@docx create a formatted report` |
+| Need to build a PowerPoint presentation or pitch deck? | [`pptx`](#skill-pptx) | `@pptx design a 6-slide presentation` |
+| Need an Excel spreadsheet with clean formulas and headers? | [`xlsx`](#skill-xlsx) | `@xlsx build a financial model` |
+| Need to read, inspect, split, or merge PDF documents? | [`pdf`](#skill-pdf) | `@pdf extract tables from annual_report.pdf` |
+| Need to convert ANY file (PDF, Word, PPTX, image, audio) into clean Markdown? | [`markitdown`](#skill-markitdown) | `@markitdown convert file.pdf to markdown` |
+| Need to design visual graphics, posters, or certificates (PNG/PDF)? | [`canvas-design`](#skill-canvas-design) | `@canvas-design design a minimalist event poster` |
 
 ### Detailed Breakdown of Skills in Document, Office & Content Creation
 
@@ -148,7 +149,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When you want visually designed certificates, posters, social media banners, or graphical cheat sheets.
 - **Example Prompt:**
   ```text
-  use the canvas-design skill to design a modern minimalist event poster and save as poster.png
+  @canvas-design design a modern minimalist event poster and save as poster.png
   ```
 
 <a id="skill-docx"></a>
@@ -159,7 +160,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When you need to generate professional Word reports, transform markdown notes into formatted DOCX files, or edit existing Word docs.
 - **Example Prompt:**
   ```text
-  use the docx skill to create a comprehensive report from these notes and export to report.docx
+  @docx create a comprehensive report from these notes and export to report.docx
   ```
 
 <a id="skill-markitdown"></a>
@@ -176,7 +177,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
   ```
 - **Example Prompt:**
   ```text
-  use the markitdown skill to convert annual_report.pdf into clean markdown
+  @markitdown convert annual_report.pdf into clean markdown
   ```
 
 <a id="skill-pdf"></a>
@@ -187,7 +188,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When you need to read content out of a PDF file, combine multiple PDFs, or inspect a PDF's visual layout.
 - **Example Prompt:**
   ```text
-  use the pdf skill to extract the text and tables from document.pdf
+  @pdf extract the text and tables from document.pdf
   ```
 
 <a id="skill-pptx"></a>
@@ -198,7 +199,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When you want to turn a project summary, pitch deck, or lecture into a polished PowerPoint slide presentation.
 - **Example Prompt:**
   ```text
-  use the pptx skill to design a 7-slide presentation summarizing our quarterly progress
+  @pptx design a 7-slide presentation summarizing our quarterly progress
   ```
 
 <a id="skill-xlsx"></a>
@@ -209,7 +210,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When you need to export data tables to Excel, build financial models, or check existing sheets for broken formulas.
 - **Example Prompt:**
   ```text
-  use the xlsx skill to build a monthly budget sheet with auto-sum formulas and formatted headers
+  @xlsx build a monthly budget sheet with auto-sum formulas and formatted headers
   ```
 
 ---
@@ -224,13 +225,13 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 
 | If your goal is... | Choose this skill | Copy-Paste Example Prompt |
 | :--- | :--- | :--- |
-| Writing HTML/CSS and want modern, zero-hack standards (:has, dialog, view transitions)? | [`modern-web-guidance`](#skill-modern-web-guidance) | `use the modern-web-guidance skill to style this modal dialog` |
-| Building a new UI and want it to look distinctive, polished, and human-designed? | [`frontend-design`](#skill-frontend-design) | `use the frontend-design skill to design a clean landing page` |
-| Auditing an existing website for accessibility (WCAG, contrast, focus) and UX flaws? | [`web-design-guidelines`](#skill-web-design-guidelines) | `use the web-design-guidelines skill to audit index.html` |
-| Need a quick interactive single-file tool, calculator, or widget? | [`web-artifacts-builder`](#skill-web-artifacts-builder) | `use the web-artifacts-builder skill to build a mortgage calculator` |
-| Building a 3D WebGL scene synchronized with a 2D control panel side-by-side? | [`dual-viewport-ui`](#skill-dual-viewport-ui) | `use the dual-viewport-ui skill to build a 3D model inspector` |
-| UI looks ugly or messy and you want a visual critique and redesign advice? | [`design-quality`](#skill-design-quality) | `use the design-quality skill to review the checkout UI` |
-| Want to inspect an existing site and extract its typography/colors into a DESIGN.md? | [`create-design-md`](#skill-create-design-md) | `use the create-design-md skill to document our design tokens` |
+| Writing HTML/CSS and want modern, zero-hack standards (:has, dialog, view transitions)? | [`modern-web-guidance`](#skill-modern-web-guidance) | `@modern-web-guidance style this modal dialog` |
+| Building a new UI and want it to look distinctive, polished, and human-designed? | [`frontend-design`](#skill-frontend-design) | `@frontend-design design a clean landing page` |
+| Auditing an existing website for accessibility (WCAG, contrast, focus) and UX flaws? | [`web-design-guidelines`](#skill-web-design-guidelines) | `@web-design-guidelines audit index.html` |
+| Need a quick interactive single-file tool, calculator, or widget? | [`web-artifacts-builder`](#skill-web-artifacts-builder) | `@web-artifacts-builder build a mortgage calculator` |
+| Building a 3D WebGL scene synchronized with a 2D control panel side-by-side? | [`dual-viewport-ui`](#skill-dual-viewport-ui) | `@dual-viewport-ui build a 3D model inspector` |
+| UI looks ugly or messy and you want a visual critique and redesign advice? | [`design-quality`](#skill-design-quality) | `@design-quality review the checkout UI` |
+| Want to inspect an existing site and extract its typography/colors into a DESIGN.md? | [`create-design-md`](#skill-create-design-md) | `@create-design-md document our design tokens` |
 
 ### Detailed Breakdown of Skills in Web, Frontend & UI/UX Design
 
@@ -242,7 +243,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When onboarding onto a frontend project or building new pages that must strictly match the existing design tokens.
 - **Example Prompt:**
   ```text
-  use the create-design-md skill to inspect our frontend and write a DESIGN.md design system document
+  @create-design-md inspect our frontend and write a DESIGN.md design system document
   ```
 
 <a id="skill-design-quality"></a>
@@ -253,7 +254,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When your UI feels cluttered, misaligned, or visually unappealing and needs a design review.
 - **Example Prompt:**
   ```text
-  use the design-quality skill to review the checkout page layout and suggest design improvements
+  @design-quality review the checkout page layout and suggest design improvements
   ```
 
 <a id="skill-dual-viewport-ui"></a>
@@ -264,7 +265,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When building 3D product visualizers, interactive maps, or CAD-like tools with side-by-side controls.
 - **Example Prompt:**
   ```text
-  use the dual-viewport-ui skill to create a 3D model viewer with a side property inspector panel
+  @dual-viewport-ui create a 3D model viewer with a side property inspector panel
   ```
 
 <a id="skill-frontend-design"></a>
@@ -275,7 +276,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When building new web pages or apps and you want them to look premium, modern, and human-designed rather than generic AI templates.
 - **Example Prompt:**
   ```text
-  use the frontend-design skill to redesign the dashboard landing page with a modern dark theme
+  @frontend-design redesign the dashboard landing page with a modern dark theme
   ```
 
 <a id="skill-modern-web-guidance"></a>
@@ -286,7 +287,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When building or styling websites and you want modern, accessible, zero-dependency CSS patterns rather than outdated hacks.
 - **Example Prompt:**
   ```text
-  use the modern-web-guidance skill to style this modal dialog using native HTML dialog and modern CSS
+  @modern-web-guidance style this modal dialog using native HTML dialog and modern CSS
   ```
 
 <a id="skill-web-artifacts-builder"></a>
@@ -297,7 +298,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When you need a quick, clickable web tool, interactive prototype, or simulation in a single HTML file.
 - **Example Prompt:**
   ```text
-  use the web-artifacts-builder skill to build an interactive mortgage payment calculator in a single html file
+  @web-artifacts-builder build an interactive mortgage payment calculator in a single html file
   ```
 
 <a id="skill-web-design-guidelines"></a>
@@ -308,7 +309,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When reviewing frontend code to ensure it meets accessibility standards and best UX design practices.
 - **Example Prompt:**
   ```text
-  use the web-design-guidelines skill to audit index.html for accessibility and UI flaws
+  @web-design-guidelines audit index.html for accessibility and UI flaws
   ```
 
 ---
@@ -322,16 +323,16 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 
 | If your goal is... | Choose this skill | Copy-Paste Example Prompt |
 | :--- | :--- | :--- |
-| Just opened an unfamiliar repo and need an architecture guide and entry points? | [`codebase-onboarding`](#skill-codebase-onboarding) | `use the codebase-onboarding skill to explain this repository` |
-| Designing clean module boundaries and deep classes to avoid spaghetti code? | [`codebase-design`](#skill-codebase-design) | `use the codebase-design skill to design the auth module` |
-| General principles to simplify code, remove bloat, and fix root causes? | [`engineering-principles`](#skill-engineering-principles) | `use the engineering-principles skill to debloat this module` |
-| Want the simplest, zero-dependency, standard-library-first solution (YAGNI)? | [`ponytail`](#skill-ponytail) | `use the ponytail skill to implement a file watcher with zero dependencies` |
-| Want to scan the codebase for all shortcut comments and build a tech debt ledger? | [`ponytail-debt`](#skill-ponytail-debt) | `use the ponytail-debt skill to scan for tech debt` |
-| Code written by AI feels repetitive, bloated, or has robot boilerplate? | [`deslop`](#skill-deslop) | `use the deslop skill to clean up this controller file` |
-| Code is cluttered with obvious, useless comments like '// increment i'? | [`no-comments`](#skill-no-comments) | `use the no-comments skill to remove noisy comments` |
-| Writing TypeScript and want strict type safety, discriminated unions, and zero 'any'? | [`typescript-best-practices`](#skill-typescript-best-practices) | `use the typescript-best-practices skill to type this API` |
-| Have API JSON or database tables and need TypeScript interfaces or Zod schemas? | [`schema-to-type`](#skill-schema-to-type) | `use the schema-to-type skill to generate types for this JSON` |
-| Using weak or free models and need fast, token-efficient, low-context edits? | [`chisle`](#skill-chisle) | `use the chisle skill to refactor this script with minimal context` |
+| Just opened an unfamiliar repo and need an architecture guide and entry points? | [`codebase-onboarding`](#skill-codebase-onboarding) | `@codebase-onboarding explain this repository` |
+| Designing clean module boundaries and deep classes to avoid spaghetti code? | [`codebase-design`](#skill-codebase-design) | `@codebase-design design the auth module` |
+| General principles to simplify code, remove bloat, and fix root causes? | [`engineering-principles`](#skill-engineering-principles) | `@engineering-principles debloat this module` |
+| Want the simplest, zero-dependency, standard-library-first solution (YAGNI)? | [`ponytail`](#skill-ponytail) | `@ponytail implement a file watcher with zero dependencies` |
+| Want to scan the codebase for all shortcut comments and build a tech debt ledger? | [`ponytail-debt`](#skill-ponytail-debt) | `@ponytail-debt scan for tech debt` |
+| Code written by AI feels repetitive, bloated, or has robot boilerplate? | [`deslop`](#skill-deslop) | `@deslop clean up this controller file` |
+| Code is cluttered with obvious, useless comments like '// increment i'? | [`no-comments`](#skill-no-comments) | `@no-comments remove noisy comments` |
+| Writing TypeScript and want strict type safety, discriminated unions, and zero 'any'? | [`typescript-best-practices`](#skill-typescript-best-practices) | `@typescript-best-practices type this API` |
+| Have API JSON or database tables and need TypeScript interfaces or Zod schemas? | [`schema-to-type`](#skill-schema-to-type) | `@schema-to-type generate types for this JSON` |
+| Using weak or free models and need fast, token-efficient, low-context edits? | [`chisle`](#skill-chisle) | `@chisle refactor this script with minimal context` |
 
 ### Detailed Breakdown of Skills in Software Architecture, Coding & Refactoring
 
@@ -343,7 +344,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When working with low-context or free models and you need focused, fast edits without conversational fluff.
 - **Example Prompt:**
   ```text
-  use the chisle skill to refactor this script with minimal context usage
+  @chisle refactor this script with minimal context usage
   ```
 
 <a id="skill-codebase-design"></a>
@@ -354,7 +355,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When refactoring messy spaghetti code or designing a new service to prevent tight coupling and high cognitive load.
 - **Example Prompt:**
   ```text
-  use the codebase-design skill to design a clean, decoupled service architecture for user authentication
+  @codebase-design design a clean, decoupled service architecture for user authentication
   ```
 
 <a id="skill-codebase-onboarding"></a>
@@ -365,7 +366,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When you first open a new repository and want a fast, high-level map of how everything connects and where to start.
 - **Example Prompt:**
   ```text
-  use the codebase-onboarding skill to analyze this repo and explain the architecture and key components
+  @codebase-onboarding analyze this repo and explain the architecture and key components
   ```
 
 <a id="skill-deslop"></a>
@@ -376,7 +377,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When code written by AI models feels bloated, repetitive, or cluttered with unnecessary defensive checks.
 - **Example Prompt:**
   ```text
-  use the deslop skill to clean up this controller file and remove AI-generated boilerplate
+  @deslop clean up this controller file and remove AI-generated boilerplate
   ```
 
 <a id="skill-engineering-principles"></a>
@@ -387,7 +388,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When reviewing code for bloat, unnecessary abstractions, or overly complex designs.
 - **Example Prompt:**
   ```text
-  use the engineering-principles skill to simplify this module and remove unnecessary boilerplate
+  @engineering-principles simplify this module and remove unnecessary boilerplate
   ```
 
 <a id="skill-no-comments"></a>
@@ -398,7 +399,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When code is polluted with comments like '// increment i' or redundant docstrings that obscure the actual logic.
 - **Example Prompt:**
   ```text
-  use the no-comments skill to strip obvious comments and make the code self-documenting
+  @no-comments strip obvious comments and make the code self-documenting
   ```
 
 <a id="skill-ponytail"></a>
@@ -409,7 +410,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When you want to stop over-engineering and implement a feature with minimal lines and zero bloated dependencies.
 - **Example Prompt:**
   ```text
-  use the ponytail skill to implement this file watcher with zero third-party packages
+  @ponytail implement this file watcher with zero third-party packages
   ```
 
 <a id="skill-ponytail-debt"></a>
@@ -420,7 +421,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When planning a cleanup sprint and you want to know all shortcuts taken across the project.
 - **Example Prompt:**
   ```text
-  use the ponytail-debt skill to scan the repository and build a technical debt report
+  @ponytail-debt scan the repository and build a technical debt report
   ```
 
 <a id="skill-schema-to-type"></a>
@@ -431,7 +432,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When integrating with an external API and you need typed models matching the API's JSON responses.
 - **Example Prompt:**
   ```text
-  use the schema-to-type skill to generate TypeScript types and Zod schemas for this user API payload
+  @schema-to-type generate TypeScript types and Zod schemas for this user API payload
   ```
 
 <a id="skill-typescript-best-practices"></a>
@@ -442,7 +443,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When writing or refactoring TypeScript code and you want bulletproof type safety and great autocomplete.
 - **Example Prompt:**
   ```text
-  use the typescript-best-practices skill to refactor these API interfaces to use discriminated unions
+  @typescript-best-practices refactor these API interfaces to use discriminated unions
   ```
 
 ---
@@ -456,12 +457,12 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 
 | If your goal is... | Choose this skill | Copy-Paste Example Prompt |
 | :--- | :--- | :--- |
-| Something is broken, crashing, or throwing errors and you need the real root cause? | [`systematic-debugging`](#skill-systematic-debugging) | `use the systematic-debugging skill to debug why auth fails` |
-| Need to write unit tests, mocks, fixtures, or integration test suites? | [`test-quality`](#skill-test-quality) | `use the test-quality skill to write tests for user registration` |
-| Want absolute proof (running tests/linters) before accepting work is done? | [`verification-before-completion`](#skill-verification-before-completion) | `use the verification-before-completion skill to verify all tests pass` |
-| Application runs slowly, has CPU spikes, or leaks memory? | [`performance-profiling`](#skill-performance-profiling) | `use the performance-profiling skill to find the latency bottleneck` |
-| Running a performance benchmark and want to verify the numbers are accurate? | [`benchmark-checklist`](#skill-benchmark-checklist) | `use the benchmark-checklist skill to audit our benchmark` |
-| The AI keeps making the same mistake repeatedly on this project? | [`correct`](#skill-correct) | `use the correct skill to add rules preventing this recurring bug` |
+| Something is broken, crashing, or throwing errors and you need the real root cause? | [`systematic-debugging`](#skill-systematic-debugging) | `@systematic-debugging debug why auth fails` |
+| Need to write unit tests, mocks, fixtures, or integration test suites? | [`test-quality`](#skill-test-quality) | `@test-quality write tests for user registration` |
+| Want absolute proof (running tests/linters) before accepting work is done? | [`verification-before-completion`](#skill-verification-before-completion) | `@verification-before-completion verify all tests pass` |
+| Application runs slowly, has CPU spikes, or leaks memory? | [`performance-profiling`](#skill-performance-profiling) | `@performance-profiling find the latency bottleneck` |
+| Running a performance benchmark and want to verify the numbers are accurate? | [`benchmark-checklist`](#skill-benchmark-checklist) | `@benchmark-checklist audit our benchmark` |
+| The AI keeps making the same mistake repeatedly on this project? | [`correct`](#skill-correct) | `@correct add rules preventing this recurring bug` |
 
 ### Detailed Breakdown of Skills in Testing, Verification & Debugging
 
@@ -473,7 +474,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When running benchmarks or comparing two implementations to make sure the speed numbers are genuine.
 - **Example Prompt:**
   ```text
-  use the benchmark-checklist skill to audit our latency benchmark methodology
+  @benchmark-checklist audit our latency benchmark methodology
   ```
 
 <a id="skill-correct"></a>
@@ -484,7 +485,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When the AI keeps making the same mistake or bad assumption on a specific project.
 - **Example Prompt:**
   ```text
-  use the correct skill to diagnose our recurring build failures and add guardrails against them
+  @correct diagnose our recurring build failures and add guardrails against them
   ```
 
 <a id="skill-performance-profiling"></a>
@@ -495,7 +496,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When your application runs slowly, consumes too much RAM, or suffers from high latency spikes.
 - **Example Prompt:**
   ```text
-  use the performance-profiling skill to find why the data parsing loop is taking 8 seconds
+  @performance-profiling find why the data parsing loop is taking 8 seconds
   ```
 
 <a id="skill-systematic-debugging"></a>
@@ -506,7 +507,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When an error, test failure, or unexpected bug occurs and you want to fix the real cause instead of guessing.
 - **Example Prompt:**
   ```text
-  use the systematic-debugging skill to investigate why the session authentication fails
+  @systematic-debugging investigate why the session authentication fails
   ```
 
 <a id="skill-test-quality"></a>
@@ -517,7 +518,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When adding tests for an existing feature, fixing brittle tests, or improving overall test coverage.
 - **Example Prompt:**
   ```text
-  use the test-quality skill to write comprehensive unit and integration tests for user registration
+  @test-quality write comprehensive unit and integration tests for user registration
   ```
 
 <a id="skill-verification-before-completion"></a>
@@ -528,7 +529,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When you want absolute proof that everything compiles and passes tests before finishing a turn.
 - **Example Prompt:**
   ```text
-  use the verification-before-completion skill to run test suites and verify all checks pass
+  @verification-before-completion run test suites and verify all checks pass
   ```
 
 ---
@@ -542,13 +543,13 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 
 | If your goal is... | Choose this skill | Copy-Paste Example Prompt |
 | :--- | :--- | :--- |
-| Standard, friendly peer code review for readability, logic, and style? | [`code-review`](#skill-code-review) | `use the code-review skill to review my branch diff` |
-| Ruthless, uncompromising security & correctness audit before production? | [`thermo-nuclear-review`](#skill-thermo-nuclear-review) | `use the thermo-nuclear-review skill to audit the payment branch` |
-| Ruthless audit hunting for oversized files, bloat, and messy abstractions? | [`thermo-nuclear-code-quality-review`](#skill-thermo-nuclear-code-quality-review) | `use the thermo-nuclear-code-quality-review skill to audit this module` |
-| Want BOTH ruthless security AND code quality audits run in parallel? | [`thermos`](#skill-thermos) | `use the thermos skill to perform a dual audit of the PR` |
-| Specifically checking for web security holes (SQL injection, XSS, auth flaws)? | [`owasp-security`](#skill-owasp-security) | `use the owasp-security skill to audit API endpoints for vulnerabilities` |
-| Want to check what other files or services will break if you make a change? | [`blast-radius`](#skill-blast-radius) | `use the blast-radius skill to check the impact of changing User.id` |
-| Want the AI to critically challenge your bad assumptions instead of agreeing? | [`anti-sycophancy`](#skill-anti-sycophancy) | `use the anti-sycophancy skill to critically evaluate this design` |
+| Standard, friendly peer code review for readability, logic, and style? | [`code-review`](#skill-code-review) | `@code-review review my branch diff` |
+| Ruthless, uncompromising security & correctness audit before production? | [`thermo-nuclear-review`](#skill-thermo-nuclear-review) | `@thermo-nuclear-review audit the payment branch` |
+| Ruthless audit hunting for oversized files, bloat, and messy abstractions? | [`thermo-nuclear-code-quality-review`](#skill-thermo-nuclear-code-quality-review) | `@thermo-nuclear-code-quality-review audit this module` |
+| Want BOTH ruthless security AND code quality audits run in parallel? | [`thermos`](#skill-thermos) | `@thermos perform a dual audit of the PR` |
+| Specifically checking for web security holes (SQL injection, XSS, auth flaws)? | [`owasp-security`](#skill-owasp-security) | `@owasp-security audit API endpoints for vulnerabilities` |
+| Want to check what other files or services will break if you make a change? | [`blast-radius`](#skill-blast-radius) | `@blast-radius check the impact of changing User.id` |
+| Want the AI to critically challenge your bad assumptions instead of agreeing? | [`anti-sycophancy`](#skill-anti-sycophancy) | `@anti-sycophancy critically evaluate this design` |
 
 ### Detailed Breakdown of Skills in Code Review, Auditing & Security
 
@@ -560,7 +561,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When you want an honest, unvarnished critical assessment of an idea, design, or architecture plan.
 - **Example Prompt:**
   ```text
-  use the anti-sycophancy skill to critically evaluate this database migration strategy
+  @anti-sycophancy critically evaluate this database migration strategy
   ```
 
 <a id="skill-blast-radius"></a>
@@ -571,7 +572,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When modifying shared database schemas, common utilities, or core API contracts.
 - **Example Prompt:**
   ```text
-  use the blast-radius skill to check what parts of the app will be affected if we change User.id to UUID
+  @blast-radius check what parts of the app will be affected if we change User.id to UUID
   ```
 
 <a id="skill-code-review"></a>
@@ -582,7 +583,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When preparing a pull request or reviewing changes before merging into your main branch.
 - **Example Prompt:**
   ```text
-  use the code-review skill to review the changes between main and feature-branch
+  @code-review review the changes between main and feature-branch
   ```
 
 <a id="skill-owasp-security"></a>
@@ -593,7 +594,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When writing security-sensitive code (auth, payment, sessions, APIs) or doing a security hardening sweep.
 - **Example Prompt:**
   ```text
-  use the owasp-security skill to audit our API endpoints for SQL injection and auth bypass risks
+  @owasp-security audit our API endpoints for SQL injection and auth bypass risks
   ```
 
 <a id="skill-thermo-nuclear-code-quality-review"></a>
@@ -604,7 +605,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When reviewing code for long-term health and architectural cleanliness before it becomes tech debt.
 - **Example Prompt:**
   ```text
-  use the thermo-nuclear-code-quality-review skill to audit this new backend module
+  @thermo-nuclear-code-quality-review audit this new backend module
   ```
 
 <a id="skill-thermo-nuclear-review"></a>
@@ -615,7 +616,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When reviewing mission-critical code changes where security or stability failures are unacceptable.
 - **Example Prompt:**
   ```text
-  use the thermo-nuclear-review skill to audit our payment processing branch before deployment
+  @thermo-nuclear-review audit our payment processing branch before deployment
   ```
 
 <a id="skill-thermos"></a>
@@ -626,7 +627,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When you want the ultimate, all-angles review of a major feature branch in one pass.
 - **Example Prompt:**
   ```text
-  use the thermos skill to perform a comprehensive audit of the latest pull request
+  @thermos perform a comprehensive audit of the latest pull request
   ```
 
 ---
@@ -640,13 +641,13 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 
 | If your goal is... | Choose this skill | Copy-Paste Example Prompt |
 | :--- | :--- | :--- |
-| Organizing git commits, conventional commits, and clean PR histories? | [`git-workflow`](#skill-git-workflow) | `use the git-workflow skill to organize our staged commits` |
-| Stuck in a nasty merge conflict, rebase collision, or detached HEAD? | [`git-conflict-resolver`](#skill-git-conflict-resolver) | `use the git-conflict-resolver skill to resolve merge conflicts in app.ts` |
-| Want to work on another branch in parallel without stashing or switching directories? | [`using-git-worktrees`](#skill-using-git-worktrees) | `use the using-git-worktrees skill to create a worktree for bugfix` |
-| Creating or shrinking Dockerfiles, multi-stage builds, or compose setups? | [`docker-infra`](#skill-docker-infra) | `use the docker-infra skill to optimize our Dockerfile` |
-| Setting up GitHub Actions, CI/CD pipelines, or automated deployment scripts? | [`deployment-patterns`](#skill-deployment-patterns) | `use the deployment-patterns skill to create a CI pipeline` |
-| Ready to bump SemVer, generate a changelog, and tag a software release? | [`publishing-release`](#skill-publishing-release) | `use the publishing-release skill to prepare a v1.2.0 release` |
-| Auditing an app for production readiness (rate limits, timeouts, crash recovery)? | [`production-hardening`](#skill-production-hardening) | `use the production-hardening skill to audit this service` |
+| Organizing git commits, conventional commits, and clean PR histories? | [`git-workflow`](#skill-git-workflow) | `@git-workflow organize our staged commits` |
+| Stuck in a nasty merge conflict, rebase collision, or detached HEAD? | [`git-conflict-resolver`](#skill-git-conflict-resolver) | `@git-conflict-resolver resolve merge conflicts in app.ts` |
+| Want to work on another branch in parallel without stashing or switching directories? | [`using-git-worktrees`](#skill-using-git-worktrees) | `@using-git-worktrees create a worktree for bugfix` |
+| Creating or shrinking Dockerfiles, multi-stage builds, or compose setups? | [`docker-infra`](#skill-docker-infra) | `@docker-infra optimize our Dockerfile` |
+| Setting up GitHub Actions, CI/CD pipelines, or automated deployment scripts? | [`deployment-patterns`](#skill-deployment-patterns) | `@deployment-patterns create a CI pipeline` |
+| Ready to bump SemVer, generate a changelog, and tag a software release? | [`publishing-release`](#skill-publishing-release) | `@publishing-release prepare a v1.2.0 release` |
+| Auditing an app for production readiness (rate limits, timeouts, crash recovery)? | [`production-hardening`](#skill-production-hardening) | `@production-hardening audit this service` |
 
 ### Detailed Breakdown of Skills in Git, DevOps, Containers & Deployment
 
@@ -658,7 +659,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When setting up continuous integration/continuous deployment (CI/CD) pipelines from scratch.
 - **Example Prompt:**
   ```text
-  use the deployment-patterns skill to create a GitHub Actions workflow that tests and builds our app
+  @deployment-patterns create a GitHub Actions workflow that tests and builds our app
   ```
 
 <a id="skill-docker-infra"></a>
@@ -669,7 +670,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When containerizing a new application, reducing huge image sizes, or configuring local development compose setups.
 - **Example Prompt:**
   ```text
-  use the docker-infra skill to write a multi-stage Dockerfile and docker-compose.yml for this FastAPI app
+  @docker-infra write a multi-stage Dockerfile and docker-compose.yml for this FastAPI app
   ```
 
 <a id="skill-git-conflict-resolver"></a>
@@ -680,7 +681,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When git rebase or merge runs into gnarly file conflicts with lots of overlapping changes.
 - **Example Prompt:**
   ```text
-  use the git-conflict-resolver skill to resolve the merge conflict in src/app.ts
+  @git-conflict-resolver resolve the merge conflict in src/app.ts
   ```
 
 <a id="skill-git-workflow"></a>
@@ -691,7 +692,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When organizing git commits, setting up git branching workflows, or preparing a clean PR history.
 - **Example Prompt:**
   ```text
-  use the git-workflow skill to organize our staged commits into conventional commit format
+  @git-workflow organize our staged commits into conventional commit format
   ```
 
 <a id="skill-production-hardening"></a>
@@ -702,7 +703,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When taking a prototype to real production traffic and ensuring it won't crash or leak sensitive data.
 - **Example Prompt:**
   ```text
-  use the production-hardening skill to audit this web service for production readiness
+  @production-hardening audit this web service for production readiness
   ```
 
 <a id="skill-publishing-release"></a>
@@ -713,7 +714,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When your code is tested and ready to release as a new version or package.
 - **Example Prompt:**
   ```text
-  use the publishing-release skill to prepare a v1.2.0 release with a generated changelog
+  @publishing-release prepare a v1.2.0 release with a generated changelog
   ```
 
 <a id="skill-using-git-worktrees"></a>
@@ -730,7 +731,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
   ```
 - **Example Prompt:**
   ```text
-  use the using-git-worktrees skill to create an isolated worktree for bugfix-auth
+  @using-git-worktrees create an isolated worktree for bugfix-auth
   ```
 
 ---
@@ -744,10 +745,10 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 
 | If your goal is... | Choose this skill | Copy-Paste Example Prompt |
 | :--- | :--- | :--- |
-| Modifying database tables with zero downtime, defaults, and rollbacks? | [`database-migrations`](#skill-database-migrations) | `use the database-migrations skill to add a column safely` |
-| Writing complex, high-performance SQL queries (joins, window functions, CTEs)? | [`data-sql-queries`](#skill-data-sql-queries) | `use the data-sql-queries skill to write a user cohort query` |
-| An existing database query is running slow and needs EXPLAIN ANALYZE tuning? | [`data-write-query`](#skill-data-write-query) | `use the data-write-query skill to optimize this query` |
-| Building with Supabase (Auth, Row-Level Security, Edge Functions, Realtime)? | [`supabase`](#skill-supabase) | `use the supabase skill to configure RLS policies for notes` |
+| Modifying database tables with zero downtime, defaults, and rollbacks? | [`database-migrations`](#skill-database-migrations) | `@database-migrations add a column safely` |
+| Writing complex, high-performance SQL queries (joins, window functions, CTEs)? | [`data-sql-queries`](#skill-data-sql-queries) | `@data-sql-queries write a user cohort query` |
+| An existing database query is running slow and needs EXPLAIN ANALYZE tuning? | [`data-write-query`](#skill-data-write-query) | `@data-write-query optimize this query` |
+| Building with Supabase (Auth, Row-Level Security, Edge Functions, Realtime)? | [`supabase`](#skill-supabase) | `@supabase configure RLS policies for notes` |
 
 ### Detailed Breakdown of Skills in Database, Backend & Cloud
 
@@ -759,7 +760,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When writing complex joins, window functions, CTEs, or aggregations for reports and backend queries.
 - **Example Prompt:**
   ```text
-  use the data-sql-queries skill to write a PostgreSQL query calculating 30-day user retention cohorts
+  @data-sql-queries write a PostgreSQL query calculating 30-day user retention cohorts
   ```
 
 <a id="skill-data-write-query"></a>
@@ -770,7 +771,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When a database query takes too long to run and needs to be optimized for low latency.
 - **Example Prompt:**
   ```text
-  use the data-write-query skill to optimize this slow orders report query
+  @data-write-query optimize this slow orders report query
   ```
 
 <a id="skill-database-migrations"></a>
@@ -781,7 +782,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When altering production database tables, adding foreign keys, or altering large tables without downtime.
 - **Example Prompt:**
   ```text
-  use the database-migrations skill to create a zero-downtime migration for adding email_verified to users table
+  @database-migrations create a zero-downtime migration for adding email_verified to users table
   ```
 
 <a id="skill-supabase"></a>
@@ -799,7 +800,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
   ```
 - **Example Prompt:**
   ```text
-  use the supabase skill to configure Row-Level Security policies for our multi-tenant notes table
+  @supabase configure Row-Level Security policies for our multi-tenant notes table
   ```
 
 ---
@@ -813,18 +814,18 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 
 | If your goal is... | Choose this skill | Copy-Paste Example Prompt |
 | :--- | :--- | :--- |
-| Have a dataset and need answers to business and trend questions? | [`data-analyze`](#skill-data-analyze) | `use the data-analyze skill to analyze customer_churn.csv` |
-| Just received a new dataset and want to explore nulls, shapes, and distributions? | [`data-explore-data`](#skill-data-explore-data) | `use the data-explore-data skill to profile sales_data.csv` |
-| Need formal statistical hypothesis tests, regressions, ANOVA, or p-values? | [`data-statistical-analysis`](#skill-data-statistical-analysis) | `use the data-statistical-analysis skill to test significance` |
-| Designing an A/B test or calculating statistical power and sample size? | [`experiment-and-inference`](#skill-experiment-and-inference) | `use the experiment-and-inference skill to calculate sample size` |
-| Auditing a data report for math bugs, calculation errors, or bias before presenting? | [`data-validate-data`](#skill-data-validate-data) | `use the data-validate-data skill to QA our segmentation findings` |
-| Creating publication-ready charts in Python (Matplotlib, Seaborn, Plotly)? | [`data-visualization`](#skill-data-visualization) | `use the data-visualization skill to plot revenue trends` |
-| Need a quick visual chart generated fast with minimal code? | [`data-create-viz`](#skill-data-create-viz) | `use the data-create-viz skill to generate a histogram` |
-| Building a standalone interactive HTML dashboard with charts and filters? | [`data-build-dashboard`](#skill-data-build-dashboard) | `use the data-build-dashboard skill to build an interactive dashboard` |
-| Training machine learning models (classification/regression with Scikit-Learn/XGBoost)? | [`ml-workflow`](#skill-ml-workflow) | `use the ml-workflow skill to train a churn prediction model` |
-| Building an end-to-end data analytics project to showcase in a portfolio? | [`portfolio-project-builder`](#skill-portfolio-project-builder) | `use the portfolio-project-builder skill to build a portfolio project` |
-| Want an interactive teacher to explain data science or math concepts simply? | [`data-science-tutor`](#skill-data-science-tutor) | `use the data-science-tutor skill to explain gradient descent` |
-| Documenting company data definitions, warehouse rules, and tribal knowledge? | [`data-context-extractor`](#skill-data-context-extractor) | `use the data-context-extractor skill to document metric definitions` |
+| Have a dataset and need answers to business and trend questions? | [`data-analyze`](#skill-data-analyze) | `@data-analyze analyze customer_churn.csv` |
+| Just received a new dataset and want to explore nulls, shapes, and distributions? | [`data-explore-data`](#skill-data-explore-data) | `@data-explore-data profile sales_data.csv` |
+| Need formal statistical hypothesis tests, regressions, ANOVA, or p-values? | [`data-statistical-analysis`](#skill-data-statistical-analysis) | `@data-statistical-analysis test significance` |
+| Designing an A/B test or calculating statistical power and sample size? | [`experiment-and-inference`](#skill-experiment-and-inference) | `@experiment-and-inference calculate sample size` |
+| Auditing a data report for math bugs, calculation errors, or bias before presenting? | [`data-validate-data`](#skill-data-validate-data) | `@data-validate-data QA our segmentation findings` |
+| Creating publication-ready charts in Python (Matplotlib, Seaborn, Plotly)? | [`data-visualization`](#skill-data-visualization) | `@data-visualization plot revenue trends` |
+| Need a quick visual chart generated fast with minimal code? | [`data-create-viz`](#skill-data-create-viz) | `@data-create-viz generate a histogram` |
+| Building a standalone interactive HTML dashboard with charts and filters? | [`data-build-dashboard`](#skill-data-build-dashboard) | `@data-build-dashboard build an interactive dashboard` |
+| Training machine learning models (classification/regression with Scikit-Learn/XGBoost)? | [`ml-workflow`](#skill-ml-workflow) | `@ml-workflow train a churn prediction model` |
+| Building an end-to-end data analytics project to showcase in a portfolio? | [`portfolio-project-builder`](#skill-portfolio-project-builder) | `@portfolio-project-builder build a portfolio project` |
+| Want an interactive teacher to explain data science or math concepts simply? | [`data-science-tutor`](#skill-data-science-tutor) | `@data-science-tutor explain gradient descent` |
+| Documenting company data definitions, warehouse rules, and tribal knowledge? | [`data-context-extractor`](#skill-data-context-extractor) | `@data-context-extractor document metric definitions` |
 
 ### Detailed Breakdown of Skills in Data Science, Analytics & Visualizations
 
@@ -836,7 +837,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When you have a dataset and need actionable answers, business summaries, or pattern discoveries.
 - **Example Prompt:**
   ```text
-  use the data-analyze skill to analyze customer_churn.csv and identify the top drivers of churn
+  @data-analyze analyze customer_churn.csv and identify the top drivers of churn
   ```
 
 <a id="skill-data-build-dashboard"></a>
@@ -847,7 +848,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When you want to deliver an interactive reporting tool to stakeholders that runs without requiring a backend server.
 - **Example Prompt:**
   ```text
-  use the data-build-dashboard skill to build an interactive sales dashboard from monthly_sales.csv
+  @data-build-dashboard build an interactive sales dashboard from monthly_sales.csv
   ```
 
 <a id="skill-data-context-extractor"></a>
@@ -858,7 +859,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When documenting data warehouse schemas and metric calculation rules for a company or project.
 - **Example Prompt:**
   ```text
-  use the data-context-extractor skill to document our company data warehouse business definitions
+  @data-context-extractor document our company data warehouse business definitions
   ```
 
 <a id="skill-data-create-viz"></a>
@@ -869,7 +870,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When you want a quick visual representation of a table or series without manual plotting setup.
 - **Example Prompt:**
   ```text
-  use the data-create-viz skill to generate a histogram of user session durations
+  @data-create-viz generate a histogram of user session durations
   ```
 
 <a id="skill-data-explore-data"></a>
@@ -880,7 +881,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When you receive a new dataset and want to understand what is inside before starting any modeling or reporting.
 - **Example Prompt:**
   ```text
-  use the data-explore-data skill to profile sales_data.csv and summarize missing values and distributions
+  @data-explore-data profile sales_data.csv and summarize missing values and distributions
   ```
 
 <a id="skill-data-science-tutor"></a>
@@ -891,7 +892,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When learning a complex statistical or machine learning concept and you want plain-English explanations.
 - **Example Prompt:**
   ```text
-  use the data-science-tutor skill to explain how gradient descent works in simple terms
+  @data-science-tutor explain how gradient descent works in simple terms
   ```
 
 <a id="skill-data-statistical-analysis"></a>
@@ -902,7 +903,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When you need to mathematically prove whether differences in data are statistically significant.
 - **Example Prompt:**
   ```text
-  use the data-statistical-analysis skill to test if conversion rates between version A and B are statistically significant
+  @data-statistical-analysis test if conversion rates between version A and B are statistically significant
   ```
 
 <a id="skill-data-validate-data"></a>
@@ -913,7 +914,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When you want to verify that an analysis or executive report is mathematically sound and error-free.
 - **Example Prompt:**
   ```text
-  use the data-validate-data skill to QA our customer segmentation findings before the executive meeting
+  @data-validate-data QA our customer segmentation findings before the executive meeting
   ```
 
 <a id="skill-data-visualization"></a>
@@ -924,7 +925,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When creating charts for reports, articles, or presentations using Python.
 - **Example Prompt:**
   ```text
-  use the data-visualization skill to plot monthly revenue growth using Seaborn with a clean theme
+  @data-visualization plot monthly revenue growth using Seaborn with a clean theme
   ```
 
 <a id="skill-experiment-and-inference"></a>
@@ -935,7 +936,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When designing an experiment or interpreting A/B test results without falling for statistical traps.
 - **Example Prompt:**
   ```text
-  use the experiment-and-inference skill to calculate the sample size required for a 5% detectable lift
+  @experiment-and-inference calculate the sample size required for a 5% detectable lift
   ```
 
 <a id="skill-ml-workflow"></a>
@@ -946,7 +947,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When building predictive models (classification, regression) without data leakage.
 - **Example Prompt:**
   ```text
-  use the ml-workflow skill to train an XGBoost model predicting customer churn with cross-validation
+  @ml-workflow train an XGBoost model predicting customer churn with cross-validation
   ```
 
 <a id="skill-portfolio-project-builder"></a>
@@ -957,7 +958,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When assembling showcase projects for job applications, resumes, or public GitHub portfolios.
 - **Example Prompt:**
   ```text
-  use the portfolio-project-builder skill to outline a portfolio project analyzing public bike share data
+  @portfolio-project-builder outline a portfolio project analyzing public bike share data
   ```
 
 ---
@@ -971,14 +972,14 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 
 | If your goal is... | Choose this skill | Copy-Paste Example Prompt |
 | :--- | :--- | :--- |
-| Quick web search for facts, library docs, or competitor comparisons? | [`web-research`](#skill-web-research) | `use the web-research skill to compare Supabase vs Firebase` |
-| Comprehensive multi-source topic research creating an exhaustive dossier? | [`deep-research`](#skill-deep-research) | `use the deep-research skill to research local LLM quantization` |
-| Drafting, formatting, or revising an academic journal paper or literature review? | [`academic-paper`](#skill-academic-paper) | `use the academic-paper skill to draft the literature review` |
-| Simulating a harsh 5-seat peer review panel to critique your paper draft? | [`academic-paper-reviewer`](#skill-academic-paper-reviewer) | `use the academic-paper-reviewer skill to simulate a review of draft.pdf` |
-| Full academic research lifecycle (research -> draft -> review -> revise -> publish)? | [`academic-pipeline`](#skill-academic-pipeline) | `use the academic-pipeline skill to coordinate the paper workflow` |
-| Screening paper abstracts against inclusion/exclusion criteria for systematic reviews? | [`sr-screener`](#skill-sr-screener) | `use the sr-screener skill to screen these 50 paper abstracts` |
-| Finding where or at what time of day a photo was taken? | [`geo-sleuth`](#skill-geo-sleuth) | `use the geo-sleuth skill to identify the location of photo.jpg` |
-| Fetching current, up-to-date documentation for modern libraries and frameworks? | [`documentation-lookup`](#skill-documentation-lookup) | `use the documentation-lookup skill to check Next.js 15 caching API` |
+| Quick web search for facts, library docs, or competitor comparisons? | [`web-research`](#skill-web-research) | `@web-research compare Supabase vs Firebase` |
+| Comprehensive multi-source topic research creating an exhaustive dossier? | [`deep-research`](#skill-deep-research) | `@deep-research research local LLM quantization` |
+| Drafting, formatting, or revising an academic journal paper or literature review? | [`academic-paper`](#skill-academic-paper) | `@academic-paper draft the literature review` |
+| Simulating a harsh 5-seat peer review panel to critique your paper draft? | [`academic-paper-reviewer`](#skill-academic-paper-reviewer) | `@academic-paper-reviewer simulate a review of draft.pdf` |
+| Full academic research lifecycle (research -> draft -> review -> revise -> publish)? | [`academic-pipeline`](#skill-academic-pipeline) | `@academic-pipeline coordinate the paper workflow` |
+| Screening paper abstracts against inclusion/exclusion criteria for systematic reviews? | [`sr-screener`](#skill-sr-screener) | `@sr-screener screen these 50 paper abstracts` |
+| Finding where or at what time of day a photo was taken? | [`geo-sleuth`](#skill-geo-sleuth) | `@geo-sleuth identify the location of photo.jpg` |
+| Fetching current, up-to-date documentation for modern libraries and frameworks? | [`documentation-lookup`](#skill-documentation-lookup) | `@documentation-lookup check Next.js 15 caching API` |
 
 ### Detailed Breakdown of Skills in Web Research, Academic & Document Intelligence
 
@@ -997,7 +998,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
   ```
 - **Example Prompt:**
   ```text
-  use the academic-paper skill to draft the literature review section for our graph neural network paper
+  @academic-paper draft the literature review section for our graph neural network paper
   ```
 
 <a id="skill-academic-paper-reviewer"></a>
@@ -1008,7 +1009,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When you want harsh, realistic feedback on an academic paper draft before submitting to a real journal or conference.
 - **Example Prompt:**
   ```text
-  use the academic-paper-reviewer skill to simulate a peer review of draft.pdf
+  @academic-paper-reviewer simulate a peer review of draft.pdf
   ```
 
 <a id="skill-academic-pipeline"></a>
@@ -1019,7 +1020,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When embarking on an end-to-end research paper project from initial idea to final submission-ready PDF.
 - **Example Prompt:**
   ```text
-  use the academic-pipeline skill to coordinate researching, writing, and reviewing our research topic
+  @academic-pipeline coordinate researching, writing, and reviewing our research topic
   ```
 
 <a id="skill-deep-research"></a>
@@ -1030,7 +1031,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When preparing a comprehensive research brief, market analysis, or deep technical investigation.
 - **Example Prompt:**
   ```text
-  use the deep-research skill to research state-of-the-art methods in local LLM quantization
+  @deep-research research state-of-the-art methods in local LLM quantization
   ```
 
 <a id="skill-documentation-lookup"></a>
@@ -1041,7 +1042,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When using new library versions, recently changed APIs, or SDKs that change frequently.
 - **Example Prompt:**
   ```text
-  use the documentation-lookup skill to check the latest Next.js 15 App Router caching API
+  @documentation-lookup check the latest Next.js 15 App Router caching API
   ```
 
 <a id="skill-geo-sleuth"></a>
@@ -1052,7 +1053,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When you have a photo and want to pinpoint where or at what time of day it was taken.
 - **Example Prompt:**
   ```text
-  use the geo-sleuth skill to identify the location of this photo photo.jpg
+  @geo-sleuth identify the location of this photo photo.jpg
   ```
 
 <a id="skill-sr-screener"></a>
@@ -1063,7 +1064,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When conducting medical, clinical, or scientific systematic literature reviews.
 - **Example Prompt:**
   ```text
-  use the sr-screener skill to screen these 50 paper abstracts against our inclusion criteria
+  @sr-screener screen these 50 paper abstracts against our inclusion criteria
   ```
 
 <a id="skill-web-research"></a>
@@ -1074,7 +1075,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When you need to look up current documentation, pricing, release notes, or factual answers from the internet.
 - **Example Prompt:**
   ```text
-  use the web-research skill to find the latest pricing and features of Supabase vs Firebase
+  @web-research find the latest pricing and features of Supabase vs Firebase
   ```
 
 ---
@@ -1088,13 +1089,13 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 
 | If your goal is... | Choose this skill | Copy-Paste Example Prompt |
 | :--- | :--- | :--- |
-| Routing a project across lifecycle stages (planning, coding, testing, release)? | [`agentskills`](#skill-agentskills) | `use the agentskills skill to route this feature across SDLC` |
-| Breaking a complex plan into tasks executed by focused subagents? | [`subagent-driven-development`](#skill-subagent-driven-development) | `use the subagent-driven-development skill to execute PLAN.md` |
-| Running a multi-agent swarm via the local Ruflo CLI? | [`ruflo`](#skill-ruflo) | `use the ruflo skill to coordinate a multi-agent review` |
-| Running automated evaluation benchmarks via the REA CLI? | [`rea`](#skill-rea) | `use the rea skill to run evaluation benchmarks` |
+| Routing a project across lifecycle stages (planning, coding, testing, release)? | [`agentskills`](#skill-agentskills) | `@agentskills route this feature across SDLC` |
+| Breaking a complex plan into tasks executed by focused subagents? | [`subagent-driven-development`](#skill-subagent-driven-development) | `@subagent-driven-development execute PLAN.md` |
+| Running a multi-agent swarm via the local Ruflo CLI? | [`ruflo`](#skill-ruflo) | `@ruflo coordinate a multi-agent review` |
+| Running automated evaluation benchmarks via the REA CLI? | [`rea`](#skill-rea) | `@rea run evaluation benchmarks` |
 | Drafting a comprehensive implementation plan before touching code? | [`plans`](#skill-plans) | `/plan design a rate limiter for our API` |
-| Taking a vague prompt and sharpening it into a deep, precise specification? | [`sharpen`](#skill-sharpen) | `use the sharpen skill to turn my rough idea into a spec` |
-| Exploring multiple technical approaches and tradeoffs before deciding? | [`brainstorming`](#skill-brainstorming) | `use the brainstorming skill to explore caching strategies` |
+| Taking a vague prompt and sharpening it into a deep, precise specification? | [`sharpen`](#skill-sharpen) | `@sharpen turn my rough idea into a spec` |
+| Exploring multiple technical approaches and tradeoffs before deciding? | [`brainstorming`](#skill-brainstorming) | `@brainstorming explore caching strategies` |
 
 ### Detailed Breakdown of Skills in Autonomous Multi-Agent & Orchestration
 
@@ -1106,7 +1107,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When managing complex software projects across multiple stages.
 - **Example Prompt:**
   ```text
-  use the agentskills skill to route this new feature through planning, coding, and verification
+  @agentskills route this new feature through planning, coding, and verification
   ```
 
 <a id="skill-brainstorming"></a>
@@ -1117,7 +1118,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When exploring alternative architectural patterns or feature designs before committing to code.
 - **Example Prompt:**
   ```text
-  use the brainstorming skill to explore options for caching database queries
+  @brainstorming explore options for caching database queries
   ```
 
 <a id="skill-plans"></a>
@@ -1139,7 +1140,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When benchmarking agent performance or evaluating system metrics.
 - **Example Prompt:**
   ```text
-  use the rea skill to run evaluation benchmarks on our current setup
+  @rea run evaluation benchmarks on our current setup
   ```
 
 <a id="skill-ruflo"></a>
@@ -1150,7 +1151,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When running multi-agent swarms using the local Ruflo command-line tool.
 - **Example Prompt:**
   ```text
-  use the ruflo skill to coordinate a multi-agent review of the repository
+  @ruflo coordinate a multi-agent review of the repository
   ```
 
 <a id="skill-sharpen"></a>
@@ -1161,7 +1162,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When you have a rough idea and want the AI to refine it into a crystal-clear, high-quality prompt.
 - **Example Prompt:**
   ```text
-  use the sharpen skill to turn my rough idea 'make a dashboard' into a detailed specification
+  @sharpen turn my rough idea 'make a dashboard' into a detailed specification
   ```
 
 <a id="skill-subagent-driven-development"></a>
@@ -1172,7 +1173,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When tackling large multi-file refactors or implementations that benefit from modular execution.
 - **Example Prompt:**
   ```text
-  use the subagent-driven-development skill to execute the tasks outlined in PLAN.md
+  @subagent-driven-development execute the tasks outlined in PLAN.md
   ```
 
 ---
@@ -1186,13 +1187,13 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 
 | If your goal is... | Choose this skill | Copy-Paste Example Prompt |
 | :--- | :--- | :--- |
-| Generating an image from a text prompt using free AI backends? | [`image-gen`](#skill-image-gen) | `use the image-gen skill to generate a cyberpunk city illustration` |
-| Generating a short video clip from a text prompt? | [`video-gen`](#skill-video-gen) | `use the video-gen skill to generate a 5-second video clip` |
-| Directing an animated programmatic film in artistic styles (Oil, Ukiyo-e)? | [`lemo-opuscar`](#skill-lemo-opuscar) | `use the lemo-opuscar skill to direct an explainer animation` |
-| Creating interactive generative art, flow fields, or math patterns with p5.js? | [`algorithmic-art`](#skill-algorithmic-art) | `use the algorithmic-art skill to build a particle flow field in p5.js` |
-| Developing 2D/3D game mechanics or UI in Godot 4 with GDScript 2.0? | [`godot4-dev`](#skill-godot4-dev) | `use the godot4-dev skill to build a character controller script` |
-| Generating procedural 3D voxel structures and architectural math models? | [`voxel-craft-cad`](#skill-voxel-craft-cad) | `use the voxel-craft-cad skill to generate a spiral tower in voxels` |
-| Calculating Minecraft survival crafting stacks (64-item math) and chest layouts? | [`mcfunction-builder`](#skill-mcfunction-builder) | `use the mcfunction-builder skill to calculate pyramid stacks` |
+| Generating an image from a text prompt using free AI backends? | [`image-gen`](#skill-image-gen) | `@image-gen generate a cyberpunk city illustration` |
+| Generating a short video clip from a text prompt? | [`video-gen`](#skill-video-gen) | `@video-gen generate a 5-second video clip` |
+| Directing an animated programmatic film in artistic styles (Oil, Ukiyo-e)? | [`lemo-opuscar`](#skill-lemo-opuscar) | `@lemo-opuscar direct an explainer animation` |
+| Creating interactive generative art, flow fields, or math patterns with p5.js? | [`algorithmic-art`](#skill-algorithmic-art) | `@algorithmic-art build a particle flow field in p5.js` |
+| Developing 2D/3D game mechanics or UI in Godot 4 with GDScript 2.0? | [`godot4-dev`](#skill-godot4-dev) | `@godot4-dev build a character controller script` |
+| Generating procedural 3D voxel structures and architectural math models? | [`voxel-craft-cad`](#skill-voxel-craft-cad) | `@voxel-craft-cad generate a spiral tower in voxels` |
+| Calculating Minecraft survival crafting stacks (64-item math) and chest layouts? | [`mcfunction-builder`](#skill-mcfunction-builder) | `@mcfunction-builder calculate pyramid stacks` |
 
 ### Detailed Breakdown of Skills in Creative, Media, Gaming & 3D
 
@@ -1204,7 +1205,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When creating creative coding projects, generative backgrounds, or interactive math visualizers.
 - **Example Prompt:**
   ```text
-  use the algorithmic-art skill to create an interactive flow field particle simulation in p5.js
+  @algorithmic-art create an interactive flow field particle simulation in p5.js
   ```
 
 <a id="skill-godot4-dev"></a>
@@ -1215,7 +1216,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When developing 2D or 3D games, mechanics, or UI inside the Godot 4 engine.
 - **Example Prompt:**
   ```text
-  use the godot4-dev skill to create a character controller script with double-jump in GDScript
+  @godot4-dev create a character controller script with double-jump in GDScript
   ```
 
 <a id="skill-image-gen"></a>
@@ -1226,7 +1227,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When you need an image, avatar, illustration, or visual asset generated from a prompt.
 - **Example Prompt:**
   ```text
-  use the image-gen skill to generate an illustration of a cozy cyberpunk coffee shop
+  @image-gen generate an illustration of a cozy cyberpunk coffee shop
   ```
 
 <a id="skill-lemo-opuscar"></a>
@@ -1237,7 +1238,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When creating programmatic video explainers, educational animations, or artistic short films.
 - **Example Prompt:**
   ```text
-  use the lemo-opuscar skill to direct a short animation explaining gravity in watercolor style
+  @lemo-opuscar direct a short animation explaining gravity in watercolor style
   ```
 
 <a id="skill-mcfunction-builder"></a>
@@ -1248,7 +1249,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When planning large Minecraft survival construction projects and calculating required stacks.
 - **Example Prompt:**
   ```text
-  use the mcfunction-builder skill to calculate how many shulker boxes of cobblestone are needed for a 50x50 pyramid
+  @mcfunction-builder calculate how many shulker boxes of cobblestone are needed for a 50x50 pyramid
   ```
 
 <a id="skill-video-gen"></a>
@@ -1259,7 +1260,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When you need a short motion clip or visual video asset.
 - **Example Prompt:**
   ```text
-  use the video-gen skill to generate a 5-second video of ocean waves crashing at sunset
+  @video-gen generate a 5-second video of ocean waves crashing at sunset
   ```
 
 <a id="skill-voxel-craft-cad"></a>
@@ -1270,7 +1271,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When building procedural voxel worlds, 3D structures, or algorithmic building generators.
 - **Example Prompt:**
   ```text
-  use the voxel-craft-cad skill to generate a procedural spiral castle tower in voxels
+  @voxel-craft-cad generate a procedural spiral castle tower in voxels
   ```
 
 ---
@@ -1284,15 +1285,15 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 
 | If your goal is... | Choose this skill | Copy-Paste Example Prompt |
 | :--- | :--- | :--- |
-| Operating the Linux desktop (capturing screen, clicking buttons, moving windows)? | [`desktop-control`](#skill-desktop-control) | `use the desktop-control skill to inspect the active desktop window` |
-| Controlling a headless/visible Chromium browser with Playwright? | [`browser-automation`](#skill-browser-automation) | `use the browser-automation skill to test our staging login flow` |
-| Mapping an entire codebase into a searchable graph of functions and calls? | [`graphify`](#skill-graphify) | `use the graphify skill to build a knowledge graph of this repo` |
-| Building a custom Model Context Protocol (MCP) server for AI tools? | [`mcp-builder`](#skill-mcp-builder) | `use the mcp-builder skill to build a Python MCP server` |
-| Importing saved chat memories from ChatGPT, Claude, or Gemini into local memory? | [`memory-import`](#skill-memory-import) | `use the memory-import skill to import memories from memories.json` |
-| Discovering and installing new agent skills from online repositories? | [`find-skills`](#skill-find-skills) | `use the find-skills skill to search for Rust skills` |
-| Creating or scaffolding brand new custom skills for OpenCode? | [`skill-creator`](#skill-skill-creator) | `use the skill-creator skill to scaffold a new skill` |
-| Auditing how many tokens your system prompt and active tools consume? | [`context-budget`](#skill-context-budget) | `use the context-budget skill to audit token consumption` |
-| Preventing the model from truncating or cutting off large output files? | [`output-skill`](#skill-output-skill) | `use the output-skill skill to ensure the full file is printed` |
+| Operating the Linux desktop (capturing screen, clicking buttons, moving windows)? | [`desktop-control`](#skill-desktop-control) | `@desktop-control inspect the active desktop window` |
+| Controlling a headless/visible Chromium browser with Playwright? | [`browser-automation`](#skill-browser-automation) | `@browser-automation test our staging login flow` |
+| Mapping an entire codebase into a searchable graph of functions and calls? | [`graphify`](#skill-graphify) | `@graphify build a knowledge graph of this repo` |
+| Building a custom Model Context Protocol (MCP) server for AI tools? | [`mcp-builder`](#skill-mcp-builder) | `@mcp-builder build a Python MCP server` |
+| Importing saved chat memories from ChatGPT, Claude, or Gemini into local memory? | [`memory-import`](#skill-memory-import) | `@memory-import import memories from memories.json` |
+| Discovering and installing new agent skills from online repositories? | [`find-skills`](#skill-find-skills) | `@find-skills search for Rust skills` |
+| Creating or scaffolding brand new custom skills for OpenCode? | [`skill-creator`](#skill-skill-creator) | `@skill-creator scaffold a new skill` |
+| Auditing how many tokens your system prompt and active tools consume? | [`context-budget`](#skill-context-budget) | `@context-budget audit token consumption` |
+| Preventing the model from truncating or cutting off large output files? | [`output-skill`](#skill-output-skill) | `@output-skill ensure the full file is printed` |
 
 ### Detailed Breakdown of Skills in System, Desktop, Browser & Tooling
 
@@ -1311,7 +1312,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
   ```
 - **Example Prompt:**
   ```text
-  use the browser-automation skill to open our staging site and verify the login flow
+  @browser-automation open our staging site and verify the login flow
   ```
 
 <a id="skill-context-budget"></a>
@@ -1322,7 +1323,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When tuning your setup for low-context free models and checking where your token budget is spent.
 - **Example Prompt:**
   ```text
-  use the context-budget skill to audit our active configuration and report token consumption
+  @context-budget audit our active configuration and report token consumption
   ```
 
 <a id="skill-desktop-control"></a>
@@ -1340,7 +1341,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
   ```
 - **Example Prompt:**
   ```text
-  use the desktop-control skill to take a screenshot of the active window and inspect its UI
+  @desktop-control take a screenshot of the active window and inspect its UI
   ```
 
 <a id="skill-find-skills"></a>
@@ -1357,7 +1358,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
   ```
 - **Example Prompt:**
   ```text
-  use the find-skills skill to search for skills related to Rust web development
+  @find-skills search for skills related to Rust web development
   ```
 
 <a id="skill-graphify"></a>
@@ -1378,7 +1379,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
   ```
 - **Example Prompt:**
   ```text
-  use the graphify skill to trace the shortest path between "AuthService" and "DatabasePool"
+  @graphify trace the shortest path between "AuthService" and "DatabasePool"
   ```
 
 <a id="skill-mcp-builder"></a>
@@ -1395,7 +1396,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
   ```
 - **Example Prompt:**
   ```text
-  use the mcp-builder skill to build a Python MCP server that provides weather tools
+  @mcp-builder build a Python MCP server that provides weather tools
   ```
 
 <a id="skill-memory-import"></a>
@@ -1406,7 +1407,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When migrating to OpenCode from another assistant and you want to bring over your personal preferences and context.
 - **Example Prompt:**
   ```text
-  use the memory-import skill to import my exported ChatGPT memories from memories.json
+  @memory-import import my exported ChatGPT memories from memories.json
   ```
 
 <a id="skill-output-skill"></a>
@@ -1417,7 +1418,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When requesting very large outputs and you want to prevent the model from stopping halfway or truncating code.
 - **Example Prompt:**
   ```text
-  use the output-skill skill to ensure the full 500-line configuration file is output without truncation
+  @output-skill ensure the full 500-line configuration file is output without truncation
   ```
 
 <a id="skill-skill-creator"></a>
@@ -1428,7 +1429,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **When to Use:** When building a brand new custom skill for OpenCode to automate a recurring workflow.
 - **Example Prompt:**
   ```text
-  use the skill-creator skill to scaffold a new skill for managing local Kubernetes clusters
+  @skill-creator scaffold a new skill for managing local Kubernetes clusters
   ```
 
 ---

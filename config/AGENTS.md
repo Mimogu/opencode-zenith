@@ -126,7 +126,7 @@ Writing subagents: `build-error-resolver`, `refactor-cleaner`, `tdd-guide`, `e2e
 
 ## Skills
 
-Skills are loaded on demand via the `skill` tool (`skill({ name: "<skill-id>" })`). When the user asks to use a skill (e.g. "use the docx skill", "use docker-infra", "use canvas-design") or when a plan/task requires specialized domain reference, call `skill({ name: "<skill-id>" })` to read its instructions into context for that specific task. Do not load skills that are not requested. Skills that pause for confirmation are human-in-the-loop by design: respect the gate.
+Skills are loaded on demand via the `skill` tool (`skill({ name: "<skill-id>" })`). When the user asks to use a skill (e.g. "@docx", "@docker-infra", "@canvas-design", or "use the docx skill") or when a plan/task requires specialized domain reference, call `skill({ name: "<skill-id>" })` to read its instructions into context for that specific task. Do not load skills that are not requested. Skills that pause for confirmation are human-in-the-loop by design: respect the gate.
 
 Skills and guides written for Claude Code name its tools: `AskUserQuestion` is your `question` tool (same idea: one question, short options; the user can always type their own answer); "the skill base directory" is the `Base directory for this skill` line of the skill block.
 
