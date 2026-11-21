@@ -1,0 +1,234 @@
+#!/usr/bin/env python3
+"""opencode-loop: manage recurring and autonomous loop tasks for OpenCode.
+
+Usage:
+  opencode-loop start <interval> "<prompt>" [--session <session_id>]
+  opencode-loop stop
+  opencode-loop status
+  opencode-loop run-once "<prompt>" [--session <session_id>]
+
+Intervals:
+  30s, 5m, 30m, 1h, 24h, or raw seconds.
+"""
+
+import argparse
+import json
+import os
+import re
+import signal
+import subprocess
+import sys
+import time
+from datetime import datetime
+from pathlib import Path
+
+STATE_DIR = Path.home() / ".local/state/opencode"
+STATE_FILE = STATE_DIR / "loop-state.json"
+LOG_FILE = STATE_DIR / "loop.log"
+
+
+def parse_interval(val: str) -> int:
+    m = re.match(r"^(\d+)\s*(s|m|h|d)?$", val.strip().lower())
+    if not m:
+        raise ValueError(f"Invalid interval: '{val}'. Expected e.g. 30s, 5m, 30m, 1h")
+    num, unit = int(m.group(1)), m.group(2) or "s"
+    multipliers = {"s": 1, "m": 60, "h": 3600, "d": 86400}
+    return max(5, num * multipliers[unit])
+
+
+def read_state() -> dict:
+    if STATE_FILE.exists():
+        try:
+            return json.loads(STATE_FILE.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+    return {"running": False, "pid": None, "interval_sec": 0, "prompt": "", "runs": 0}
+
+
+def write_state(data: dict):
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
+    STATE_FILE.write_text(json.dumps(data, indent=2), encoding="utf-8")
+
+
+def append_log(msg: str):
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with open(LOG_FILE, "a", encoding="utf-8") as f:
+        f.write(f"[{timestamp}] {msg}\n")
+
+
+def daemon_runner(interval_sec: int, prompt: str, session_id: str | None):
+    signal.signal(signal.SIGTERM, lambda *_: sys.exit(0))
+    signal.signal(signal.SIGINT, lambda *_: sys.exit(0))
+
+    runs = 0
+    append_log(f"Loop started. Interval: {interval_sec}s. Prompt: {prompt!r}")
+
+    while True:
+        runs += 1
+        state = read_state()
+        state["runs"] = runs
+        state["last_run"] = datetime.now().isoformat()
+        write_state(state)
+
+        append_log(f"Run #{runs} starting...")
+        cmd = ["opencode", "run"]
+        if session_id:
+            cmd.extend(["-s", session_id])
+        else:
+            cmd.append("-c")
+        cmd.extend(["--auto", f"{prompt} #noreview"])
+
+        try:
+            proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, timeout=interval_sec * 2)
+            out_summary = proc.stdout.strip().replace("\n", " ") if proc.stdout else "(no output)"
+            append_log(f"Run #{runs} completed (exit {proc.returncode}): {out_summary[:180]}")
+        except subprocess.TimeoutExpired:
+            append_log(f"Run #{runs} timed out after {interval_sec * 2}s.")
+        except Exception as e:
+            append_log(f"Run #{runs} error: {e}")
+
+        time.sleep(interval_sec)
+
+
+def cmd_start(args):
+    state = read_state()
+    if state.get("running") and state.get("pid"):
+        try:
+            os.kill(state["pid"], 0)
+            print(f"Error: A loop is already running (PID {state['pid']}): {state.get('prompt')!r}")
+            print("Use 'opencode-loop stop' first.")
+            sys.exit(1)
+        except OSError:
+            pass
+
+    interval_sec = parse_interval(args.interval)
+    prompt = args.prompt.strip()
+
+    # Fork daemon process
+    pid = os.fork()
+    if pid > 0:
+        # Parent
+        write_state({
+            "running": True,
+            "pid": pid,
+            "interval_sec": interval_sec,
+            "interval_str": args.interval,
+            "prompt": prompt,
+            "session_id": args.session,
+            "start_time": datetime.now().isoformat(),
+            "runs": 0,
+        })
+        print(f"✓ OpenCode recurring loop started (PID: {pid})")
+        print(f"  Interval: {args.interval} ({interval_sec} seconds)")
+        print(f"  Prompt:   {prompt}")
+        print(f"  Logs:     {LOG_FILE}")
+        print("  Use 'opencode-loop status' or 'opencode-loop stop' to manage.")
+        sys.exit(0)
+    else:
+        # Child daemon
+        os.setsid()
+        # Redirect standard file descriptors
+        with open("/dev/null", "r") as devnull_r, open(LOG_FILE, "a") as devnull_w:
+            os.dup2(devnull_r.fileno(), sys.stdin.fileno())
+            os.dup2(devnull_w.fileno(), sys.stdout.fileno())
+            os.dup2(devnull_w.fileno(), sys.stderr.fileno())
+        daemon_runner(interval_sec, prompt, args.session)
+
+
+def cmd_stop(_args):
+    state = read_state()
+    pid = state.get("pid")
+    stopped = False
+
+    if pid:
+        try:
+            os.kill(pid, signal.SIGTERM)
+            stopped = True
+        except ProcessLookupError:
+            stopped = True
+        except Exception as e:
+            print(f"Error stopping PID {pid}: {e}")
+
+    state["running"] = False
+    state["pid"] = None
+    state["stopped_at"] = datetime.now().isoformat()
+    write_state(state)
+    append_log("Loop stopped by user.")
+
+    if stopped:
+        print(f"✓ OpenCode loop (PID {pid}) stopped.")
+    else:
+        print("No active OpenCode loop was running.")
+
+
+def cmd_status(_args):
+    state = read_state()
+    pid = state.get("pid")
+    is_alive = False
+
+    if pid:
+        try:
+            os.kill(pid, 0)
+            is_alive = True
+        except OSError:
+            is_alive = False
+
+    if is_alive:
+        print(f"● OpenCode Loop: ACTIVE (PID {pid})")
+        print(f"  Interval: {state.get('interval_str', state.get('interval_sec'))}")
+        print(f"  Prompt:   {state.get('prompt')}")
+        print(f"  Started:  {state.get('start_time')}")
+        print(f"  Runs:     {state.get('runs', 0)}")
+        print(f"  Last Run: {state.get('last_run', 'none')}")
+    else:
+        print("○ OpenCode Loop: INACTIVE")
+        if state.get("stopped_at"):
+            print(f"  Last stopped: {state.get('stopped_at')}")
+
+    print(f"  Log file:     {LOG_FILE}")
+    if LOG_FILE.exists():
+        lines = LOG_FILE.read_text(encoding="utf-8").splitlines()[-5:]
+        if lines:
+            print("\nRecent Logs:")
+            for line in lines:
+                print(f"  {line}")
+
+
+def cmd_run_once(args):
+    cmd = ["opencode", "run"]
+    if args.session:
+        cmd.extend(["-s", args.session])
+    else:
+        cmd.append("-c")
+    cmd.extend(["--auto", f"{args.prompt} #noreview"])
+    subprocess.run(cmd)
+
+
+def main():
+    p = argparse.ArgumentParser(description="Manage OpenCode recurring loops")
+    sub = p.add_subparsers(dest="subcommand", required=True)
+
+    p_start = sub.add_parser("start", help="Start recurring loop")
+    p_start.add_argument("interval", help="Interval (e.g. 5m, 30m, 1h)")
+    p_start.add_argument("prompt", help="Prompt task to execute")
+    p_start.add_argument("--session", "-s", help="Target session ID (defaults to active)")
+    p_start.set_defaults(func=cmd_start)
+
+    p_stop = sub.add_parser("stop", help="Stop running loop")
+    p_stop.set_defaults(func=cmd_stop)
+
+    p_status = sub.add_parser("status", help="Show loop status")
+    p_status.set_defaults(func=cmd_status)
+
+    p_once = sub.add_parser("run-once", help="Run prompt once in background")
+    p_once.add_argument("prompt", help="Prompt task to execute")
+    p_once.add_argument("--session", "-s", help="Target session ID")
+    p_once.set_defaults(func=cmd_run_once)
+
+    args = p.parse_args()
+    args.func(args)
+
+
+if __name__ == "__main__":
+    main()
