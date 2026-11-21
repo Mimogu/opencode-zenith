@@ -35,7 +35,7 @@ BIDI_PORT = int(os.environ.get("BROWSER_BIDI_PORT", "9223"))  # Firefox's defaul
 CACHE = Path.home() / ".config/opencode/state/browsers.json"
 LOG = Path("/var/tmp/pip-scratch/opencode/browser-ctl.log")
 GENERIC = {"web", "browser", "google", "mozilla", "microsoft", "the", "internet", "-", "(flatpak)"}
-MCP = {"chromium": "my-browser", "qtwebengine": "my-browser", "gecko": "my-firefox"}
+MCP = {"chromium": "browse", "qtwebengine": "browse", "gecko": "my-firefox"}
 
 
 # ------------------------------------------------------------------ discovery
@@ -453,7 +453,7 @@ def describe_ready(b: dict) -> str:
     if b["engine"] == "gecko":
         return f"ready: {b['name']} (Marionette 127.0.0.1:{MARIONETTE_PORT}) -> use the `my-firefox` MCP tools"
     info = cdp_info() or {}
-    return f"ready: {b['name']} ({info.get('Browser', '?')}, CDP 127.0.0.1:{CDP_PORT}) -> use the `my-browser` MCP tools"
+    return f"ready: {b['name']} ({info.get('Browser', '?')}, CDP 127.0.0.1:{CDP_PORT}) -> use the `browse` MCP tools"
 
 
 def chromium_profiles(pids: list[int]) -> set[Path]:

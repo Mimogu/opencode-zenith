@@ -86,7 +86,9 @@ export class Browsers {
       return {
         why: `named:${b.id}`,
         text: b.automatable
-          ? `If this needs a browser, use the user's ${b.name}, not the headless servers: run \`browser-ctl start ${b.id}\` (exit 3 = it is open without its automation port: ask the user before \`browser-ctl restart ${b.id}\`; exit 4 = another browser holds the port: ask before stopping it), then use the \`${b.mcp}\` MCP tools in a new tab. Follow the browser-automation skill.${browserSheet(b.mcp) ? `\n${browserSheet(b.mcp)}` : ""}`
+          ? (b.mcp === "browse"
+            ? `If this needs a browser, use the user's ${b.name}: use the \`browse\` MCP tools in a new tab (e.g. \`tools.browse.tabs({ action: "new", url: "..." })\` or \`tools.browse.execute({ code: "..." })\`). It connects directly to your active browser via the OpenCode Browse extension on relay 127.0.0.1:19988 without restarting. Follow the browser-automation skill.${browserSheet("browse") ? `\n${browserSheet("browse")}` : ""}`
+            : `If this needs a browser, use the user's ${b.name}, not the headless servers: run \`browser-ctl start ${b.id}\` (exit 3 = it is open without its automation port: ask the user before \`browser-ctl restart ${b.id}\`; exit 4 = another browser holds the port: ask before stopping it), then use the \`${b.mcp}\` MCP tools in a new tab. Follow the browser-automation skill.${browserSheet(b.mcp) ? `\n${browserSheet(b.mcp)}` : ""}`)
           : `The user named ${b.name}, which cannot be automated over a protocol (${b.engine}). If the task needs it, drive it with the desktop-control skill (real cursor, \`see\` for the screen).`,
       };
     }

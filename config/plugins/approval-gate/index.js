@@ -149,7 +149,7 @@ export function fold(state, messages) {
       const out = (p.state?.content || []).map((c) => c?.text || "").join("\n").replace(/\\"/g, '"').replace(/\\n/g, "\n");
       if (out.includes(HELD_MARK)) { st.held = st.n; st.askedAfterHold = false; }
       // the page the browser is on: the newest "Page URL:" line or navigate call (not tab lists)
-      for (const u of `${code}\n${out}`.matchAll(/(?:Page URL:\s*|browser_navigate\s*\(\s*\{\s*url\s*:\s*["'`]|navigate_page\s*\(\s*\{[^}]*?url\s*:\s*["'`]|\.goto\s*\(\s*["'`])(https?:\/\/[^\s"'`\\)]+)/g)) st.host = hostOf(u[1]) || st.host;
+      for (const u of `${code}\n${out}`.matchAll(/(?:Page URL:\s*|browser_navigate\s*\(\s*\{\s*url\s*:\s*["'`]|navigate_page\s*\(\s*\{[^}]*?url\s*:\s*["'`]|\.navigate\s*\(\s*\{[^}]*?url\s*:\s*["'`]|\.goto\s*\(\s*["'`])(https?:\/\/[^\s"'`\\)]+)/g)) st.host = hostOf(u[1]) || st.host;
       // element labels from the newest snapshot only: refs are reused when the page changes
       const snap = new Map();
       for (const x of out.matchAll(/-\s+(\w+)\s+"([^"]*)"[^\n]*?\[ref=([\w]+)\]/g)) snap.set(x[3], `${x[1]} "${x[2]}"`);
@@ -255,7 +255,7 @@ export function decide(e, { state } = {}) {
   if (shell ? !/ydotool|xdotool|wtype|desk\.sh|9222|devtools|cdp|playwright|puppeteer|selenium/i.test(code) : !commits(code).length) return null;
   const st = state === undefined ? sessionState(e.sessionID) : state;
   // a navigate earlier in this very script moves the page; any other url text does not
-  const nav = [...code.matchAll(/(?:browser_navigate\s*\(\s*\{\s*url\s*:|navigate_page\s*\(\s*\{[^}]*?url\s*:|\.goto\s*\()\s*["'`](https?:\/\/[^"'`]+)/g)].at(-1);
+  const nav = [...code.matchAll(/(?:browser_navigate\s*\(\s*\{\s*url\s*:|navigate_page\s*\(\s*\{[^}]*?url\s*:|\.navigate\s*\(\s*\{[^}]*?url\s*:|\.goto\s*\()\s*["'`](https?:\/\/[^"'`]+)/g)].at(-1);
   const host = nav ? hostOf(nav[1]) : st ? st.host || "" : UNKNOWN;
   const found = shell ? riskyShell(code, host) : risky(code, host, st?.labels || new Map());
   if (!found.length) return null;

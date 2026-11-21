@@ -20,7 +20,7 @@ function log(msg) { try { fs.appendFileSync(LOG, `[${new Date().toISOString()}] 
 const CALL = /tools\s*(?:\[\s*["'`](my-browser|my-firefox|browse)["'`]\s*\]|\.(my_browser|my_firefox|browse))\s*\.\s*(\w+)\s*\(/g;
 // the user asking for work in their current tab lifts the guard for that turn; a negation near it does not
 // ("don't touch my tab", "keep this tab as is"); "my tab"/"open tab" alone are too ambiguous to count
-export const THIS_TAB = /\b(in|on|use|using|with)\s+(this|the current|my current|the same|this same)\s+(browser\s+)?tab\b|في (التبويب|التاب) (ده|هذا|الحالي)|(نفس|هذا) (التبويب|التاب)|\bclose (the|this|that) tab\b/i;
+export const THIS_TAB = /\b(in|on|use|using|with)\s+(this|the current|my current|the same|this same)\s+(browser\s+)?tab\b|في (التبويب|التاب) (ده|هذا|الحالي)|(نفس|هذا) (التبويب|التاب)|\bclose\s+(all\s+)?(the\s+|this\s+|that\s+|your\s+|opened\s+|open\s+)*(browser\s+)?tabs?\b|\bclose tabs?\b|اقفل\s+(كل\s+)?(التابات|التبويبات|التاب|التبويب)|اغلق\s+(كل\s+)?(التابات|التبويبات|التاب|التبويب)/i;
 const NOT_THIS_TAB = /\b(don'?t|do not|never|not|without|leave|keep|avoid)\b[^.!?\n]{0,40}\b(tab|tabs)\b|متلمسش|لا تلمس|سيب/i;
 export const asksThisTab = (text) => THIS_TAB.test(String(text || "")) && !NOT_THIS_TAB.test(String(text || ""));
 /** The argument text of a call starting at `i` (just after "("): a balanced {...} literal, or "" */
@@ -40,7 +40,7 @@ function argsAt(code, i) {
 // a literal index, null when none is given (= the current tab), "?" when it is an expression we cannot read
 const num = (args, key) => {
   const a = String(args || "");
-  const m = a.match(new RegExp(`\\b${key}\\s*:\\s*(\\d+)\\s*[,}]`));
+  const m = a.match(new RegExp(`\\b${key}\\s*:\\s*["']?(\\d+)["']?\\s*[,}]`));
   if (m) return Number(m[1]);
   return new RegExp(`\\b${key}\\s*:`).test(a) ? "?" : null;
 };
@@ -72,6 +72,16 @@ export function classify(server, name, args = "") {
       if (!/\btab\s*:/.test(a)) return { kind: "new" };
       return { kind: "nav", what: name };
     }
+    if (name === "execute") {
+      if (!/\btab\s*:/.test(a)) {
+        if (/page\.goto|\.navigate\(|context\.newPage/.test(a)) return { kind: "new" };
+      }
+      if (/page\.close\(|\.tabs\(\s*\{[^}]*action\s*:\s*["'`]close/.test(a)) {
+        return { kind: "close", index: num(a, "tab") };
+      }
+      if (/page\.goto|browse\.navigate/.test(a)) return { kind: "nav", what: "execute.navigate" };
+      return { kind: "read" };
+    }
     if (name === "close") return { kind: "close", index: num(a, "tab") };
     return { kind: "read" };
   }
@@ -97,7 +107,13 @@ const fresh = () => ({ ownIdx: { "my-browser": new Set(), "my-firefox": new Set(
 
 // after any close the browser may show one of the user's tabs: the agent selects its own again (or opens one)
 function closeTab(st, s, index) {
-  if (index !== null && index !== "?") st.ownIdx[s] = new Set([...st.ownIdx[s]].filter((i) => i !== index).map((i) => (i > index ? i - 1 : i)));
+  if (index !== null && index !== "?") {
+    if (s === "browse") {
+      st.ownIdx[s].delete(Number(index));
+    } else {
+      st.ownIdx[s] = new Set([...st.ownIdx[s]].filter((i) => i !== index).map((i) => (i > index ? i - 1 : i)));
+    }
+  }
   st.onOwn[s] = false;
 }
 
@@ -121,7 +137,11 @@ export function step(st, c) {
 export function fold(state, messages) {
   const st = state || fresh();
   for (const m of messages) {
-    if (m.type === "user" && typeof m.text === "string") { st.thisTab = asksThisTab(m.text); continue; }
+    if (m.type === "user") {
+      const userText = typeof m.text === "string" ? m.text : (Array.isArray(m.content) ? m.content.map((p) => p?.text || "").join(" ") : String(m.content || ""));
+      st.thisTab = asksThisTab(userText);
+      continue;
+    }
     if (m.type !== "assistant") continue;
     for (const p of Array.isArray(m.content) ? m.content : []) {
       if (p?.type !== "tool") continue;
@@ -129,22 +149,29 @@ export function fold(state, messages) {
       const calls = callsIn(code);
       if (!calls.length) continue;
       const out = (p.state?.content || []).map((c) => c?.text || "").join("\n").replace(/\\"/g, '"').replace(/\\n/g, "\n");
-      if (/^\s*(\[harness tab guard|\[harness approval gate)/.test(out)) continue; // held: nothing ran
+      if (/\[harness tab guard|\[harness approval gate/.test(out)) continue; // held: nothing ran
       for (const c of calls) {
         if (c.kind === "new") {
           // the index the new tab got: Firefox "new page [2] →", Playwright "- 3: (current) [..]", browse '{"tab":1545729747}'
-          let idx;
           if (c.server === "my-firefox") {
-            idx = (out.match(/new page \[(\d+)\]/) || [])[1];
+            const idx = (out.match(/new page \[(\d+)\]/) || [])[1];
+            if (idx !== undefined) st.ownIdx[c.server].add(Number(idx));
           } else if (c.server === "browse") {
-            idx = (out.match(/"tab"\s*:\s*(\d+)/) || out.match(/tab\s*:\s*(\d+)/) || out.match(/"id"\s*:\s*"?(\d+)"?/) || [])[1];
+            for (const match of out.matchAll(/"tab"\s*:\s*(\d+)/g)) st.ownIdx["browse"].add(Number(match[1]));
+            for (const match of out.matchAll(/\btab\s*:\s*(\d+)/g)) st.ownIdx["browse"].add(Number(match[1]));
+            for (const match of out.matchAll(/"id"\s*:\s*"?(\d+)"?/g)) st.ownIdx["browse"].add(Number(match[1]));
           } else {
-            idx = [...out.matchAll(/-\s*(\d+):\s*\(current\)/g)].at(-1)?.[1];
+            const idx = [...out.matchAll(/-\s*(\d+):\s*\(current\)/g)].at(-1)?.[1];
+            if (idx !== undefined) st.ownIdx[c.server].add(Number(idx));
           }
-          if (idx !== undefined) st.ownIdx[c.server].add(Number(idx));
           st.onOwn[c.server] = true;
         } else if (c.kind === "close") closeTab(st, c.server, c.index);
-        else step(st, c);
+        else {
+          if (c.server === "browse") {
+            for (const match of out.matchAll(/"tab"\s*:\s*(\d+)/g)) st.ownIdx["browse"].add(Number(match[1]));
+          }
+          step(st, c);
+        }
       }
     }
   }

@@ -224,18 +224,30 @@ test the login form with sample credentials #noreview
 
 ---
 
-### 🌐 Browser Remote Control
+### 🌐 Browser Remote Control & Extension Setup
 
-OpenCode Zenith supports two browser operational modes:
+OpenCode Zenith integrates natively with the official **OpenCode Browse** extension and local relay (`http://127.0.0.1:19988`):
 
 1. **Desktop Remote Control (Real User Window via OpenCode Browse)**:
    ```text
    open news.ycombinator.com in my browser
    remote control brave to search youtube for miku dayo and play the first result #noreview
    ```
-   *Uses the official OpenCode Browse extension and local relay to drive your active desktop browser, preserving logins and tab groups.*
+   *Drives your real, active desktop browser with saved logins, cookies, and tab grouping without port conflicts or browser restarts.*
 
-2. **Autonomous Background Browsing & Search**:
+2. **Browser Extension Setup (Chrome, Brave, Edge, Opera, Arc)**:
+   * **Chrome Web Store Extension**: [OpenCode Browse](https://chromewebstore.google.com/detail/mfnicocicmmlkpjnaffgihfjhdgjkdjg)
+   * **Edge Users**: Click *"Allow extensions from other stores"* &rarr; click *"Add to Edge"*.
+   * **Brave / Opera / Arc**: 1-click install directly from the Chrome Web Store.
+   * **Firefox**: Firefox does not support Chromium extensions; keep Chrome, Brave, or Edge installed on your machine for browser tasks.
+
+3. **Recommended Extension Settings**:
+   * Right-click the Browse extension icon in your browser toolbar &rarr; **Options**:
+     * **Collapse agent groups**: Change from *"Automatically"* to **`Never`**. *(Chromium default auto-collapses inactive groups into a small colored dot, making opened tabs seem missing; setting it to `Never` keeps tab titles permanently visible).*
+     * **Where agents open their tabs**: **`Your window`** (shared within an agent tab group) or **`Own window`** (opens in a dedicated window).
+     * **Close idle tabs after**: Set to `Never` (or your preferred idle retention).
+
+4. **Autonomous Background Browsing & Search**:
    ```text
    search the web to find solutions for this docker build error
    ```

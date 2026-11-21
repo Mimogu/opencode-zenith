@@ -38,7 +38,7 @@ has_cmd() {
 mkdir -p "${HOME}/.local/bin" "${HOME}/.npm-global/bin"
 export PATH="${HOME}/.local/bin:${HOME}/.npm-global/bin:${HOME}/.bun/bin:${PATH}"
 
-for profile in "${HOME}/.bashrc" "${HOME}/.profile"; do
+for profile in "${HOME}/.bashrc" "${HOME}/.profile" "${HOME}/.zshrc"; do
   if [ -f "$profile" ] && ! grep -q "\.local/bin" "$profile" 2>/dev/null; then
     echo 'export PATH="${HOME}/.local/bin:${HOME}/.npm-global/bin:${HOME}/.bun/bin:${PATH}"' >> "$profile"
   fi
@@ -416,6 +416,12 @@ echo ""
 echo "3. Activation:"
 echo "   Once installed, click the OpenCode Browse icon in your browser toolbar"
 echo "   once to connect it to OpenCode."
+echo ""
+echo "4. Recommended Extension Settings:"
+echo "   • Right-click the Browse extension icon -> Options:"
+echo "     - Set 'Collapse agent groups' to 'Never' to keep tabs expanded and visible"
+echo "       in your tab strip (otherwise Chromium folds them into a collapsed dot)."
+echo "     - 'Where agents open their tabs': 'Your window' (shared) or 'Own window'."
 echo "=========================================================================="
 
 if [ -t 0 ] && [ -n "${DISPLAY:-${WAYLAND_DISPLAY:-}}" ] && has_cmd xdg-open; then

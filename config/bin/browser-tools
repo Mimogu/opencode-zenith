@@ -22,10 +22,10 @@ import time
 
 CFG = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 OUT = os.path.join(CFG, "state", "browser-tools.json")
-OWN_BROWSERS = ("my-browser", "my-firefox")  # the user's real browser, with their tabs and logins
-BROWSER_SERVERS = ("playwright", "browser-profile", "my-browser", "my-firefox", "chrome-devtools", "camofox")
+OWN_BROWSERS = ("browse", "my-browser", "my-firefox")  # the user's real browser, with their tabs and logins
+BROWSER_SERVERS = ("browse", "playwright", "browser-profile", "my-browser", "my-firefox", "chrome-devtools", "camofox")
 # the tools a browser task needs; the rest (profiling, extensions, network…) stays out of the sheet
-CORE = ("navigate", "new_page", "tabs", "list_pages", "select_page", "close", "snapshot", "click", "hover",
+CORE = ("execute", "status", "navigate", "new_page", "tabs", "list_pages", "select_page", "close", "snapshot", "click", "hover",
         "fill", "type", "press", "select_option", "evaluate", "run_code", "screenshot", "get_page_text",
         "wait", "handle_dialog", "accept_dialog", "dismiss_dialog", "file_upload", "upload", "drag", "back",
         "go_back", "navigate_back", "find", "get_text", "scroll", "create_tab", "open")
@@ -129,6 +129,21 @@ def one_call_example(server, tools):
     result" by doing one action per step; the same task is one script: open, let the page settle, read.
     No example (empty string) when one cannot be built from the schema alone: a wrong example costs more
     than none (2026-11-18 review: chrome-devtools needs a pageId the script cannot know)."""
+    url = "https://www.youtube.com/results?search_query=lord+of+the+mysteries"
+    if server == "browse":
+        return f"""One call does a whole open-and-read task with Playwright-style page control (adapt the URL and selector):
+const s = tools["browse"];
+const res = await s.execute({{
+  code: `
+await page.goto("{url}");
+await snapshot();
+return await page.evaluate(() => {{
+  const items = [...document.querySelectorAll('a#video-title')].slice(0, 3).map(a => ({{ title: a.textContent.trim(), url: a.href }}));
+  return {{ found: items.length, items }};
+}});
+`
+}});
+return res;"""
     props = lambda t: ((t.get("inputSchema") or {}).get("properties") or {})
     req = lambda t: set((t.get("inputSchema") or {}).get("required") or [])
     ev = next((t for t in tools if "evaluate" in t["name"] and "privileged" not in t["name"]), None)
@@ -144,9 +159,6 @@ def one_call_example(server, tools):
     own = server in OWN_BROWSERS
     url = "https://www.youtube.com/results?search_query=lord+of+the+mysteries"
     # the page function reports how much it found, so "got data" is checked on that count only
-    body = "{ const items = [...document.querySelectorAll('a#video-title')].slice(0, 3).map(a => ({ title: a.textContent.trim(), url: a.href })); return JSON.stringify({ found: items.length, items }); }"
-    js = f"() => {body}" if code_field != "expression" else f"(() => {body})()"
-    lines = [f'const s = tools["{server}"];']
     if tab:
         opener = next((t for t in tools if "create_tab" in t["name"] and "url" in props(t)), None)
         closer = next((t for t in tools if "close_tab" in t["name"] and "tabId" in props(t)), None)
@@ -204,8 +216,18 @@ def sheet(server, tools):
 
 
 def servers():
-    cfg = json.load(open(os.path.join(CFG, "opencode.json")))
-    return {k: v for k, v in (cfg.get("mcp") or {}).items() if k in BROWSER_SERVERS and v.get("type") == "local" and v.get("enabled", True)}
+    cfg_path = os.path.join(CFG, "opencode.json")
+    if not os.path.exists(cfg_path):
+        cfg_path = os.path.join(CFG, "opencode.json.template")
+    if not os.path.exists(cfg_path):
+        cfg_path = os.path.expanduser("~/.config/opencode/opencode.json")
+    if not os.path.exists(cfg_path):
+        return {}
+    cfg = json.load(open(cfg_path))
+    mcp = cfg.get("mcp") or {}
+    if "servers" in mcp:
+        mcp = mcp["servers"]
+    return {k: v for k, v in mcp.items() if k in BROWSER_SERVERS and v.get("type") == "local" and v.get("enabled", True)}
 
 
 def main(argv):

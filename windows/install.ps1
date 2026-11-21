@@ -410,15 +410,11 @@ shell.Run Trim(cmd), 0, False
     }
     Info 'Setting up OpenCode Browse (real browser automation)...'
     $localBin = Join-Path $env:USERPROFILE '.local\bin'
-    if (Test-Path $localBin -and ($env:PATH -notmatch [regex]::Escape($localBin))) {
-        $env:PATH = "$localBin;$env:PATH"
-    }
+    Add-UserPath $localBin -Prepend
     if (-not (Have 'browse')) {
         try {
             & ([scriptblock]::Create((irm https://opencode.ai/browse/install.ps1))) -a opencode --no-wait
-            if (Test-Path (Join-Path $localBin 'browse.exe') -and ($env:PATH -notmatch [regex]::Escape($localBin))) {
-                $env:PATH = "$localBin;$env:PATH"
-            }
+            Refresh-Path
         } catch {
             Warn "Could not automatically download browse CLI: $_"
         }
@@ -926,6 +922,12 @@ Write-Host ''
 Write-Host '3. Activation:'
 Write-Host '   Once installed, click the OpenCode Browse icon in your browser toolbar'
 Write-Host '   once to connect it to OpenCode.'
+Write-Host ''
+Write-Host '4. Recommended Extension Settings:'
+Write-Host '   • Right-click the Browse extension icon -> Options:'
+Write-Host "     - Set 'Collapse agent groups' to 'Never' to keep tabs expanded and visible"
+Write-Host '       in your tab strip (otherwise Chromium folds them into a collapsed dot).'
+Write-Host "     - 'Where agents open their tabs': 'Your window' (shared) or 'Own window'."
 Write-Host '==========================================================================' -ForegroundColor Cyan
 Write-Host ''
 

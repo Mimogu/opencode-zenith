@@ -26,6 +26,12 @@ This gives the agent:
    - **Opera / Vivaldi / Arc**: Direct Chrome Web Store support.
    - **Extension URL**: `https://chromewebstore.google.com/detail/mfnicocicmmlkpjnaffgihfjhdgjkdjg`
    - If not connected, prompt the user to install the extension and click the extension icon once.
+3. **Recommended Extension Settings**:
+   Right-click the Browse extension icon in your browser -> **Options**:
+   - **Collapse agent groups**: Set to **`Never`** (default in Chromium is "Automatically", which folds inactive agent groups into a small colored dot so tabs may appear hidden).
+   - **Where agents open their tabs**: **`Your window`** (in your current window in a labeled tab group) or **`Own window`** (separate browser window).
+   - **Close idle tabs after**: Set to `Never` (or your preferred idle cleanup timeout).
+   - **Human-like input**: Enabled (curved mouse movement and natural typing pacing).
 
 ---
 

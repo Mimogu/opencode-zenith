@@ -79,7 +79,23 @@ test("browse MCP: browse.navigate without tab opens a new tab and closing its re
   expect(decide(run(`await tools.browse.tabs({ action: "close", tab: 1545729747 })`), { state: st })).toBeNull();
 });
 
-test("user saying 'close the tab' lifts tab guard close", () => {
+test("user saying 'close the tab' or 'close all the tabs you opened' lifts tab guard close", () => {
   const st = fold(null, [user("close the tab")]);
   expect(decide(run(`await tools.browse.tabs({ action: "close", tab: 999 })`), { state: st })).toBeNull();
+  const st2 = fold(null, [user("close all the tabs you opened")]);
+  expect(decide(run(`await tools.browse.tabs({ action: "close", tab: 999 })`), { state: st2 })).toBeNull();
+});
+
+test("browse batch navigate tracks all tab IDs and ignores held logs", () => {
+  const batchOutput = '{"n":{"tab":1545729749},"k":{"tab":1545729751},"m":{"tab":1545729750}}';
+  const st = fold(null, [asst(tool(`await Promise.all([tools.browse.navigate({ url: "https://a.com" }), tools.browse.navigate({ url: "https://b.com" })])`, batchOutput))]);
+  expect(st.ownIdx["browse"].has(1545729749)).toBe(true);
+  expect(st.ownIdx["browse"].has(1545729751)).toBe(true);
+  expect(st.ownIdx["browse"].has(1545729750)).toBe(true);
+  expect(decide(run(`await tools.browse.tabs({ action: "close", tab: 1545729749 })`), { state: st })).toBeNull();
+
+  // A held close attempt with Logs: does not remove the tab from ownIdx
+  const heldOutput = "Logs:\n[harness tab guard (harness, not the user)] Nothing ran";
+  const stAfterHeld = fold(st, [asst(tool(`await tools.browse.tabs({ action: "close", tab: 1545729749 })`, heldOutput))]);
+  expect(stAfterHeld.ownIdx["browse"].has(1545729749)).toBe(true);
 });
