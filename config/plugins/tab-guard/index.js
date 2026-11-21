@@ -20,7 +20,7 @@ function log(msg) { try { fs.appendFileSync(LOG, `[${new Date().toISOString()}] 
 const CALL = /tools\s*(?:\[\s*["'`](my-browser|my-firefox|browse)["'`]\s*\]|\.(my_browser|my_firefox|browse))\s*\.\s*(\w+)\s*\(/g;
 // the user asking for work in their current tab lifts the guard for that turn; a negation near it does not
 // ("don't touch my tab", "keep this tab as is"); "my tab"/"open tab" alone are too ambiguous to count
-export const THIS_TAB = /\b(in|on|use|using|with)\s+(this|the current|my current|the same|this same)\s+(browser\s+)?tab\b|في (التبويب|التاب) (ده|هذا|الحالي)|(نفس|هذا) (التبويب|التاب)/i;
+export const THIS_TAB = /\b(in|on|use|using|with)\s+(this|the current|my current|the same|this same)\s+(browser\s+)?tab\b|في (التبويب|التاب) (ده|هذا|الحالي)|(نفس|هذا) (التبويب|التاب)|\bclose (the|this|that) tab\b/i;
 const NOT_THIS_TAB = /\b(don'?t|do not|never|not|without|leave|keep|avoid)\b[^.!?\n]{0,40}\b(tab|tabs)\b|متلمسش|لا تلمس|سيب/i;
 export const asksThisTab = (text) => THIS_TAB.test(String(text || "")) && !NOT_THIS_TAB.test(String(text || ""));
 /** The argument text of a call starting at `i` (just after "("): a balanced {...} literal, or "" */
@@ -68,8 +68,11 @@ export function classify(server, name, args = "") {
       if (action === "close") return { kind: "close", index: num(a, "tab") };
       return { kind: "read" };
     }
-    if (/^(navigate)$/.test(name)) return { kind: "nav", what: name };
-    if (name === "close") return { kind: "close", index: null };
+    if (/^(navigate)$/.test(name)) {
+      if (!/\btab\s*:/.test(a)) return { kind: "new" };
+      return { kind: "nav", what: name };
+    }
+    if (name === "close") return { kind: "close", index: num(a, "tab") };
     return { kind: "read" };
   }
   if (name === "new_page") return { kind: "new" };
@@ -129,8 +132,15 @@ export function fold(state, messages) {
       if (/^\s*(\[harness tab guard|\[harness approval gate)/.test(out)) continue; // held: nothing ran
       for (const c of calls) {
         if (c.kind === "new") {
-          // the index the new tab got: Firefox "new page [2] →", Playwright "- 3: (current) [..]"
-          const idx = c.server === "my-firefox" ? (out.match(/new page \[(\d+)\]/) || [])[1] : [...out.matchAll(/-\s*(\d+):\s*\(current\)/g)].at(-1)?.[1];
+          // the index the new tab got: Firefox "new page [2] →", Playwright "- 3: (current) [..]", browse '{"tab":1545729747}'
+          let idx;
+          if (c.server === "my-firefox") {
+            idx = (out.match(/new page \[(\d+)\]/) || [])[1];
+          } else if (c.server === "browse") {
+            idx = (out.match(/"tab"\s*:\s*(\d+)/) || out.match(/tab\s*:\s*(\d+)/) || out.match(/"id"\s*:\s*"?(\d+)"?/) || [])[1];
+          } else {
+            idx = [...out.matchAll(/-\s*(\d+):\s*\(current\)/g)].at(-1)?.[1];
+          }
           if (idx !== undefined) st.ownIdx[c.server].add(Number(idx));
           st.onOwn[c.server] = true;
         } else if (c.kind === "close") closeTab(st, c.server, c.index);

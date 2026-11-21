@@ -72,3 +72,14 @@ test("after closing its own tab by index the agent is no longer on its own tab",
   const st2 = fold(st, [asst(tool(`await tools["my-browser"].browser_tabs({ action: "close", index: 1 })`, "- 0: (current) [Mostaql](https://mostaql.com)"))]);
   expect(decide(run(`await tools["my-browser"].browser_navigate({ url: "https://x.com" })`), { state: st2 })).not.toBeNull();
 });
+
+test("browse MCP: browse.navigate without tab opens a new tab and closing its returned tab ID runs", () => {
+  expect(decide(run(`await tools.browse.navigate({ url: "https://news.ycombinator.com" })`), { state: null })).toBeNull();
+  const st = fold(null, [asst(tool(`await tools.browse.tabs({ action: "new", url: "https://news.ycombinator.com" })`, '{"tab":1545729747,"url":"https://news.ycombinator.com/","title":"Hacker News"}'))]);
+  expect(decide(run(`await tools.browse.tabs({ action: "close", tab: 1545729747 })`), { state: st })).toBeNull();
+});
+
+test("user saying 'close the tab' lifts tab guard close", () => {
+  const st = fold(null, [user("close the tab")]);
+  expect(decide(run(`await tools.browse.tabs({ action: "close", tab: 999 })`), { state: st })).toBeNull();
+});
