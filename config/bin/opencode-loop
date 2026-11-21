@@ -28,11 +28,11 @@ LOG_FILE = STATE_DIR / "loop.log"
 
 
 def parse_interval(val: str) -> int:
-    m = re.match(r"^(\d+)\s*(s|m|h|d)?$", val.strip().lower())
+    m = re.match(r"^(\d+)\s*(s|m|h|d|w)?$", val.strip().lower())
     if not m:
         raise ValueError(f"Invalid interval: '{val}'. Expected e.g. 30s, 5m, 30m, 1h")
     num, unit = int(m.group(1)), m.group(2) or "s"
-    multipliers = {"s": 1, "m": 60, "h": 3600, "d": 86400}
+    multipliers = {"s": 1, "m": 60, "h": 3600, "d": 86400, "w": 604800}
     return max(5, num * multipliers[unit])
 
 
