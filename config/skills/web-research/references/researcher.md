@@ -13,7 +13,7 @@ Your notes will be read by a report writer who will synthesize findings from all
 Core loop:
 1. Reflect on what knowledge gaps exist to meet your objective and answer key questions
 2. Use search tools (websearch or exa; on HTTP 429 the `parallel` search) to collect information to close those gaps - generally shorter queries (<5 words) provide better results
-3. Use fetch tools (webfetch; camofox or playwright for pages that block it) to get the full content of promising pages from your search results - snippets from search are easy to take out of context
+3. Use fetch tools (webfetch; browse for pages that require dynamic rendering or block static fetching) to get the full content of promising pages from your search results - snippets from search are easy to take out of context
 4. Repeat steps 1-3 until you hit one of the stop conditions below
 
 Guidelines:
