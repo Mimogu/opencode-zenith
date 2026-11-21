@@ -409,9 +409,16 @@ shell.Run Trim(cmd), 0, False
         [IO.File]::WriteAllText($targetVbs, $vbsCode, (New-Object System.Text.UTF8Encoding $false))
     }
     Info 'Setting up OpenCode Browse (real browser automation)...'
+    $localBin = Join-Path $env:USERPROFILE '.local\bin'
+    if (Test-Path $localBin -and ($env:PATH -notmatch [regex]::Escape($localBin))) {
+        $env:PATH = "$localBin;$env:PATH"
+    }
     if (-not (Have 'browse')) {
         try {
             & ([scriptblock]::Create((irm https://opencode.ai/browse/install.ps1))) -a opencode --no-wait
+            if (Test-Path (Join-Path $localBin 'browse.exe') -and ($env:PATH -notmatch [regex]::Escape($localBin))) {
+                $env:PATH = "$localBin;$env:PATH"
+            }
         } catch {
             Warn "Could not automatically download browse CLI: $_"
         }

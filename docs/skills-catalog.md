@@ -78,14 +78,14 @@ When you want OpenCode to visually interact with your installed desktop browser 
   ```
 * **How It Works**: OpenCode dynamically boots the browser with its automation port (`browser-ctl start <browser>`), controls real tabs via MCP tools, and cleanly closes the desktop app when finished (`browser-ctl stop <browser>`).
 
-#### B. Autonomous Internet Browsing (Background Agent Mode)
-When you want OpenCode to quietly browse documentation, search for bug fixes, or scrape web information in the background without opening windows on your desktop:
-* **Trigger Prompt**: Write *"search the web..."* or *"browse the internet in the background..."*:
+#### B. Autonomous Internet Browsing & Search (Background Mode)
+When you want OpenCode to quietly browse documentation, search for bug fixes, or gather web information in the background without opening windows on your desktop:
+* **Trigger Prompt**: Write *"search the web..."* or *"find docs on..."*:
   ```text
-  browse the web to find how to configure systemd user services on Arch Linux
+  search the web to find how to configure systemd user services on Arch Linux
   search the documentation for Bun v1.4 test runner flags
   ```
-* **How It Works**: OpenCode routes these requests to **Camofox** (the local stealth agent browser running on port 9377) or **Exa/Context7** tools, completely leaving your desktop undisturbed.
+* **How It Works**: OpenCode routes these requests to **Exa websearch** or **Context7** tools, completely leaving your desktop undisturbed.
 
 ---
 

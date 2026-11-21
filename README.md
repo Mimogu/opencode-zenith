@@ -228,18 +228,18 @@ test the login form with sample credentials #noreview
 
 OpenCode Zenith supports two browser operational modes:
 
-1. **Desktop Remote Control (Real User Window)**:
+1. **Desktop Remote Control (Real User Window via OpenCode Browse)**:
    ```text
+   open news.ycombinator.com in my browser
    remote control brave to search youtube for miku dayo and play the first result #noreview
-   remote control chrome to open github.com/trending and summarize the top 3 repos #noreview
    ```
-   *Dynamically launches your installed browser with its automation port and cleanly shuts it down when finished.*
+   *Uses the official OpenCode Browse extension and local relay to drive your active desktop browser, preserving logins and tab groups.*
 
-2. **Autonomous Background Browsing (Stealth Agent)**:
+2. **Autonomous Background Browsing & Search**:
    ```text
-   browse the web in the background to find solutions for this docker build error
+   search the web to find solutions for this docker build error
    ```
-   *Uses the local stealth headless Camofox browser (port 9377) without opening any windows on your screen.*
+   *Uses high-speed Exa websearch and Context7 tools in the background without opening windows on your screen.*
 
 ---
 
