@@ -1,4 +1,7 @@
-﻿#Requires -Version 5.1
+if ($PSVersionTable.PSVersion.Major -lt 5 -or ($PSVersionTable.PSVersion.Major -eq 5 -and $PSVersionTable.PSVersion.Minor -lt 1)) {
+    Write-Host "OpenCode Zenith requires Windows PowerShell 5.1 or higher." -ForegroundColor Red
+    return
+}
 <#
   OpenCode setup for Windows 10/11.
 
@@ -14,10 +17,18 @@
     -SkipPrograms   do not install missing programs (only copy and configure)
     -NoOmniRoute    skip the OmniRoute part
 #>
-param(
-    [switch]$SkipPrograms,
-    [switch]$NoOmniRoute
-)
+$SkipPrograms = $false
+$NoOmniRoute = $false
+
+if ($env:ZENITH_SKIP_PROGRAMS -eq '1' -or $env:SKIP_PROGRAMS -eq '1') { $SkipPrograms = $true }
+if ($env:ZENITH_NO_OMNIROUTE -eq '1' -or $env:NO_OMNIROUTE -eq '1') { $NoOmniRoute = $true }
+
+if ($args) {
+    foreach ($arg in $args) {
+        if ($arg -match '^[-/]?SkipPrograms$') { $SkipPrograms = $true }
+        if ($arg -match '^[-/]?NoOmniRoute$') { $NoOmniRoute = $true }
+    }
+}
 
 try { Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force -ErrorAction SilentlyContinue } catch {}
 

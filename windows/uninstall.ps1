@@ -1,4 +1,7 @@
-#Requires -Version 5.1
+if ($PSVersionTable.PSVersion.Major -lt 5 -or ($PSVersionTable.PSVersion.Major -eq 5 -and $PSVersionTable.PSVersion.Minor -lt 1)) {
+    Write-Host "OpenCode Zenith requires Windows PowerShell 5.1 or higher." -ForegroundColor Red
+    return
+}
 <#
   Removes what install.ps1 set up: the login launcher, the daily benchmark task,
   the running sentinel/OmniRoute processes, and (after confirmation) the OpenCode
