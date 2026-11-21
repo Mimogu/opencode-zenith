@@ -73,48 +73,14 @@
         "enabled": true,
         "timeout": 30000
       },
-      "my-browser": {
+      "browse": {
         "type": "local",
         "command": [
-          "node",
-          "{{CONFIG_DIR}}/mcp-servers/node_modules/@playwright/mcp/cli.js",
-          "--cdp-endpoint",
-          "http://127.0.0.1:9222",
-          "--cdp-timeout",
-          "15000",
-          "--caps",
-          "vision,pdf",
-          "--image-responses",
-          "omit"
+          "browse",
+          "mcp"
         ],
         "enabled": true,
         "timeout": 60000
-      },
-      "my-firefox": {
-        "type": "local",
-        "command": [
-          "node",
-          "{{CONFIG_DIR}}/mcp-servers/node_modules/@mozilla/firefox-devtools-mcp/dist/index.js",
-          "--connect-existing",
-          "--marionette-port",
-          "2828",
-          "--idle-timeout",
-          "600"
-        ],
-        "enabled": true,
-        "timeout": 60000
-      },
-      "camofox": {
-        "type": "local",
-        "command": [
-          "node",
-          "{{CONFIG_DIR}}/mcp-servers/camofox/server.mjs"
-        ],
-        "environment": {
-          "CAMOFOX_URL": "http://127.0.0.1:9377"
-        },
-        "enabled": true,
-        "timeout": 120000
       },
       "memory": {
         "type": "local",

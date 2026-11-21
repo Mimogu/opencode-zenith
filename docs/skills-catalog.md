@@ -1288,7 +1288,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 | If your goal is... | Choose this skill | Copy-Paste Example Prompt |
 | :--- | :--- | :--- |
 | Operating the Linux desktop (capturing screen, clicking buttons, moving windows)? | [`desktop-control`](#skill-desktop-control) | `@desktop-control inspect the active desktop window` |
-| Controlling a headless/visible Chromium browser with Playwright? | [`browser-automation`](#skill-browser-automation) | `@browser-automation test our staging login flow` |
+| Controlling a real desktop browser (Chrome/Brave/Edge) with OpenCode Browse? | [`browser-automation`](#skill-browser-automation) | `@browser-automation test our staging login flow` |
 | Mapping an entire codebase into a searchable graph of functions and calls? | [`graphify`](#skill-graphify) | `@graphify build a knowledge graph of this repo` |
 | Building a custom Model Context Protocol (MCP) server for AI tools? | [`mcp-builder`](#skill-mcp-builder) | `@mcp-builder build a Python MCP server` |
 | Importing saved chat memories from ChatGPT, Claude, or Gemini into local memory? | [`memory-import`](#skill-memory-import) | `@memory-import import memories from memories.json` |
@@ -1300,17 +1300,19 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 ### Detailed Breakdown of Skills in System, Desktop, Browser & Tooling
 
 <a id="skill-browser-automation"></a>
-#### `browser-automation` — Browser Driving & Automation (Playwright/Chrome)
+#### `browser-automation` — Real Browser Driving & Automation (OpenCode Browse)
 - **Source Folder:** [browser-automation](../config/skills/browser-automation)
-- **Upstream Repository:** [microsoft/playwright](https://github.com/microsoft/playwright)
-- **What It Does:** Controls a headless or visible Chromium browser using Playwright: navigates web pages, fills forms, clicks elements, and takes full-page screenshots.
-- **When to Use:** When automating web tasks, scraping dynamic web pages, or testing web application interactions.
+- **Upstream Repository:** [anomalyco/browse](https://github.com/anomalyco/browse)
+- **What It Does:** Drives the user's real desktop browser (Chrome, Brave, Edge, Opera, Arc) via the official OpenCode Browse extension and MCP relay: navigates pages, reads compact accessibility snapshots with element refs, clicks, fills forms, executes Playwright scripts, and hands off CAPTCHAs/2FA.
+- **When to Use:** When automating web workflows, testing sites with logged-in sessions, reading web content with interactive refs, or completing multi-step forms.
 - **Most Commonly Used Commands:**
   ```text
-  navigate <url>                           # Open a URL in the browser
-  screenshot                               # Capture high-resolution screenshot of active page
-  click <selector>                         # Click on a button, link, or DOM element
-  fill <selector> "<value>"                # Type text into an input field or textarea
+  navigate <url>                           # Open a URL in a connected browser tab
+  snapshot                                 # Return compact text outline with element refs (e1, e2...)
+  click <ref>                              # Click element matching ref (e.g. e1)
+  fill <ref> "<value>"                     # Fill text input or textarea
+  handoff                                  # Prompt user to solve CAPTCHA/2FA and resume
+  execute "<js>"                           # Execute Playwright-style script on page
   ```
 - **Example Prompt:**
   ```text
@@ -1449,7 +1451,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 | [`benchmark-checklist`](#skill-benchmark-checklist) | [Testing, Verification & Debugging](#testing-verification-debugging) | Vets performance measurements against systematic criteria: warm-up runs, system limits, measurement noise, and statistical significance.. |
 | [`blast-radius`](#skill-blast-radius) | [Code Review, Auditing & Security](#code-review-auditing-security) | Calculates downstream dependencies and side effects of a code change to reveal what elsewhere could break before you ship.. |
 | [`brainstorming`](#skill-brainstorming) | [Autonomous Multi-Agent & Orchestration](#autonomous-multi-agent-orchestration) | Facilitates structured brainstorming: explores multiple technical approaches, weighs pros and cons, and clarifies requirements before deciding.. |
-| [`browser-automation`](#skill-browser-automation) | [System, Desktop, Browser & Tooling](#system-desktop-browser-tooling) | Controls a headless or visible Chromium browser using Playwright: navigates web pages, fills forms, clicks elements, and takes full-page screenshots.. |
+| [`browser-automation`](#skill-browser-automation) | [System, Desktop, Browser & Tooling](#system-desktop-browser-tooling) | Drives the user's real desktop browser via the OpenCode Browse extension with saved logins and CAPTCHA hand-off.. |
 | [`canvas-design`](#skill-canvas-design) | [Document, Office & Content Creation](#document-office-content-creation) | Generates visual artwork, posters, infographics, and book covers rendered into high-resolution PNG or PDF files.. |
 | [`chisle`](#skill-chisle) | [Software Architecture, Coding & Refactoring](#software-architecture-coding-refactoring) | A hyper-efficient, minimal-overhead development and audit mode designed to execute changes cleanly with the least tokens possible.. |
 | [`code-review`](#skill-code-review) | [Code Review, Auditing & Security](#code-review-auditing-security) | Conducts thorough code reviews examining correctness, security vulnerabilities, edge cases, maintainability, and code style.. |

@@ -149,13 +149,12 @@ Skills and guides written for Claude Code name its tools: `AskUserQuestion` is y
 ## Browser Routing Rules (100% Dynamic)
 
 - **Desktop Remote Control (Any Installed Browser)**: When the user asks to control or drive their desktop browser (e.g., "remote control Brave", "open in Chrome", "use my browser"):
-  1. Any browser installed on Linux (Brave, Chrome, Chromium, Firefox, Helium, etc.) is supported dynamically via `browser-ctl`.
-  2. Start the named browser with its automation port via bash: `browser-ctl start <browser-id>` (e.g., `browser-ctl start brave`, `browser-ctl start chrome`, `browser-ctl start firefox`). If the user did not specify which browser, check `browser-ctl list` or ask them.
-  3. Use the `my-browser` (for Chromium-based browsers: Brave, Chrome, Chromium, Helium) or `my-firefox` (for Gecko/Firefox) MCP tools to interact with real tabs.
-  4. **Media playback duration**: When asked to play video/audio for a duration $N$, do not rely on fixed wall-clock sleep alone (buffering and autoplay start early, causing overshoot). Set a programmatic pause via JS: `document.querySelector('video')?.pause()` after $N$ seconds, or poll until `video.currentTime >= target`.
-  5. **Clean browser exit**: To close a desktop browser when finished, run `browser-ctl stop <browser-id>` via bash. Closing only the active tab or calling `browser_close()` disconnects CDP but leaves the desktop GUI window running.
-- **Autonomous Internet Browsing / Fix Finding (Agent Mode)**: When the user asks to browse the web, search for fixes, check documentation, or inspect sites in the background:
-  Use `camofox` (the local stealth agent browser service on port 9377) or `web-research`. Never launch or disturb the user's personal desktop browser for background scraping.
+  1. Primary method: Use the official `browse` MCP tools (`tools.browse.navigate`, `tools.browse.snapshot`, `tools.browse.click`, `tools.browse.handoff`, `tools.browse.execute`). It connects directly to the user's active browser via the OpenCode Browse extension on relay `127.0.0.1:19988` with zero port conflicts and preserves existing logins.
+  2. Legacy protocol fallback: Browsers can also be started with dedicated automation ports via `browser-ctl start <browser-id>` and driven via `my-browser` or `my-firefox`.
+  3. **Media playback duration**: When asked to play video/audio for a duration $N$, do not rely on fixed wall-clock sleep alone (buffering and autoplay start early, causing overshoot). Set a programmatic pause via JS: `document.querySelector('video')?.pause()` after $N$ seconds, or poll until `video.currentTime >= target`.
+  4. **Clean browser exit**: To close a desktop browser when finished, run `tools.browse.tabs({ action: "close", tab: id })` or `browser-ctl stop <browser-id>`. Closing only the active tab leaves the desktop window intact.
+- **Autonomous Internet Browsing / Fix Finding (Agent Mode)**: When the user asks to browse the web, search for fixes, check documentation, or inspect sites:
+  Use `browse`, `websearch`, or `web-research`. Never disturb the user's personal tabs for background scraping; always open new tabs.
 - **Review Bypass (`#noreview`)**: When the user includes `#noreview` in their prompt, verify-claims and outcome review are completely bypassed for that turn. Useful for quick interactive checks, media playback, and ephemeral testing.
 
 ## Memory

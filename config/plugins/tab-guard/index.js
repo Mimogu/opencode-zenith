@@ -17,7 +17,7 @@ const LOG = path.join(os.homedir(), ".config/opencode/context-engine.log");
 export const TAG = "[harness tab guard";
 function log(msg) { try { fs.appendFileSync(LOG, `[${new Date().toISOString()}] tab-guard ${msg}\n`); } catch {} }
 
-const CALL = /tools\s*(?:\[\s*["'`](my-browser|my-firefox)["'`]\s*\]|\.(my_browser|my_firefox))\s*\.\s*(\w+)\s*\(/g;
+const CALL = /tools\s*(?:\[\s*["'`](my-browser|my-firefox|browse)["'`]\s*\]|\.(my_browser|my_firefox|browse))\s*\.\s*(\w+)\s*\(/g;
 // the user asking for work in their current tab lifts the guard for that turn; a negation near it does not
 // ("don't touch my tab", "keep this tab as is"); "my tab"/"open tab" alone are too ambiguous to count
 export const THIS_TAB = /\b(in|on|use|using|with)\s+(this|the current|my current|the same|this same)\s+(browser\s+)?tab\b|في (التبويب|التاب) (ده|هذا|الحالي)|(نفس|هذا) (التبويب|التاب)/i;
@@ -60,6 +60,18 @@ export function classify(server, name, args = "") {
     if (name === "browser_close") return { kind: "close", index: null };
     return { kind: "read" };
   }
+  if (server === "browse") {
+    if (name === "tabs") {
+      const action = (a.match(/action\s*:\s*["'`](\w+)/) || [])[1] || "list";
+      if (action === "new") return { kind: "new" };
+      if (action === "select") return { kind: "select", index: num(a, "tab") };
+      if (action === "close") return { kind: "close", index: num(a, "tab") };
+      return { kind: "read" };
+    }
+    if (/^(navigate)$/.test(name)) return { kind: "nav", what: name };
+    if (name === "close") return { kind: "close", index: null };
+    return { kind: "read" };
+  }
   if (name === "new_page") return { kind: "new" };
   if (name === "select_page") return { kind: "select", index: num(a, "pageIdx") };
   if (name === "close_page") return { kind: "close", index: num(a, "pageIdx") };
@@ -72,13 +84,13 @@ export function callsIn(code) {
   const out = [];
   const src = String(code || "");
   for (const m of src.matchAll(CALL)) {
-    const server = m[1] || (m[2] === "my_browser" ? "my-browser" : "my-firefox");
+    const server = m[1] || (m[2] === "my_browser" ? "my-browser" : (m[2] === "my_firefox" ? "my-firefox" : "browse"));
     out.push({ server, name: m[3], ...classify(server, m[3], argsAt(src, m.index + m[0].length)) });
   }
   return out;
 }
 
-const fresh = () => ({ ownIdx: { "my-browser": new Set(), "my-firefox": new Set() }, onOwn: { "my-browser": false, "my-firefox": false }, thisTab: false });
+const fresh = () => ({ ownIdx: { "my-browser": new Set(), "my-firefox": new Set(), "browse": new Set() }, onOwn: { "my-browser": false, "my-firefox": false, "browse": false }, thisTab: false });
 
 // after any close the browser may show one of the user's tabs: the agent selects its own again (or opens one)
 function closeTab(st, s, index) {
@@ -129,7 +141,7 @@ export function fold(state, messages) {
   return st;
 }
 
-const clone = (st) => ({ ownIdx: { "my-browser": new Set(st.ownIdx["my-browser"]), "my-firefox": new Set(st.ownIdx["my-firefox"]) }, onOwn: { ...st.onOwn }, thisTab: st.thisTab });
+const clone = (st) => ({ ownIdx: { "my-browser": new Set(st.ownIdx["my-browser"] || []), "my-firefox": new Set(st.ownIdx["my-firefox"] || []), "browse": new Set(st.ownIdx["browse"] || []) }, onOwn: { ...st.onOwn }, thisTab: st.thisTab });
 
 /** null = let it run, else the reason. `state` = fold() of the session (tests pass it). */
 export function decide(e, { state } = {}) {
@@ -143,7 +155,11 @@ export function decide(e, { state } = {}) {
 }
 
 export function heldMessage(d) {
-  const open = d.server === "my-firefox" ? `tools["my-firefox"].new_page({ url: "<url>" })` : `tools["my-browser"].browser_tabs({ action: "new" })`;
+  const open = d.server === "my-firefox"
+    ? `tools["my-firefox"].new_page({ url: "<url>" })`
+    : d.server === "browse"
+      ? `tools["browse"].navigate({ url: "<url>" })`
+      : `tools["my-browser"].browser_tabs({ action: "new" })`;
   return `${TAG} (harness, not the user)] Nothing ran: ${d.why}. ${d.server} is the user's own browser with their tabs and logins. Open your own tab first with ${open}, work only there, and close only that tab when done. If the user really wants this done in their current tab, ask them.`;
 }
 

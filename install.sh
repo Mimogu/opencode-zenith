@@ -152,23 +152,15 @@ mkdir -p "$CONFIG_DIR"
 cp -r "${SCRIPT_DIR}/config/"* "$CONFIG_DIR/"
 rm -rf "${CONFIG_DIR}/__pycache__" "${CONFIG_DIR}/tests/__pycache__"
 
-# Install pinned MCP server binaries (playwright-mcp, firefox-devtools-mcp, camofox)
-if [ -f "${CONFIG_DIR}/mcp-servers/package.json" ]; then
-  echo "  [+] Installing browser MCP server binaries..."
-  if has_cmd npm; then
-    (cd "${CONFIG_DIR}/mcp-servers" && (npm ci --silent 2>/dev/null || npm install --silent 2>/dev/null || true))
-    if [ -f "${CONFIG_DIR}/mcp-servers/camofox/package.json" ]; then
-      (cd "${CONFIG_DIR}/mcp-servers/camofox" && (npm ci --silent 2>/dev/null || npm install --silent 2>/dev/null || true))
-    fi
-  elif has_cmd bun; then
-    (cd "${CONFIG_DIR}/mcp-servers" && bun install --silent 2>/dev/null || true)
-    if [ -f "${CONFIG_DIR}/mcp-servers/camofox/package.json" ]; then
-      (cd "${CONFIG_DIR}/mcp-servers/camofox" && bun install --silent 2>/dev/null || true)
-    fi
-  fi
-  if [ -f "${CONFIG_DIR}/mcp-servers/node_modules/@playwright/mcp/cli.js" ] && [ -f "${CONFIG_DIR}/mcp-servers/node_modules/@mozilla/firefox-devtools-mcp/dist/index.js" ]; then
-    echo "  [✓] Browser MCP tools ready (playwright-mcp, firefox-devtools-mcp)."
-  fi
+# Setup OpenCode Browse CLI & MCP (drives real desktop browsers via browser extension)
+echo "  [+] Setting up OpenCode Browse (real browser automation)..."
+if ! has_cmd browse; then
+  curl -fsSL https://opencode.ai/browse/install | bash -s -- -a opencode --no-wait 2>/dev/null || true
+else
+  browse install -a opencode --no-wait 2>/dev/null || true
+fi
+if has_cmd browse; then
+  echo "  [✓] OpenCode Browse CLI ready ($(browse version 2>/dev/null || echo 'installed'))."
 fi
 
 # 3. Process configuration templates
@@ -195,18 +187,18 @@ if 'servers' in mcp:
 if 'graphify' in mcp:
     del mcp['graphify']
 
-# Browser & local MCP checks
-pw_js = '${CONFIG_DIR}/mcp-servers/node_modules/@playwright/mcp/cli.js'
-if not os.path.isfile(pw_js) and 'my-browser' in mcp:
-    mcp['my-browser']['enabled'] = False
+# Remove legacy persistent browser MCP servers (replaced by official browse extension MCP)
+for legacy in ['my-browser', 'my-firefox', 'camofox']:
+    if legacy in mcp:
+        del mcp[legacy]
 
-ff_js = '${CONFIG_DIR}/mcp-servers/node_modules/@mozilla/firefox-devtools-mcp/dist/index.js'
-if not os.path.isfile(ff_js) and 'my-firefox' in mcp:
-    mcp['my-firefox']['enabled'] = False
-
-camo_js = '${CONFIG_DIR}/mcp-servers/camofox/server.mjs'
-if not os.path.isfile(camo_js) and 'camofox' in mcp:
-    mcp['camofox']['enabled'] = False
+if 'browse' not in mcp:
+    mcp['browse'] = {
+        'type': 'local',
+        'command': ['browse', 'mcp'],
+        'enabled': True,
+        'timeout': 60000
+    }
 
 with open(p, 'w', encoding='utf-8') as f:
     json.dump(data, f, indent=2)
@@ -398,6 +390,39 @@ fi
 
 if [ "$CLEANUP_TEMP" = true ]; then
   rm -rf "$SCRIPT_DIR"
+fi
+
+echo ""
+echo "=========================================================================="
+echo "               🌐 OpenCode Browser Extension Setup Guide                 "
+echo "=========================================================================="
+echo "OpenCode uses the official 'OpenCode Browse' extension to drive your real"
+echo "browser without port conflicts or losing your login sessions."
+echo ""
+echo "1. Install the Extension (Chrome Web Store):"
+echo "   https://chromewebstore.google.com/detail/mfnicocicmmlkpjnaffgihfjhdgjkdjg"
+echo ""
+echo "2. Browser Compatibility:"
+echo "   • Google Chrome & Chromium : Click 'Add to Chrome'"
+echo "   • Brave                    : Click 'Add to Brave'"
+echo "   • Microsoft Edge           : Click 'Allow extensions from other stores',"
+echo "                                then click 'Add to Edge'"
+echo "   • Opera / Vivaldi / Arc    : Installs directly from Chrome Web Store"
+echo ""
+echo "   * Note for Firefox users: Firefox does not support Chromium extensions."
+echo "     Keep a Chromium-based browser (Chrome, Brave, Edge) installed on your"
+echo "     system for OpenCode browser automation tasks."
+echo ""
+echo "3. Activation:"
+echo "   Once installed, click the OpenCode Browse icon in your browser toolbar"
+echo "   once to connect it to OpenCode."
+echo "=========================================================================="
+
+if [ -t 0 ] && [ -n "${DISPLAY:-${WAYLAND_DISPLAY:-}}" ] && has_cmd xdg-open; then
+  read -r -p "Open the extension link in your default browser now? [y/N]: " open_ext || true
+  case "$open_ext" in
+    [yY]*) xdg-open "https://chromewebstore.google.com/detail/mfnicocicmmlkpjnaffgihfjhdgjkdjg" >/dev/null 2>&1 & ;;
+  esac
 fi
 
 echo ""

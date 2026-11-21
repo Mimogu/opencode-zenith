@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 <#
   OpenCode setup for Windows 10/11.
 
@@ -408,41 +408,22 @@ shell.Run Trim(cmd), 0, False
 '@
         [IO.File]::WriteAllText($targetVbs, $vbsCode, (New-Object System.Text.UTF8Encoding $false))
     }
-    $mcpDir = Join-Path $ConfigDir 'mcp-servers'
-    if (Test-Path (Join-Path $mcpDir 'package.json')) {
-        Info 'Installing browser MCP servers (playwright-mcp, firefox-devtools-mcp, camofox)...'
-        Push-Location $mcpDir
+    Info 'Setting up OpenCode Browse (real browser automation)...'
+    if (-not (Have 'browse')) {
         try {
-            if (Have 'npm') {
-                & npm ci --silent 2>$null
-                if ($LASTEXITCODE -ne 0 -or -not (Test-Path (Join-Path $mcpDir 'node_modules\@playwright\mcp\cli.js'))) {
-                    & npm install --silent 2>$null
-                }
-            } elseif (Have 'bun') {
-                & bun install --silent 2>$null
-            }
-        } catch {} finally { Pop-Location }
-
-        $camoDir = Join-Path $mcpDir 'camofox'
-        if (Test-Path (Join-Path $camoDir 'package.json')) {
-            Push-Location $camoDir
-            try {
-                if (Have 'npm') {
-                    & npm ci --silent 2>$null
-                    if ($LASTEXITCODE -ne 0) { & npm install --silent 2>$null }
-                } elseif (Have 'bun') {
-                    & bun install --silent 2>$null
-                }
-            } catch {} finally { Pop-Location }
+            & ([scriptblock]::Create((irm https://opencode.ai/browse/install.ps1))) -a opencode --no-wait
+        } catch {
+            Warn "Could not automatically download browse CLI: $_"
         }
+    } else {
+        try {
+            & browse install -a opencode --no-wait
+        } catch {}
     }
 
     $tpl = Join-Path $ConfigDir 'opencode.json.template'
     if (Test-Path $tpl) {
         $posixConfig = $ConfigDir.Replace('\', '/')
-        $pwMcpJs = (Join-Path $ConfigDir 'mcp-servers\node_modules\@playwright\mcp\cli.js').Replace('\', '/')
-        $ffMcpJs = (Join-Path $ConfigDir 'mcp-servers\node_modules\@mozilla\firefox-devtools-mcp\dist\index.js').Replace('\', '/')
-        $camoJs = (Join-Path $ConfigDir 'mcp-servers\camofox\server.mjs').Replace('\', '/')
         $targetJson = (Join-Path $ConfigDir 'opencode.json').Replace('\', '/')
         $posixTpl = $tpl.Replace('\', '/')
 
@@ -464,13 +445,18 @@ if 'servers' in mcp:
 if 'graphify' in mcp:
     del mcp['graphify']
 
-# Check browser MCP binaries
-if not os.path.isfile(r'$pwMcpJs') and 'my-browser' in mcp:
-    mcp['my-browser']['enabled'] = False
-if not os.path.isfile(r'$ffMcpJs') and 'my-firefox' in mcp:
-    mcp['my-firefox']['enabled'] = False
-if not os.path.isfile(r'$camoJs') and 'camofox' in mcp:
-    mcp['camofox']['enabled'] = False
+# Remove legacy persistent browser MCP servers (replaced by official browse extension MCP)
+for legacy in ['my-browser', 'my-firefox', 'camofox']:
+    if legacy in mcp:
+        del mcp[legacy]
+
+if 'browse' not in mcp:
+    mcp['browse'] = {
+        'type': 'local',
+        'command': ['browse', 'mcp'],
+        'enabled': True,
+        'timeout': 60000
+    }
 
 if os.path.isfile(p):
     try:
@@ -907,6 +893,39 @@ if (Ask-YesNo 'Run a quick model test now? (uses about 3 free messages, takes a 
     Push-Location $ConfigDir
     & $Python model_lab.py --smoke
     Pop-Location
+}
+
+Write-Host ''
+Write-Host '==========================================================================' -ForegroundColor Cyan
+Write-Host '               🌐 OpenCode Browser Extension Setup Guide                 ' -ForegroundColor Cyan
+Write-Host '==========================================================================' -ForegroundColor Cyan
+Write-Host "OpenCode uses the official 'OpenCode Browse' extension to drive your real"
+Write-Host 'browser without port conflicts or losing your login sessions.'
+Write-Host ''
+Write-Host '1. Install the Extension (Chrome Web Store):'
+Write-Host '   https://chromewebstore.google.com/detail/mfnicocicmmlkpjnaffgihfjhdgjkdjg' -ForegroundColor Yellow
+Write-Host ''
+Write-Host '2. Browser Compatibility:'
+Write-Host '   • Google Chrome & Chromium : Click "Add to Chrome"'
+Write-Host '   • Brave                    : Click "Add to Brave"'
+Write-Host '   • Microsoft Edge           : Click "Allow extensions from other stores",'
+Write-Host '                                then click "Add to Edge"'
+Write-Host '   • Opera / Vivaldi / Arc    : Installs directly from Chrome Web Store'
+Write-Host ''
+Write-Host '   * Note for Firefox users: Firefox does not support Chromium extensions.'
+Write-Host '     Keep a Chromium-based browser (Edge, Chrome, Brave) installed for'
+Write-Host '     OpenCode browser automation tasks.'
+Write-Host ''
+Write-Host '3. Activation:'
+Write-Host '   Once installed, click the OpenCode Browse icon in your browser toolbar'
+Write-Host '   once to connect it to OpenCode.'
+Write-Host '==========================================================================' -ForegroundColor Cyan
+Write-Host ''
+
+if ([Environment]::UserInteractive) {
+    if (Ask-YesNo 'Open the extension link in your default browser now?' $true) {
+        Start-Process 'https://chromewebstore.google.com/detail/mfnicocicmmlkpjnaffgihfjhdgjkdjg'
+    }
 }
 
 # ----------------------------------------------------------------- done
