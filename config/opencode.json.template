@@ -2,213 +2,55 @@
   "$schema": "https://opencode.ai/config.json",
   "model": "nvidia/nvidia/nemotron-3.5-super-vl-120b-a12b",
   "small_model": "nvidia/nvidia/nemotron-3.5-super-vl-120b-a12b",
-  "permissions": [
-    {
-      "action": "shell",
-      "resource": "*",
-      "effect": "allow"
+  "permission": {
+    "shell": {
+      "*": "allow",
+      "rm -rf *": "ask",
+      "rm -fr *": "ask",
+      "rm -r *": "ask",
+      "sudo *": "ask",
+      "git push --force*": "ask",
+      "git push -f*": "ask",
+      "git reset --hard*": "ask",
+      "git clean -f*": "ask",
+      "git checkout -- *": "ask",
+      "dd *": "ask",
+      "mkfs*": "ask",
+      "chmod -R *": "ask",
+      "chown -R *": "ask",
+      "systemctl stop *": "ask",
+      "systemctl disable *": "ask",
+      "pacman -R*": "ask",
+      "yay -R*": "ask",
+      "pkill *": "ask",
+      "killall *": "ask",
+      "kill *": "ask",
+      "xargs kill*": "ask",
+      "xargs -r kill*": "ask",
+      "pkill*": "ask",
+      "killall*": "ask",
+      "kill -*": "ask",
+      "*opencode.db*": "ask",
+      "*--break-system-packages*": "ask",
+      "sudo pip*": "ask",
+      "sudo python* -m pip*": "ask"
     },
-    {
-      "action": "shell",
-      "resource": "rm -rf *",
-      "effect": "ask"
+    "read": {
+      "*": "allow",
+      "*opencode.db*": "ask"
     },
-    {
-      "action": "shell",
-      "resource": "rm -fr *",
-      "effect": "ask"
-    },
-    {
-      "action": "shell",
-      "resource": "rm -r *",
-      "effect": "ask"
-    },
-    {
-      "action": "shell",
-      "resource": "sudo *",
-      "effect": "ask"
-    },
-    {
-      "action": "shell",
-      "resource": "git push --force*",
-      "effect": "ask"
-    },
-    {
-      "action": "shell",
-      "resource": "git push -f*",
-      "effect": "ask"
-    },
-    {
-      "action": "shell",
-      "resource": "git reset --hard*",
-      "effect": "ask"
-    },
-    {
-      "action": "shell",
-      "resource": "git clean -f*",
-      "effect": "ask"
-    },
-    {
-      "action": "shell",
-      "resource": "git checkout -- *",
-      "effect": "ask"
-    },
-    {
-      "action": "shell",
-      "resource": "dd *",
-      "effect": "ask"
-    },
-    {
-      "action": "shell",
-      "resource": "mkfs*",
-      "effect": "ask"
-    },
-    {
-      "action": "shell",
-      "resource": "chmod -R *",
-      "effect": "ask"
-    },
-    {
-      "action": "shell",
-      "resource": "chown -R *",
-      "effect": "ask"
-    },
-    {
-      "action": "shell",
-      "resource": "systemctl stop *",
-      "effect": "ask"
-    },
-    {
-      "action": "shell",
-      "resource": "systemctl disable *",
-      "effect": "ask"
-    },
-    {
-      "action": "shell",
-      "resource": "pacman -R*",
-      "effect": "ask"
-    },
-    {
-      "action": "shell",
-      "resource": "yay -R*",
-      "effect": "ask"
-    },
-    {
-      "action": "shell",
-      "resource": "pkill *",
-      "effect": "ask"
-    },
-    {
-      "action": "shell",
-      "resource": "killall *",
-      "effect": "ask"
-    },
-    {
-      "action": "glob",
-      "resource": "*",
-      "effect": "allow"
-    },
-    {
-      "action": "grep",
-      "resource": "*",
-      "effect": "allow"
-    },
-    {
-      "action": "list",
-      "resource": "*",
-      "effect": "allow"
-    },
-    {
-      "action": "task",
-      "resource": "*",
-      "effect": "allow"
-    },
-    {
-      "action": "skill",
-      "resource": "*",
-      "effect": "allow"
-    },
-    {
-      "action": "webfetch",
-      "resource": "*",
-      "effect": "allow"
-    },
-    {
-      "action": "websearch",
-      "resource": "*",
-      "effect": "allow"
-    },
-    {
-      "action": "external_directory",
-      "resource": "*",
-      "effect": "allow"
-    },
-    {
-      "action": "doom_loop",
-      "resource": "*",
-      "effect": "allow"
-    },
-    {
-      "action": "lsp",
-      "resource": "*",
-      "effect": "allow"
-    },
-    {
-      "action": "shell",
-      "resource": "kill *",
-      "effect": "ask"
-    },
-    {
-      "action": "shell",
-      "resource": "xargs kill*",
-      "effect": "ask"
-    },
-    {
-      "action": "shell",
-      "resource": "xargs -r kill*",
-      "effect": "ask"
-    },
-    {
-      "action": "shell",
-      "resource": "pkill*",
-      "effect": "ask"
-    },
-    {
-      "action": "shell",
-      "resource": "killall*",
-      "effect": "ask"
-    },
-    {
-      "action": "shell",
-      "resource": "kill -*",
-      "effect": "ask"
-    },
-    {
-      "action": "shell",
-      "resource": "*opencode.db*",
-      "effect": "ask"
-    },
-    {
-      "action": "read",
-      "resource": "*opencode.db*",
-      "effect": "ask"
-    },
-    {
-      "action": "shell",
-      "resource": "*--break-system-packages*",
-      "effect": "ask"
-    },
-    {
-      "action": "shell",
-      "resource": "sudo pip*",
-      "effect": "ask"
-    },
-    {
-      "action": "shell",
-      "resource": "sudo python* -m pip*",
-      "effect": "ask"
-    }
-  ],
+    "edit": "allow",
+    "glob": "allow",
+    "grep": "allow",
+    "list": "allow",
+    "task": "allow",
+    "skill": "allow",
+    "webfetch": "allow",
+    "websearch": "allow",
+    "external_directory": "allow",
+    "doom_loop": "allow",
+    "lsp": "allow"
+  },
   "update": "notify",
   "websearch": {
     "provider": "exa"

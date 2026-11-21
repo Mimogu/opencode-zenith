@@ -98,11 +98,11 @@ function Read-Secret([string]$prompt) {
 function Refresh-Path {
     $m = [Environment]::GetEnvironmentVariable('Path', 'Machine')
     $u = [Environment]::GetEnvironmentVariable('Path', 'User')
-    $env:Path = "$m;$u"
+    $env:Path = "$u;$m"
     foreach ($extra in @(
-        "$env:ProgramFiles\nodejs",
         "$env:LOCALAPPDATA\Microsoft\WinGet\Links",
-        "$env:APPDATA\npm"
+        "$env:APPDATA\npm",
+        "$env:ProgramFiles\nodejs"
     )) {
         if ((Test-Path $extra) -and ($env:Path -notlike "*$extra*")) {
             $env:Path = "$extra;" + $env:Path
@@ -149,12 +149,15 @@ function Set-UserEnv([string]$name, [string]$value) {
     [Environment]::SetEnvironmentVariable($name, $value, 'User')
     Set-Item -Path "Env:$name" -Value $value
 }
-function Add-UserPath([string]$dir) {
+function Add-UserPath([string]$dir, [switch]$Prepend) {
     $u = [Environment]::GetEnvironmentVariable('Path', 'User')
-    $parts = @($u -split ';' | Where-Object { $_ })
-    if ($parts -notcontains $dir) {
-        [Environment]::SetEnvironmentVariable('Path', (@($dir) + $parts) -join ';', 'User')
+    $parts = @($u -split ';' | Where-Object { $_ -and $_ -ne $dir })
+    if ($Prepend) {
+        $parts = @($dir) + $parts
+    } elseif ($parts -notcontains $dir) {
+        $parts = $parts + @($dir)
     }
+    [Environment]::SetEnvironmentVariable('Path', ($parts -join ';'), 'User')
     Refresh-Path
 }
 
@@ -251,9 +254,23 @@ function Get-OpenCodeVer([string]$cmdPath = 'opencode') {
 
 function Find-ValidOpenCode {
     $candidates = @()
-    foreach ($c in @(Get-Command opencode -All -ErrorAction SilentlyContinue)) {
-        $v = Get-OpenCodeVer $c.Source
-        if ($v) { $candidates += @{ Path = $c.Source; Version = $v } }
+    foreach ($cmdName in @('opencode2', 'opencode')) {
+        foreach ($c in @(Get-Command $cmdName -All -ErrorAction SilentlyContinue)) {
+            $v = Get-OpenCodeVer $c.Source
+            if ($v) { $candidates += @{ Name = $cmdName; Path = $c.Source; Version = $v } }
+        }
+    }
+    $wellKnown = @(
+        "$env:LOCALAPPDATA\Microsoft\WinGet\Links\opencode.exe",
+        "$env:LOCALAPPDATA\Microsoft\WinGet\Links\opencode2.exe",
+        "$env:APPDATA\npm\opencode.cmd",
+        "$env:APPDATA\npm\opencode"
+    )
+    foreach ($p in $wellKnown) {
+        if (Test-Path $p) {
+            $v = Get-OpenCodeVer $p
+            if ($v) { $candidates += @{ Name = 'opencode'; Path = $p; Version = $v } }
+        }
     }
     $v2 = @($candidates | Where-Object { $_.Version.Major -ge 2 } | Sort-Object { $_.Version } -Descending)
     if ($v2.Count -gt 0) { return $v2[0] }
@@ -263,18 +280,25 @@ function Find-ValidOpenCode {
 
 $oc = Find-ValidOpenCode
 
-# If missing or outdated (e.g. legacy OpenCode 1.x like 1.18.30 from Chocolatey)
-if (-not $oc -or ($oc.Version.Major -lt 2)) {
-    if ($oc -and ($oc.Version.Major -lt 2)) {
-        Warn "Detected OpenCode $($oc.Version) at $($oc.Path). OpenCode Zenith requires OpenCode 2.x."
-        if ($oc.Path -like '*chocolatey*') {
-            Info 'The installed version comes from an outdated Chocolatey package. Upgrading to OpenCode 2...'
+# Detect if legacy OpenCode 1.x is present in PATH and attempt cleanup
+foreach ($c in @(Get-Command opencode -All -ErrorAction SilentlyContinue)) {
+    $v = Get-OpenCodeVer $c.Source
+    if ($v -and ($v.Major -lt 2)) {
+        Warn "Detected legacy OpenCode $($v) at $($c.Source). OpenCode Zenith requires OpenCode 2.x."
+        if ($c.Source -like '*chocolatey*') {
+            Info 'Removing outdated Chocolatey opencode package...'
             if (Have 'choco') {
                 try { & choco uninstall opencode -y 2>$null | Out-Null } catch {}
             }
+            if (Test-Path $c.Source) {
+                Remove-Item $c.Source -Force -ErrorAction SilentlyContinue
+            }
         }
     }
+}
 
+# If missing or outdated (e.g. legacy OpenCode 1.x like 1.18.30 from Chocolatey)
+if (-not $oc -or ($oc.Version.Major -lt 2)) {
     Info 'Installing/upgrading to OpenCode 2 (@opencode/cli) ...'
     $installed = $false
 
@@ -288,11 +312,12 @@ if (-not $oc -or ($oc.Version.Major -lt 2)) {
     }
 
     if (-not $installed -and (Have 'npm')) {
+        & npm uninstall -g opencode-ai 2>$null | Out-Null
         & npm install -g @opencode/cli@latest
         Refresh-Path
         $npmBin = (& npm prefix -g 2>$null).Trim()
         if ($npmBin) {
-            Add-UserPath $npmBin
+            Add-UserPath $npmBin -Prepend
             $env:Path = "$npmBin;" + $env:Path
         }
         $oc = Find-ValidOpenCode
@@ -307,6 +332,7 @@ if ($oc.Version.Major -lt 2) {
 $OpenCodeExe = $oc.Path
 $ocDir = Split-Path $OpenCodeExe
 if ($ocDir) {
+    Add-UserPath $ocDir -Prepend
     $env:Path = "$ocDir;" + $env:Path
 }
 
@@ -446,6 +472,16 @@ if not os.path.isfile(r'$ffMcpJs') and 'my-firefox' in mcp:
 if not os.path.isfile(r'$camoJs') and 'camofox' in mcp:
     mcp['camofox']['enabled'] = False
 
+if os.path.isfile(p):
+    try:
+        with open(p, 'r', encoding='utf-8') as ef:
+            old_data = json.load(ef)
+            for k, v in old_data.items():
+                if k not in ('permission', 'permissions'):
+                    data[k] = v
+    except Exception:
+        pass
+
 with open(p, 'w', encoding='utf-8') as f:
     json.dump(data, f, indent=2)
 "@
@@ -453,10 +489,11 @@ with open(p, 'w', encoding='utf-8') as f:
             & $Python -c $pyCode 2>$null
         } catch {}
 
-        if (-not (Test-Path (Join-Path $ConfigDir 'opencode.json'))) {
+        $targetConfig = Join-Path $ConfigDir 'opencode.json'
+        if (-not (Test-Path $targetConfig)) {
             $content = Get-Content $tpl -Raw
             $content = $content.Replace('{{CONFIG_DIR}}', $posixConfig).Replace('"python3"', '"python"')
-            [IO.File]::WriteAllText((Join-Path $ConfigDir 'opencode.json'), $content, (New-Object System.Text.UTF8Encoding $false))
+            [IO.File]::WriteAllText($targetConfig, $content, (New-Object System.Text.UTF8Encoding $false))
         }
     }
 } catch { Fail "could not copy the config into ${ConfigDir}: $($_.Exception.Message)" }
@@ -466,6 +503,16 @@ $pathsJson = @{
 } | ConvertTo-Json
 # Windows PowerShell's -Encoding UTF8 adds a BOM; write plain UTF-8 instead
 [IO.File]::WriteAllText((Join-Path $ConfigDir 'paths.json'), $pathsJson, (New-Object System.Text.UTF8Encoding $false))
+
+# Install opencode and opencode2 command shims in $ConfigDir\bin
+$binDir = Join-Path $ConfigDir 'bin'
+New-Item -ItemType Directory -Force -Path $binDir | Out-Null
+$shimContent = "@echo off`r`n`"$OpenCodeExe`" %*`r`n"
+[IO.File]::WriteAllText((Join-Path $binDir 'opencode.cmd'), $shimContent, [System.Text.Encoding]::ASCII)
+[IO.File]::WriteAllText((Join-Path $binDir 'opencode2.cmd'), $shimContent, [System.Text.Encoding]::ASCII)
+Add-UserPath $binDir -Prepend
+$env:Path = "$binDir;" + $env:Path
+
 New-Item -ItemType Directory -Force -Path (Join-Path $ConfigDir 'state') | Out-Null
 $skillCount = @(Get-ChildItem (Join-Path $ConfigDir 'skills') -Directory).Count
 Ok "installed $skillCount skills, agents, commands and plugins"
@@ -676,11 +723,22 @@ if (-not $NoOmniRoute) {
     if (Test-Path $combosFile) {
         if ($env:OMNIROUTE_API_KEY) {
             $existing = @()
-            try { $existing = @((Omni combo list --output json 2>$null | Out-String | ConvertFrom-Json) | ForEach-Object { $_.name }) } catch {}
+            try {
+                $rawList = & Omni combo list --json 2>$null | Out-String
+                if ($rawList) {
+                    $parsed = $rawList | ConvertFrom-Json
+                    if ($parsed -is [Array]) { $existing = @($parsed | ForEach-Object { $_.name }) }
+                    elseif ($parsed.combos) { $existing = @($parsed.combos | ForEach-Object { $_.name }) }
+                }
+            } catch {}
             foreach ($c in (Get-Content $combosFile -Raw | ConvertFrom-Json)) {
-                if ($existing -contains $c.name) { Ok "$($c.name) already exists"; continue }
-                Omni combo create $c.name --strategy $c.strategy --models ($c.models -join ',') *> $null
-                if ($LASTEXITCODE -eq 0) { Ok "created $($c.name)" } else { Warn "could not create $($c.name); create it in the dashboard (models: $($c.models -join ', '))" }
+                if ($existing -contains $c.name) { Ok "combo $($c.name) already exists"; continue }
+                $createRes = & Omni combo create $c.name --strategy $c.strategy --models ($c.models -join ',') 2>&1 | Out-String
+                if ($LASTEXITCODE -eq 0 -or $createRes -match 'already exists') {
+                    Ok "combo $($c.name) ready"
+                } else {
+                    Warn "could not create $($c.name); create it in the dashboard (models: $($c.models -join ', '))"
+                }
             }
         } else { Info 'skipped (requires OMNIROUTE_API_KEY)' }
     } else { Info 'skipped (no combos file)' }
@@ -716,13 +774,44 @@ if (-not $NoOmniRoute) {
 Step 'Checking local embedding AI (Ollama)'
 if (Have 'ollama') {
     Ok 'Ollama found'
-    $models = @(& ollama list 2>$null)
-    if ($models -notmatch 'embeddinggemma') {
-        Info 'Pulling recommended local embedding model (embeddinggemma, ~620MB)...'
-        & ollama pull embeddinggemma
-        if ($LASTEXITCODE -eq 0) { Ok 'embeddinggemma pulled successfully' } else { Warn 'could not pull embeddinggemma; you can run "ollama pull embeddinggemma" later' }
+    $ollamaUp = $false
+    try {
+        $res = Invoke-WebRequest -Uri 'http://127.0.0.1:11434/api/tags' -TimeoutSec 2 -UseBasicParsing -ErrorAction Stop
+        if ($res.StatusCode -eq 200) { $ollamaUp = $true }
+    } catch {}
+
+    if (-not $ollamaUp) {
+        Info 'Ollama service is not running. Attempting to start Ollama background service...'
+        try {
+            Start-Process -FilePath 'ollama.exe' -ArgumentList 'serve' -WindowStyle Hidden
+            for ($i = 0; $i -lt 4; $i++) {
+                Start-Sleep -Seconds 1
+                try {
+                    $res = Invoke-WebRequest -Uri 'http://127.0.0.1:11434/api/tags' -TimeoutSec 1 -UseBasicParsing -ErrorAction Stop
+                    if ($res.StatusCode -eq 200) { $ollamaUp = $true; break }
+                } catch {}
+            }
+        } catch {}
+    }
+
+    if ($ollamaUp) {
+        $models = @()
+        try { $models = @(& ollama list 2>$null) } catch {}
+        if ($models -notmatch 'embeddinggemma') {
+            if (Ask-YesNo 'Download recommended local embedding model (embeddinggemma, ~620MB)?' $true) {
+                Info 'Pulling recommended local embedding model (embeddinggemma, ~620MB)...'
+                & ollama pull embeddinggemma
+                if ($LASTEXITCODE -eq 0) { Ok 'embeddinggemma pulled successfully' } else { Warn 'could not pull embeddinggemma; you can run "ollama pull embeddinggemma" later' }
+            } else {
+                Info 'Skipping embeddinggemma download. You can run "ollama pull embeddinggemma" anytime.'
+            }
+        } else {
+            Ok 'embeddinggemma model is ready'
+        }
     } else {
-        Ok 'embeddinggemma model is ready'
+        Warn 'Ollama is installed but the background service is not running on http://127.0.0.1:11434.'
+        Info 'Zenith will use built-in BM25 keyword matching for skills and memory.'
+        Info 'To enable semantic embeddings anytime: start Ollama and run "ollama pull embeddinggemma". Continuing.'
     }
 } else {
     Write-Host ''
@@ -732,9 +821,22 @@ if (Have 'ollama') {
         Refresh-Path
         if (Have 'ollama') {
             Ok 'Ollama installed successfully'
-            Info 'Pulling embeddinggemma model...'
-            & ollama pull embeddinggemma
-            if ($LASTEXITCODE -eq 0) { Ok 'embeddinggemma model is ready' }
+            try { Start-Process -FilePath 'ollama.exe' -ArgumentList 'serve' -WindowStyle Hidden } catch {}
+            $wingetOllamaUp = $false
+            for ($i = 0; $i -lt 5; $i++) {
+                Start-Sleep -Seconds 1
+                try {
+                    $res = Invoke-WebRequest -Uri 'http://127.0.0.1:11434/api/tags' -TimeoutSec 1 -UseBasicParsing -ErrorAction Stop
+                    if ($res.StatusCode -eq 200) { $wingetOllamaUp = $true; break }
+                } catch {}
+            }
+            if ($wingetOllamaUp) {
+                Info 'Pulling embeddinggemma model...'
+                & ollama pull embeddinggemma
+                if ($LASTEXITCODE -eq 0) { Ok 'embeddinggemma model is ready' }
+            } else {
+                Warn 'Ollama service was not ready in time. You can run "ollama pull embeddinggemma" once started.'
+            }
         } else {
             Warn 'Ollama was installed; open a new terminal or reboot to use it'
         }

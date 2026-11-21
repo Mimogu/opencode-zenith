@@ -238,11 +238,28 @@ done
 echo "[4/5] Checking local embedding engine..."
 if has_cmd ollama; then
   echo "  [✓] Ollama found."
-  if ! ollama list 2>/dev/null | grep -q "embeddinggemma"; then
-    echo "  [+] Pulling recommended local embedding model (embeddinggemma, ~620MB)..."
-    ollama pull embeddinggemma || echo "  [!] Could not pull embeddinggemma automatically. You can run 'ollama pull embeddinggemma' anytime."
+  ollama_up=0
+  if curl -s -m 2 http://127.0.0.1:11434/api/tags >/dev/null 2>&1; then
+    ollama_up=1
   else
-    echo "  [✓] embeddinggemma model ready."
+    systemctl start ollama 2>/dev/null || systemctl --user start ollama 2>/dev/null || true
+    sleep 1
+    if curl -s -m 2 http://127.0.0.1:11434/api/tags >/dev/null 2>&1; then
+      ollama_up=1
+    fi
+  fi
+
+  if [ "$ollama_up" -eq 1 ]; then
+    if ! ollama list 2>/dev/null | grep -q "embeddinggemma"; then
+      echo "  [+] Pulling recommended local embedding model (embeddinggemma, ~620MB)..."
+      ollama pull embeddinggemma || echo "  [!] Could not pull embeddinggemma automatically. You can run 'ollama pull embeddinggemma' anytime."
+    else
+      echo "  [✓] embeddinggemma model ready."
+    fi
+  else
+    echo "  [!] Ollama is installed but the background daemon is not running on 127.0.0.1:11434."
+    echo "      Zenith will use built-in BM25 keyword matching for skills and memory."
+    echo "      To enable semantic embeddings anytime: start Ollama and run 'ollama pull embeddinggemma'."
   fi
 else
   INSTALL_OLLAMA="n"
