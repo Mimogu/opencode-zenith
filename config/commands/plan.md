@@ -1,49 +1,45 @@
 ---
-description: Create implementation plan with risk assessment
+description: Create implementation plan with change-impact blast-radius analysis
 agent: planner
 subtask: true
 ---
 
 # Plan Command
 
-Create a detailed implementation plan for: $ARGUMENTS
+Create a detailed implementation plan and change-impact analysis for: $ARGUMENTS
 
 ## Your Task
 
-1. **Restate Requirements** - Clarify what needs to be built
-2. **Identify Risks** - Surface potential issues, blockers, and dependencies
-3. **Create Step Plan** - Break down implementation into phases
-4. **Wait for Confirmation** - MUST receive user approval before proceeding
+1. **Restate Requirements** - Clarify what needs to be built or changed.
+2. **Change Impact & Blast Radius Preflight**:
+   - Trace call paths: Which modules or callers depend on the files being touched?
+   - Schema & API contracts: Will any public functions, types, or data structures change?
+   - Test impact: Which test suites verify this area?
+   - Mark any unknown dependency as `unverified`.
+3. **Identify Risks** - Surface potential breaking changes, blockers, or edge cases.
+4. **Atomic Step Plan** - Break down implementation into numbered, verifiable steps.
+5. **Wait for Confirmation** - MUST receive user approval before modifying any files.
 
 ## Output Format
 
 ### Requirements Restatement
-[Clear, concise restatement of what will be built]
+[Clear, concise restatement of the goal]
 
-### Implementation Phases
-[Phase 1: Description]
-- Step 1.1
-- Step 1.2
-...
+### Change Impact Surface
+| Area | Files Affected | Blast Radius (Low/Med/High) | Test Coverage |
+| :--- | :--- | :--- | :--- |
 
-[Phase 2: Description]
-- Step 2.1
-- Step 2.2
-...
+### Implementation Steps
+1. [Atomic step 1 - file to edit, exact change]
+2. [Atomic step 2 - test to add or update]
+3. [Atomic step 3 - verification command]
 
-### Dependencies
-[List external dependencies, APIs, services needed]
-
-### Risks
-- HIGH: [Critical risks that could block implementation]
-- MEDIUM: [Moderate risks to address]
-- LOW: [Minor concerns]
-
-### Estimated Complexity
-[HIGH/MEDIUM/LOW with time estimates]
+### Risk Assessment
+- Critical / High: [Blockers, breaking API risks]
+- Medium / Low: [Edge cases, performance considerations]
 
 **WAITING FOR CONFIRMATION**: Proceed with this plan? (yes/no/modify)
 
 ---
 
-**CRITICAL**: Do NOT write any code until the user explicitly confirms with "yes", "proceed", or similar affirmative response.
+**CRITICAL**: Do NOT write or edit any code until the user explicitly confirms with "yes", "proceed", or similar affirmative response.

@@ -1,67 +1,43 @@
 ---
-description: Run verification loop to validate implementation
-agent: build
+description: Run 6-phase mechanical verification pipeline with raw exit codes
+agent: verifier
+subtask: true
 ---
 
 # Verify Command
 
-Run verification loop to validate the implementation: $ARGUMENTS
+Run mechanical verification loop to validate recent work: $ARGUMENTS
 
-## Your Task
+## Verification Protocol
 
-Execute comprehensive verification:
+Execute the 6-phase verification sequence using real shell commands with `set -o pipefail`. Do not guess or skip phases.
 
-1. **Type Check**: `npx tsc --noEmit`
-2. **Lint**: `npm run lint`
-3. **Unit Tests**: `npm test`
-4. **Integration Tests**: `npm run test:integration` (if available)
-5. **Build**: `npm run build`
-6. **Coverage Check**: Verify 80%+ coverage
+1. **Phase 1: Build Verification**
+   - Run the project build command (`npm run build`, `bun run build`, `cargo build`, or `make`).
+2. **Phase 2: Static Type Check**
+   - Run type analysis (`npx tsc --noEmit`, `pyright`, or `mypy`).
+3. **Phase 3: Linter & Formatting**
+   - Run linter checks (`npm run lint`, `eslint`, `ruff check`, or `cargo clippy`).
+4. **Phase 4: Test Suite & Coverage**
+   - Run test suite (`bun test`, `npm test`, `pytest`, or `cargo test`). Confirm all test cases pass.
+5. **Phase 5: Security Grep**
+   - Grep git diff for accidental secret leaks, debug `console.log`, disabled auth checks, or insecure deserialization.
+6. **Phase 6: Diff Review**
+   - Inspect `git diff --stat` and `git diff` to confirm diff is surgical and contains no unintended changes.
 
-## Verification Checklist
+## Verification Gate Requirement
 
-### Code Quality
-- [ ] No TypeScript errors
-- [ ] No lint warnings
-- [ ] No console.log statements
-- [ ] Functions < 50 lines
-- [ ] Files < 800 lines
+Every phase must pass with exit code 0. Do NOT declare PASS if any command was skipped or emitted unresolved errors. Rationalizations such as "tests assumed to pass" or "compilation should succeed" are strictly rejected.
 
-### Tests
-- [ ] All tests passing
-- [ ] Coverage >= 80%
-- [ ] Edge cases covered
-- [ ] Error conditions tested
+Output a final table:
 
-### Security
-- [ ] No hardcoded secrets
-- [ ] Input validation present
-- [ ] No SQL injection risks
-- [ ] No XSS vulnerabilities
+| Phase | Command Executed | Exit Code | Status | Notes |
+|-------|------------------|-----------|--------|-------|
+| 1. Build | `<command>` | `0` | PASS/FAIL | ... |
+| 2. Typecheck | `<command>` | `0` | PASS/FAIL | ... |
+| 3. Lint | `<command>` | `0` | PASS/FAIL | ... |
+| 4. Tests | `<command>` | `0` | PASS/FAIL | ... |
+| 5. Security | `<command>` | `0` | PASS/FAIL | ... |
+| 6. Diff | `git diff` | `0` | PASS/FAIL | ... |
 
-### Build
-- [ ] Build succeeds
-- [ ] No warnings
-- [ ] Bundle size acceptable
-
-## Verification Report
-
-### Summary
-- Status: PASS: PASS / FAIL: FAIL
-- Score: X/Y checks passed
-
-### Details
-| Check | Status | Notes |
-|-------|--------|-------|
-| TypeScript | PASS:/FAIL: | [details] |
-| Lint | PASS:/FAIL: | [details] |
-| Tests | PASS:/FAIL: | [details] |
-| Coverage | PASS:/FAIL: | XX% (target: 80%) |
-| Build | PASS:/FAIL: | [details] |
-
-### Action Items
-[If FAIL, list what needs to be fixed]
-
----
-
-**NOTE**: Verification loop should be run before every commit and PR.
+Final Status: PASS if all exit codes are 0; otherwise FAIL with actionable remediation steps.

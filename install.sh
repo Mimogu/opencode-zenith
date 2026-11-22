@@ -255,7 +255,7 @@ if has_cmd ollama; then
   fi
 else
   INSTALL_OLLAMA="n"
-  if [ -e /dev/tty ] && [ -r /dev/tty ]; then
+  if [ "${ZENITH_NON_INTERACTIVE:-0}" != "1" ] && [ -t 0 ] && [ -e /dev/tty ] && [ -r /dev/tty ]; then
     printf "  [?] Ollama not found. Would you like to install Ollama & download embeddinggemma (~620MB) for vector search? [y/N]: "
     read -r INSTALL_OLLAMA </dev/tty || INSTALL_OLLAMA="n"
   fi
@@ -286,7 +286,7 @@ if [ ! -f "$CONFIG_ENV" ]; then
   echo "  [+] Generated new free-models.env from template."
 fi
 
-if [ -e /dev/tty ] && [ -r /dev/tty ]; then
+if [ "${ZENITH_NON_INTERACTIVE:-0}" != "1" ] && [ -t 0 ] && [ -e /dev/tty ] && [ -r /dev/tty ]; then
   python3 -c "
 import sys, re, os
 
@@ -377,8 +377,10 @@ fi
 
 # Restart OpenCode background services so new MCP servers and config take effect
 if has_cmd opencode; then
-  opencode service restart >/dev/null 2>&1 || true
-  opencode reload >/dev/null 2>&1 || true
+  SERVICE_STATUS="$(timeout 2 opencode service status 2>/dev/null || echo 'stopped')"
+  if [[ "$SERVICE_STATUS" == http* ]]; then
+    timeout 5 opencode service restart >/dev/null 2>&1 || true
+  fi
 fi
 if has_cmd opencode-stack; then
   opencode-stack down >/dev/null 2>&1 || true

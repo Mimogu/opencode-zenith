@@ -1,4 +1,4 @@
-if ($PSVersionTable.PSVersion.Major -lt 5 -or ($PSVersionTable.PSVersion.Major -eq 5 -and $PSVersionTable.PSVersion.Minor -lt 1)) {
+﻿if ($PSVersionTable.PSVersion.Major -lt 5 -or ($PSVersionTable.PSVersion.Major -eq 5 -and $PSVersionTable.PSVersion.Minor -lt 1)) {
     Write-Host "OpenCode Zenith requires Windows PowerShell 5.1 or higher." -ForegroundColor Red
     return
 }
@@ -865,8 +865,12 @@ Get-CimInstance Win32_Process -Filter "Name like 'python%'" -ErrorAction Silentl
 Start-Process -FilePath $PythonW -ArgumentList @("`"$(Join-Path $ConfigDir 'sentinel.py')`"") -WorkingDirectory $ConfigDir -WindowStyle Hidden
 Ok 'sentinel started'
 Get-Process -Name 'opencode-cli', 'OpenCode' -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
-try { & $OpenCodeExe service restart 2>$null | Out-Null } catch {}
-try { & $OpenCodeExe reload 2>$null | Out-Null } catch {}
+try {
+    $svcStatus = (& $OpenCodeExe service status 2>$null | Select-Object -First 1)
+    if ($svcStatus -and $svcStatus -match '^https?://') {
+        & $OpenCodeExe service restart 2>$null | Out-Null
+    }
+} catch {}
 
 $taskName = 'OpenCode Model Lab'
 try {
