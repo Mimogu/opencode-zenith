@@ -92,6 +92,7 @@ function Fail($m)  {
 }
 function Have($cmd) { [bool](Get-Command $cmd -ErrorAction SilentlyContinue) }
 function Ask-YesNo([string]$q, [bool]$default = $true) {
+    if (-not [Environment]::UserInteractive -or $env:ZENITH_NON_INTERACTIVE -eq '1') { return $default }
     $hint = if ($default) { '[Y/n]' } else { '[y/N]' }
     while ($true) {
         $a = (Read-Host "    $q $hint").Trim().ToLower()
@@ -101,10 +102,15 @@ function Ask-YesNo([string]$q, [bool]$default = $true) {
     }
 }
 function Read-Secret([string]$prompt) {
-    $s = Read-Host -AsSecureString "    $prompt"
-    $b = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($s)
-    try { return [Runtime.InteropServices.Marshal]::PtrToStringBSTR($b).Trim() }
-    finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($b) }
+    if (-not [Environment]::UserInteractive -or $env:ZENITH_NON_INTERACTIVE -eq '1') { return '' }
+    try {
+        $s = Read-Host -AsSecureString "    $prompt"
+        $b = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($s)
+        try { return [Runtime.InteropServices.Marshal]::PtrToStringBSTR($b).Trim() }
+        finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($b) }
+    } catch {
+        return ''
+    }
 }
 function Refresh-Path {
     $m = [Environment]::GetEnvironmentVariable('Path', 'Machine')
@@ -582,14 +588,20 @@ if (-not $NoOmniRoute) {
     } else {
         Info 'Choose an admin password for the OmniRoute dashboard (typing is hidden).'
         while ($true) {
-            $pw1 = Read-Secret 'OmniRoute admin password'
+            $pw1 = Read-Secret 'OmniRoute admin password (Enter = skip)'
+            if (-not $pw1) {
+                Info 'Skipped setting admin password (set it in the dashboard anytime).'
+                break
+            }
             if ($pw1.Length -lt 8) { Warn 'Use at least 8 characters.'; continue }
             $pw2 = Read-Secret 'Repeat the password'
             if ($pw1 -ne $pw2) { Warn 'The passwords do not match.'; continue }
             break
         }
-        Omni setup --non-interactive --password $pw1
-        if ($LASTEXITCODE -eq 0) { Ok 'admin password set' } else { Warn "could not set the password (exit $LASTEXITCODE); set it in the dashboard instead" }
+        if ($pw1) {
+            Omni setup --non-interactive --password $pw1
+            if ($LASTEXITCODE -eq 0) { Ok 'admin password set' } else { Warn "could not set the password (exit $LASTEXITCODE); set it in the dashboard instead" }
+        }
         $pw1 = $null; $pw2 = $null
     }
 
@@ -724,9 +736,10 @@ if (-not $NoOmniRoute) {
         if ($env:OMNIROUTE_API_KEY) {
             $existing = @()
             try {
-                $rawList = & Omni combo list --json 2>$null | Out-String
-                if ($rawList) {
-                    $parsed = $rawList | ConvertFrom-Json
+                $rawList = & Omni combo list --output json 2>$null | Out-String
+                if (-not $rawList) { $rawList = & Omni combo list --json 2>$null | Out-String }
+                if ($rawList -match '(?s)(\{.*\})') {
+                    $parsed = $Matches[1] | ConvertFrom-Json
                     if ($parsed -is [Array]) { $existing = @($parsed | ForEach-Object { $_.name }) }
                     elseif ($parsed.combos) { $existing = @($parsed.combos | ForEach-Object { $_.name }) }
                 }

@@ -34,6 +34,10 @@ has_cmd() {
   command -v "$1" >/dev/null 2>&1
 }
 
+is_interactive() {
+  [ "${ZENITH_NON_INTERACTIVE:-0}" != "1" ] && [ "${CI:-0}" != "1" ] && [ -c /dev/tty ] && [ -r /dev/tty ] && [ -w /dev/tty ]
+}
+
 # Ensure local user bin paths are available in PATH
 mkdir -p "${HOME}/.local/bin" "${HOME}/.npm-global/bin"
 export PATH="${HOME}/.local/bin:${HOME}/.npm-global/bin:${HOME}/.bun/bin:${PATH}"
@@ -255,8 +259,8 @@ if has_cmd ollama; then
   fi
 else
   INSTALL_OLLAMA="n"
-  if [ "${ZENITH_NON_INTERACTIVE:-0}" != "1" ] && [ -t 0 ] && [ -e /dev/tty ] && [ -r /dev/tty ]; then
-    printf "  [?] Ollama not found. Would you like to install Ollama & download embeddinggemma (~620MB) for vector search? [y/N]: "
+  if is_interactive; then
+    printf "  [?] Ollama not found. Would you like to install Ollama & download embeddinggemma (~620MB) for vector search? [y/N]: " >/dev/tty
     read -r INSTALL_OLLAMA </dev/tty || INSTALL_OLLAMA="n"
   fi
   if [[ "$INSTALL_OLLAMA" =~ ^[Yy]$ ]]; then
@@ -278,24 +282,62 @@ else
   fi
 fi
 
-# 6. Environment configuration setup
-echo "[5/5] Finalizing environment & services..."
+# 6. Service templates
+if [ -d "${SCRIPT_DIR}/systemd" ] && has_cmd systemctl; then
+  SYSTEMD_USER="${HOME}/.config/systemd/user"
+  mkdir -p "$SYSTEMD_USER"
+  [ -f "${SCRIPT_DIR}/systemd/omniroute.service" ] && cp "${SCRIPT_DIR}/systemd/omniroute.service" "$SYSTEMD_USER/"
+  [ -f "${SCRIPT_DIR}/systemd/opencode-sentinel.service" ] && cp "${SCRIPT_DIR}/systemd/opencode-sentinel.service" "$SYSTEMD_USER/"
+  [ -f "${SCRIPT_DIR}/systemd/opencode-benchmark.service" ] && cp "${SCRIPT_DIR}/systemd/opencode-benchmark.service" "$SYSTEMD_USER/"
+  [ -f "${SCRIPT_DIR}/systemd/opencode-benchmark.timer" ] && cp "${SCRIPT_DIR}/systemd/opencode-benchmark.timer" "$SYSTEMD_USER/"
+  systemctl --user daemon-reload 2>/dev/null || true
+  systemctl --user enable --now omniroute.service 2>/dev/null || true
+  systemctl --user enable --now opencode-sentinel.service 2>/dev/null || true
+  systemctl --user enable --now opencode-benchmark.timer 2>/dev/null || true
+  echo "  [✓] Systemd user services (omniroute, sentinel, benchmark timer) enabled."
+fi
+
+# 7. Environment & OmniRoute configuration
+echo "[5/5] Finalizing environment & OmniRoute gateway..."
 CONFIG_ENV="${CONFIG_DIR}/free-models.env"
 if [ ! -f "$CONFIG_ENV" ]; then
   cp "${SCRIPT_DIR}/.env.example" "$CONFIG_ENV"
   echo "  [+] Generated new free-models.env from template."
 fi
 
-if [ "${ZENITH_NON_INTERACTIVE:-0}" != "1" ] && [ -t 0 ] && [ -e /dev/tty ] && [ -r /dev/tty ]; then
-  python3 -c "
-import sys, re, os
+if has_cmd omniroute; then
+  for _ in 1 2 3 4 5; do
+    if curl -s -m 1 http://127.0.0.1:20128/ >/dev/null 2>&1; then
+      break
+    fi
+    sleep 1
+  done
+  if ! curl -s -m 1 http://127.0.0.1:20128/ >/dev/null 2>&1; then
+    nohup omniroute serve --no-open >/dev/null 2>&1 &
+    sleep 2
+  fi
+fi
 
-p = sys.argv[1]
-if not os.path.isfile(p):
-    exit(0)
+python3 -c "
+import sys, re, os, subprocess, json, getpass
 
-with open(p, 'r', encoding='utf-8') as f:
-    content = f.read()
+config_env = sys.argv[1]
+config_dir = sys.argv[2]
+script_dir = sys.argv[3]
+
+is_interactive = False
+if os.environ.get('ZENITH_NON_INTERACTIVE') != '1' and os.environ.get('CI') != '1':
+    try:
+        if os.path.exists('/dev/tty'):
+            with open('/dev/tty', 'r+') as tty:
+                is_interactive = True
+    except Exception:
+        is_interactive = False
+
+content = ''
+if os.path.isfile(config_env):
+    with open(config_env, 'r', encoding='utf-8') as f:
+        content = f.read()
 
 def get_key(k):
     m = re.search(rf'^{k}=(.*)$', content, re.M)
@@ -317,63 +359,203 @@ def update_key(k, v):
     else:
         content += f'\n{k}={v}\n'
 
-keys = [
-    ('NVIDIA_API_KEY', 'NVIDIA API key (from https://build.nvidia.com)'),
-    ('OPENROUTER_API_KEY', 'OpenRouter API key (from https://openrouter.ai/keys)'),
-    ('OMNIROUTE_API_KEY', 'OmniRoute API key (from http://localhost:20128)'),
-]
+def has_cmd(cmd):
+    return subprocess.run(['which', cmd], capture_output=True).returncode == 0
 
-try:
-    with open('/dev/tty', 'r') as tty, open('/dev/tty', 'w') as tty_out:
-        for k, desc in keys:
-            curr = os.environ.get(k, '') or get_key(k)
-            if curr:
-                m = mask(curr)
-                tty_out.write(f'  Existing {k} detected ({m}).\n  Enter new key to update (Enter = keep current): ')
-                tty_out.flush()
-                line = tty.readline().strip()
-                if line:
-                    update_key(k, line)
-                    tty_out.write(f'  [✓] {k} updated.\n\n')
+has_omniroute = has_cmd('omniroute')
+
+def run_omni(*args):
+    if not has_omniroute:
+        return -1
+    res = subprocess.run(['omniroute'] + list(args), capture_output=True)
+    return res.returncode
+
+# --- 1. OmniRoute Admin Password ---
+if has_omniroute and is_interactive:
+    omni_db = os.path.expanduser('~/.omniroute/storage.sqlite')
+    is_existing = os.path.isfile(omni_db)
+    try:
+        import urllib.request
+        urllib.request.urlopen('http://127.0.0.1:20128/', timeout=1)
+        is_existing = True
+    except Exception:
+        pass
+
+    if is_existing:
+        try:
+            pw1 = getpass.getpass('  OmniRoute admin password (Enter = keep current password): ').strip()
+            if pw1:
+                if len(pw1) < 8:
+                    print('  [!] Password must be at least 8 characters. Keeping current password.')
                 else:
-                    update_key(k, curr)
-                    tty_out.write(f'  [✓] Current {k} preserved.\n\n')
+                    code = run_omni('setup', '--non-interactive', '--password', pw1)
+                    if code == 0:
+                        print('  [✓] OmniRoute admin password updated.')
+                    else:
+                        print('  [!] Could not update password; keeping current.')
             else:
-                tty_out.write(f'  Enter {desc} (Enter = skip): ')
-                tty_out.flush()
-                line = tty.readline().strip()
-                if line:
-                    update_key(k, line)
-                    tty_out.write(f'  [✓] {k} saved.\n\n')
+                print('  [✓] Current OmniRoute admin password preserved.')
+        except Exception:
+            pass
+    else:
+        print('  Choose an admin password for the OmniRoute dashboard (typing is hidden).')
+        while True:
+            try:
+                pw1 = getpass.getpass('  OmniRoute admin password (Enter = skip): ').strip()
+                if not pw1:
+                    print('  [i] Skipped setting admin password.')
+                    break
+                if len(pw1) < 8:
+                    print('  [!] Use at least 8 characters.')
+                    continue
+                pw2 = getpass.getpass('  Repeat the password: ').strip()
+                if pw1 != pw2:
+                    print('  [!] The passwords do not match.')
+                    continue
+                code = run_omni('setup', '--non-interactive', '--password', pw1)
+                if code == 0:
+                    print('  [✓] OmniRoute admin password set.')
                 else:
-                    tty_out.write(f'  [i] Skipped {k} (existing settings preserved).\n\n')
-            tty_out.flush()
-except Exception:
-    pass
+                    print(f'  [!] Could not set password (code {code}); set it in the dashboard instead.')
+                break
+            except Exception:
+                break
 
-with open(p, 'w', encoding='utf-8') as f:
-    f.write(content)
-" "$CONFIG_ENV" 2>/dev/null || true
-  echo ""
-  echo "To view or update your free model keys anytime: ${CONFIG_ENV}"
-else
-  echo "  [✓] Existing free-models.env preserved (your API keys are safe)."
-fi
+# --- 2. API Keys & Provider Connections ---
+if is_interactive:
+    try:
+        with open('/dev/tty', 'r') as tty, open('/dev/tty', 'w') as tty_out:
+            def prompt(text):
+                tty_out.write(text)
+                tty_out.flush()
+                return tty.readline().strip()
 
-# 7. Service templates
-if [ -d "${SCRIPT_DIR}/systemd" ] && has_cmd systemctl; then
-  SYSTEMD_USER="${HOME}/.config/systemd/user"
-  mkdir -p "$SYSTEMD_USER"
-  [ -f "${SCRIPT_DIR}/systemd/omniroute.service" ] && cp "${SCRIPT_DIR}/systemd/omniroute.service" "$SYSTEMD_USER/"
-  [ -f "${SCRIPT_DIR}/systemd/opencode-sentinel.service" ] && cp "${SCRIPT_DIR}/systemd/opencode-sentinel.service" "$SYSTEMD_USER/"
-  [ -f "${SCRIPT_DIR}/systemd/opencode-benchmark.service" ] && cp "${SCRIPT_DIR}/systemd/opencode-benchmark.service" "$SYSTEMD_USER/"
-  [ -f "${SCRIPT_DIR}/systemd/opencode-benchmark.timer" ] && cp "${SCRIPT_DIR}/systemd/opencode-benchmark.timer" "$SYSTEMD_USER/"
-  systemctl --user daemon-reload 2>/dev/null || true
-  systemctl --user enable --now omniroute.service 2>/dev/null || true
-  systemctl --user enable --now opencode-sentinel.service 2>/dev/null || true
-  systemctl --user enable --now opencode-benchmark.timer 2>/dev/null || true
-  echo "  [✓] Systemd user services (omniroute, sentinel, benchmark timer) enabled."
-fi
+            # NVIDIA_API_KEY
+            curr_nv = os.environ.get('NVIDIA_API_KEY', '') or get_key('NVIDIA_API_KEY')
+            if curr_nv:
+                m = mask(curr_nv)
+                val = prompt(f'  Existing NVIDIA_API_KEY detected ({m}).\n  Enter new key to update (Enter = keep current): ')
+                if val:
+                    update_key('NVIDIA_API_KEY', val)
+                    os.environ['NVIDIA_API_KEY'] = val
+                    curr_nv = val
+                    print('  [✓] NVIDIA_API_KEY updated.')
+                else:
+                    update_key('NVIDIA_API_KEY', curr_nv)
+                    print('  [✓] Current NVIDIA_API_KEY preserved.')
+            else:
+                tty_out.write('  NVIDIA NIM powers the flagship Nemotron 3.5 Super VL model (free tier).\n  Create a free key at https://build.nvidia.com, or press Enter to skip.\n')
+                val = prompt('  Enter NVIDIA API key (Enter = skip): ')
+                if val:
+                    update_key('NVIDIA_API_KEY', val)
+                    os.environ['NVIDIA_API_KEY'] = val
+                    curr_nv = val
+                    print('  [✓] NVIDIA_API_KEY saved.')
+                else:
+                    print('  [i] Skipped NVIDIA_API_KEY (existing settings preserved).')
+
+            if curr_nv and has_omniroute:
+                run_omni('setup', '--non-interactive', '--add-provider', '--provider', 'nvidia', '--provider-name', 'NVIDIA NIM', '--api-key', curr_nv)
+
+            # OPENROUTER_API_KEY
+            curr_or = os.environ.get('OPENROUTER_API_KEY', '') or get_key('OPENROUTER_API_KEY')
+            if curr_or:
+                m = mask(curr_or)
+                val = prompt(f'  Existing OPENROUTER_API_KEY detected ({m}).\n  Enter new key to update (Enter = keep current): ')
+                if val:
+                    update_key('OPENROUTER_API_KEY', val)
+                    os.environ['OPENROUTER_API_KEY'] = val
+                    curr_or = val
+                    print('  [✓] OPENROUTER_API_KEY updated.')
+                else:
+                    update_key('OPENROUTER_API_KEY', curr_or)
+                    print('  [✓] Current OPENROUTER_API_KEY preserved.')
+            else:
+                tty_out.write('  OpenRouter gives free fallback models when the OpenCode free allowance runs out.\n  Create a free key at https://openrouter.ai/keys, or press Enter to skip.\n')
+                val = prompt('  Enter OpenRouter API key (Enter = skip): ')
+                if val:
+                    update_key('OPENROUTER_API_KEY', val)
+                    os.environ['OPENROUTER_API_KEY'] = val
+                    curr_or = val
+                    print('  [✓] OPENROUTER_API_KEY saved.')
+                else:
+                    print('  [i] Skipped OPENROUTER_API_KEY (existing settings preserved).')
+
+            if curr_or and has_omniroute:
+                run_omni('setup', '--non-interactive', '--add-provider', '--provider', 'openrouter', '--provider-name', 'OpenRouter', '--api-key', curr_or, '--test-provider')
+
+            # OMNIROUTE_API_KEY
+            curr_omni = os.environ.get('OMNIROUTE_API_KEY', '') or get_key('OMNIROUTE_API_KEY')
+            if curr_omni:
+                m = mask(curr_omni)
+                val = prompt(f'  Existing OMNIROUTE_API_KEY detected ({m}).\n  Enter new key to update (Enter = keep current): ')
+                if val:
+                    update_key('OMNIROUTE_API_KEY', val)
+                    os.environ['OMNIROUTE_API_KEY'] = val
+                    curr_omni = val
+                    print('  [✓] OMNIROUTE_API_KEY updated.')
+                else:
+                    update_key('OMNIROUTE_API_KEY', curr_omni)
+                    print('  [✓] Current OMNIROUTE_API_KEY preserved.')
+            else:
+                tty_out.write('  Now the OmniRoute dashboard opens in your browser (http://localhost:20128).\n    1. Log in with your admin password.\n    2. Optional: Providers -> add the AI accounts you want to route through OmniRoute\n       (for example Antigravity / Google login).\n    3. API Keys -> create a key, copy it, and paste it below.\n')
+                if (os.environ.get('DISPLAY') or os.environ.get('WAYLAND_DISPLAY')) and has_cmd('xdg-open'):
+                    subprocess.Popen(['xdg-open', 'http://localhost:20128'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                val = prompt('  Paste the OmniRoute API key (Enter = skip): ')
+                if val:
+                    update_key('OMNIROUTE_API_KEY', val)
+                    os.environ['OMNIROUTE_API_KEY'] = val
+                    curr_omni = val
+                    print('  [✓] OMNIROUTE_API_KEY saved.')
+                else:
+                    print('  [i] Skipped OMNIROUTE_API_KEY.')
+    except Exception:
+        pass
+else:
+    print('  [✓] Existing free-models.env preserved (your API keys are safe).')
+
+# Write updated keys back to free-models.env
+if content:
+    with open(config_env, 'w', encoding='utf-8') as f:
+        f.write(content)
+
+# --- 3. OmniRoute Combos ---
+if has_omniroute:
+    combos_file = ''
+    for cand in [os.path.join(script_dir, 'config', 'omniroute-combos.json'), os.path.join(config_dir, 'omniroute-combos.json')]:
+        if os.path.isfile(cand):
+            combos_file = cand
+            break
+
+    if combos_file:
+        try:
+            with open(combos_file, 'r', encoding='utf-8') as cf:
+                target_combos = json.load(cf)
+
+            res = subprocess.run(['omniroute', 'combo', 'list', '--output', 'json'], capture_output=True, text=True)
+            existing = []
+            s = res.stdout
+            start = s.find('{')
+            end = s.rfind('}')
+            if start != -1 and end != -1:
+                d = json.loads(s[start:end+1])
+                existing = [c['name'] for c in d.get('combos', [])]
+
+            for c in target_combos:
+                cname = c.get('name')
+                if cname in existing:
+                    continue
+                models_str = ','.join(c.get('models', []))
+                strat = c.get('strategy', 'priority')
+                c_res = subprocess.run(['omniroute', 'combo', 'create', cname, '--strategy', strat, '--models', models_str], capture_output=True, text=True)
+                if c_res.returncode == 0 or 'already exists' in c_res.stdout:
+                    print(f'  [✓] Combo {cname} ready.')
+        except Exception:
+            pass
+" "$CONFIG_ENV" "$CONFIG_DIR" "$SCRIPT_DIR" 2>/dev/null || true
+
+echo ""
+echo "To view or update your free model keys anytime: ${CONFIG_ENV}"
 
 # Restart OpenCode background services so new MCP servers and config take effect
 if has_cmd opencode; then
@@ -426,8 +608,9 @@ echo "       in your tab strip (otherwise Chromium folds them into a collapsed d
 echo "     - 'Where agents open their tabs': 'Your window' (shared) or 'Own window'."
 echo "=========================================================================="
 
-if [ -t 0 ] && [ -n "${DISPLAY:-${WAYLAND_DISPLAY:-}}" ] && has_cmd xdg-open; then
-  read -r -p "Open the extension link in your default browser now? [y/N]: " open_ext || true
+if is_interactive && [ -n "${DISPLAY:-${WAYLAND_DISPLAY:-}}" ] && has_cmd xdg-open; then
+  printf "Open the extension link in your default browser now? [y/N]: " >/dev/tty
+  read -r open_ext </dev/tty || open_ext="n"
   case "$open_ext" in
     [yY]*) xdg-open "https://chromewebstore.google.com/detail/mfnicocicmmlkpjnaffgihfjhdgjkdjg" >/dev/null 2>&1 & ;;
   esac
