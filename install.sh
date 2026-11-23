@@ -35,7 +35,7 @@ has_cmd() {
 }
 
 is_interactive() {
-  [ "${ZENITH_NON_INTERACTIVE:-0}" != "1" ] && [ "${CI:-0}" != "1" ] && [ -c /dev/tty ] && [ -r /dev/tty ] && [ -w /dev/tty ]
+  [ "${ZENITH_NON_INTERACTIVE:-0}" != "1" ] && [ "${CI:-0}" != "1" ] && (exec </dev/tty) 2>/dev/null && (exec >/dev/tty) 2>/dev/null
 }
 
 # Ensure local user bin paths are available in PATH
@@ -153,7 +153,7 @@ if [ -d "$CONFIG_DIR" ]; then
 fi
 
 mkdir -p "$CONFIG_DIR"
-cp -r "${SCRIPT_DIR}/config/"* "$CONFIG_DIR/"
+cp -r --remove-destination "${SCRIPT_DIR}/config/"* "$CONFIG_DIR/" 2>/dev/null || cp -r -f "${SCRIPT_DIR}/config/"* "$CONFIG_DIR/"
 rm -rf "${CONFIG_DIR}/__pycache__" "${CONFIG_DIR}/tests/__pycache__"
 
 # Setup OpenCode Browse CLI & MCP (drives real desktop browsers via browser extension)
@@ -291,10 +291,15 @@ if [ -d "${SCRIPT_DIR}/systemd" ] && has_cmd systemctl; then
   [ -f "${SCRIPT_DIR}/systemd/opencode-benchmark.service" ] && cp "${SCRIPT_DIR}/systemd/opencode-benchmark.service" "$SYSTEMD_USER/"
   [ -f "${SCRIPT_DIR}/systemd/opencode-benchmark.timer" ] && cp "${SCRIPT_DIR}/systemd/opencode-benchmark.timer" "$SYSTEMD_USER/"
   systemctl --user daemon-reload 2>/dev/null || true
-  systemctl --user enable --now omniroute.service 2>/dev/null || true
-  systemctl --user enable --now opencode-sentinel.service 2>/dev/null || true
-  systemctl --user enable --now opencode-benchmark.timer 2>/dev/null || true
-  echo "  [✓] Systemd user services (omniroute, sentinel, benchmark timer) enabled."
+  systemd_ok=0
+  if systemctl --user enable --now omniroute.service opencode-sentinel.service opencode-benchmark.timer 2>/dev/null; then
+    systemd_ok=1
+  fi
+  if [ "$systemd_ok" -eq 1 ]; then
+    echo "  [✓] Systemd user services (omniroute, sentinel, benchmark timer) enabled."
+  else
+    echo "  [i] Systemd user services not active (skipped; start services manually or via login script)."
+  fi
 fi
 
 # 7. Environment & OmniRoute configuration
@@ -328,9 +333,8 @@ script_dir = sys.argv[3]
 is_interactive = False
 if os.environ.get('ZENITH_NON_INTERACTIVE') != '1' and os.environ.get('CI') != '1':
     try:
-        if os.path.exists('/dev/tty'):
-            with open('/dev/tty', 'r+') as tty:
-                is_interactive = True
+        with open('/dev/tty', 'r') as t_in, open('/dev/tty', 'w') as t_out:
+            is_interactive = True
     except Exception:
         is_interactive = False
 

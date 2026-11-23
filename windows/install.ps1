@@ -95,7 +95,14 @@ function Ask-YesNo([string]$q, [bool]$default = $true) {
     if (-not [Environment]::UserInteractive -or $env:ZENITH_NON_INTERACTIVE -eq '1') { return $default }
     $hint = if ($default) { '[Y/n]' } else { '[y/N]' }
     while ($true) {
-        $a = (Read-Host "    $q $hint").Trim().ToLower()
+        $raw = $null
+        try {
+            $raw = Read-Host "    $q $hint"
+        } catch {
+            return $default
+        }
+        if ($raw -eq $null) { return $default }
+        $a = $raw.Trim().ToLower()
         if ($a -eq '') { return $default }
         if ($a -in @('y', 'yes')) { return $true }
         if ($a -in @('n', 'no')) { return $false }
