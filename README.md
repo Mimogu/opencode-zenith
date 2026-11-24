@@ -14,6 +14,7 @@ Standard AI coding assistants either burn expensive cloud tokens or fail miserab
 * 🔄 **Zero-Cost Automated Fallback Ladders**: Combines free endpoints from OpenRouter, NVIDIA NIM, and local gateways into a resilient chain (Primary → Secondary → Standby → Local). If one hits a rate limit or 503 error, it seamlessly continues on the next tier.
 * 📊 **Self-Healing Daily Benchmarks**: Runs an automated live test every morning at 04:00 AM, scoring available free models on real tasks and dynamically promoting the best-performing model to the top of your ladder.
 * 🛠️ **90+ Curated Skills**: Instant access to specialized workflows for Word (`.docx`), PowerPoint (`.pptx`), Excel (`.xlsx`), PDF extraction, high-performance TypeScript, systematic debugging, OWASP security scanning, and film direction.
+* 🔐 **Secret Guard**: API keys and tokens from `free-models.env` are replaced with `<redacted:NAME>` before anything is sent to a model, so a model that prints your key file while debugging cannot leak the keys to its provider. Commands that use `$NAME` keep working.
 * 🚦 **Human Review Gates (`#noreview`)**: Built-in verification checks ensure models never hallucinate file changes. For quick visual or browser tasks, simply append `#noreview` to finish cleanly in one turn without delays.
 * 🌐 **Dynamic Desktop Browser Control**: Remotely drives any installed desktop browser (Brave, Chrome, Chromium, Firefox) with programmatic media timing and clean process termination.
 
@@ -248,7 +249,10 @@ OpenCode Zenith integrates natively with the official **OpenCode Browse** extens
      * **Where agents open their tabs**: **`Your window`** (shared within an agent tab group) or **`Own window`** (opens in a dedicated window).
      * **Close idle tabs after**: Set to `Never` (or your preferred idle retention).
 
-4. **Autonomous Background Browsing & Search**:
+4. **When the extension is not connected**:
+   *If the browser that has the extension is closed (or the extension is off), the agent says so and reads plain pages with `webfetch` instead of opening other browsers. Open that browser, check the extension is on, and ask again; it reconnects by itself. Check the state anytime with `browse status`.*
+
+5. **Autonomous Background Browsing & Search**:
    ```text
    search the web to find solutions for this docker build error
    ```
@@ -256,7 +260,7 @@ OpenCode Zenith integrates natively with the official **OpenCode Browse** extens
 
 ---
 
-## 📚 Complete Skills Catalog (90+ Skills)
+## 📚 Complete Skills Catalog (91 Skills)
 OpenCode Zenith bundles **91 production-grade engineering skills**. All skills operate in **Manual On-Demand Invocation Mode** — they consume **zero token budget** during normal conversation and only load instructions when you explicitly invoke them with `@<name>` (e.g. `@docx create a report from notes.txt` or `@web-research search for...`).
 For the full directory of all 91 skills with decision matrices and prompt recipes, see the comprehensive [Skills Catalog Guide](docs/skills-catalog.md).
 
@@ -470,6 +474,11 @@ Yes! While Zenith is specialized to maximize free model performance, you can add
 <details>
 <summary><b>Will the installer overwrite my existing tools?</b></summary>
 No. The installer checks if Git, Python, Node, Bun, and ripgrep are already installed and skips them. If you already have a <code>~/.config/opencode</code> folder, it creates a timestamped backup before deploying.
+</details>
+
+<details>
+<summary><b>@video-gen says "all video tiers failed" or "Authentication required: login to veoaifree.com"</b></summary>
+The two OmniRoute video tiers use the <code>veo-free</code> provider, which needs a signed-in veoaifree.com session; when it is signed out, both tiers fail. Reconnect that provider in the OmniRoute dashboard (<code>http://localhost:20128</code>). If a <code>generate-video</code> command is installed, <code>@video-gen</code> falls back to it (Hugging Face LTX-Video, uses <code>HF_TOKEN</code>) as tier 3. Each tier's output is checked with ffprobe, so an empty or broken file is never reported as a video.
 </details>
 
 <details>

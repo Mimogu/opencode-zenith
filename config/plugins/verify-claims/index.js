@@ -268,6 +268,28 @@ export function unseenMedia(turn, opts = {}) {
   return null;
 }
 
+/** How much a video changes: mean pixel difference between small grey frames at the start, middle and end.
+ *  2026-11-24 an "animation of a paper boat drifting" was the same frame for 6 s; the agent said "drifting
+ *  smoothly" and the reviewer agreed, because nothing in the transcript measured motion. */
+export function frameDiff(a, b) {
+  if (!a || !b || a.length !== b.length || !a.length) return null;
+  let sum = 0;
+  for (let i = 0; i < a.length; i++) sum += Math.abs(a[i] - b[i]);
+  return (sum / a.length / 255) * 100;
+}
+function greyFrame(file, t) {
+  const r = spawnSync("ffmpeg", ["-v", "error", "-ss", String(t), "-i", file, "-frames:v", "1", "-vf", "scale=64:36,format=gray", "-f", "rawvideo", "-"], { timeout: 15000, maxBuffer: 1 << 20 });
+  return r.status === 0 && r.stdout?.length === 64 * 36 ? r.stdout : null;
+}
+function motionOf(file, dur) {
+  const ts = [0.05, dur / 2, Math.max(0, dur - 0.1)];
+  const fr = ts.map((t) => greyFrame(file, t.toFixed(2)));
+  const d1 = frameDiff(fr[0], fr[1]), d2 = frameDiff(fr[1], fr[2]);
+  if (d1 === null || d2 === null) return "";
+  const still = Math.max(d1, d2) < 0.7;
+  return `, frames at start/middle/end differ by ${d1.toFixed(1)}% / ${d2.toFixed(1)}%${still ? " (PRACTICALLY A STILL PICTURE: nothing visibly moves)" : ""}`;
+}
+
 /** Measured facts about delivered media (ffprobe), for the reviewer: 2026-11-06 a "20-second film"
  *  was 9.9 s long and passed review, because nothing in the transcript said how long it was. */
 export function mediaFacts(files) {
@@ -280,7 +302,8 @@ export function mediaFacts(files) {
       const a = (j.streams || []).some((x) => x.codec_type === "audio");
       const dur = Number(j.format?.duration);
       const still = /\.(png|jpe?g|webp)$/i.test(f);
-      out.push(`${f}: ${v ? `${v.width}x${v.height}` : "no picture"}${still ? "" : `, ${Number.isFinite(dur) ? `${dur.toFixed(1)} s` : "unknown length"}, ${a ? "with audio" : "no audio"}`}`);
+      const m = !still && v && Number.isFinite(dur) && dur > 0.3 ? motionOf(expand(f), dur) : "";
+      out.push(`${f}: ${v ? `${v.width}x${v.height}` : "no picture"}${still ? "" : `, ${Number.isFinite(dur) ? `${dur.toFixed(1)} s` : "unknown length"}, ${a ? "with audio" : "no audio"}`}${m}`);
     } catch { out.push(`${f}: could not be read by ffprobe`); }
   }
   return out;
@@ -857,7 +880,7 @@ export default {
         const facts = mediaFacts(deliveredMedia(turn));
         const notes = [];
         if (audits.length) notes.push({ type: "synthetic", payload: { text: auditNote(audits) } });
-        if (facts.length) notes.push({ type: "synthetic", payload: { text: `Measured by the harness (ffprobe) — compare with what the user asked for (length, size, sound):\n${facts.join("\n")}` } });
+        if (facts.length) notes.push({ type: "synthetic", payload: { text: `Measured by the harness (ffprobe) — compare with what the user asked for (length, size, sound, motion):\n${facts.join("\n")}` } });
         const core = coreFacts();
         // the agent was given these with every request; without them a correct "your laptop has no M.2
         // slot" (from the verified laptop fact) was judged unsupported and dropped (2026-11-06)

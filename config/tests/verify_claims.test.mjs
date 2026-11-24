@@ -361,3 +361,26 @@ test("#noreview user prompt strictly skips check and needsReview", async () => {
   const turnPhrase = [user("open site, no review needed"), reply("Done: opened site.", [sh("cat site.txt")])];
   expect(needsReview(turnPhrase)).toBe(false); // cat is read-only, short text
 });
+
+describe("motion facts for delivered videos", () => {
+  const { spawnSync } = require("child_process");
+  const dir = require("fs").mkdtempSync(require("path").join(require("os").tmpdir(), "vc-motion-"));
+  const mk = (name, src) => {
+    const f = `${dir}/${name}.mp4`;
+    spawnSync("ffmpeg", ["-v", "error", "-y", "-f", "lavfi", "-i", src, "-t", "3", "-pix_fmt", "yuv420p", f]);
+    return f;
+  };
+  test("frameDiff is a 0-100 percentage", () => {
+    expect(VC.frameDiff(Buffer.from([0, 0]), Buffer.from([255, 255]))).toBe(100);
+    expect(VC.frameDiff(Buffer.from([10]), Buffer.from([10]))).toBe(0);
+    expect(VC.frameDiff(Buffer.from([1]), Buffer.from([1, 2]))).toBeNull();
+  });
+  test("a still video is flagged, a moving one is not", () => {
+    const still = mk("still", "color=c=teal:s=320x180:r=24");
+    const moving = mk("moving", "testsrc2=s=320x180:r=24");
+    const [s, m] = VC.mediaFacts([still, moving]);
+    expect(s).toContain("PRACTICALLY A STILL PICTURE");
+    expect(m).toContain("differ by");
+    expect(m).not.toContain("STILL PICTURE");
+  });
+});

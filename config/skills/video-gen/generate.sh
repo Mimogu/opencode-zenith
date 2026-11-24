@@ -12,9 +12,8 @@ QUIET=0
 log() { [ "$QUIET" -eq 1 ] || printf '%s\n' "$*" >&2; }
 die() { printf 'error: %s\n' "$*" >&2; exit 2; }
 
-TIERS=(veo seedance)
-TIER_NAMES=("OmniRoute Google Veo" "OmniRoute SeaDance")
-TIER_MODELS=("veo-free/veo" "veo-free/seedance")
+TIERS=(veo seedance ltx)
+TIER_NAMES=("OmniRoute Google Veo" "OmniRoute SeaDance" "Hugging Face LTX-Video (generate-video)")
 
 usage() {
   cat <<'EOF'
@@ -23,13 +22,14 @@ Tiered free video generation, best backend first.
   ./generate.sh "ocean waves crashing against cliffs at sunset" [-o out.mp4] [--tier N] [--list] [--quiet]
 
   -o FILE     output path (default: video.mp4)
-  --tier N    start at tier N (1-2), skipping better ones
+  --tier N    start at tier N (1-3), skipping better ones
   --list      show the tier order and exit
   --quiet     suppress progress logging
 
 Tiers, best first:
   1  OmniRoute Google Veo       via local gateway, photorealistic high definition video
   2  OmniRoute SeaDance         via local gateway, stylized dynamic motion video
+  3  Hugging Face LTX-Video     free ZeroGPU spaces via `generate-video`, if installed (uses HF_TOKEN)
 EOF
 }
 
@@ -51,7 +51,7 @@ done
 case "$START_TIER" in
   ''|*[!0-9]*) die "--tier must be a number" ;;
 esac
-[ "$START_TIER" -ge 1 ] && [ "$START_TIER" -le 2 ] || die "--tier must be 1-2"
+[ "$START_TIER" -ge 1 ] && [ "$START_TIER" -le "${#TIERS[@]}" ] || die "--tier must be 1-${#TIERS[@]}"
 
 command -v jq >/dev/null 2>&1 || die "jq is required"
 command -v curl >/dev/null 2>&1 || die "curl is required"
@@ -104,6 +104,17 @@ tier_seedance() {
   return 0
 }
 
+# Hugging Face ZeroGPU text-to-video; no camera pan/zoom fallback passed off as a generated clip
+tier_ltx() {
+  local gen
+  gen="$(command -v generate-video || echo "$HOME/.local/bin/generate-video")"
+  [ -x "$gen" ] || { log "  generate-video not installed"; return 1; }
+  timeout 900 "$gen" --prompt "$PROMPT" -o "$OUT" --require-neural >&2 || return 1
+  [ -s "$OUT" ] || return 1
+  verify_video "$OUT" || return 1
+  return 0
+}
+
 # Verify video has a stream and duration > 0
 verify_video() {
   local file="$1"
@@ -119,7 +130,7 @@ verify_video() {
   return 0
 }
 
-for (( i = START_TIER; i <= 2; i++ )); do
+for (( i = START_TIER; i <= ${#TIERS[@]}; i++ )); do
   name="${TIER_NAMES[$((i - 1))]}"
   log "tier $i: $name"
   if "tier_${TIERS[$((i - 1))]}"; then

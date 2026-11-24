@@ -1277,7 +1277,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 #### `video-gen` — AI Video Clip Generator
 - **Source Folder:** [video-gen](../config/skills/video-gen)
 - **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
-- **What It Does:** Generates short animated video clips from text prompts using tiered video generation models in OmniRoute.
+- **What It Does:** Generates short animated video clips from text prompts: tier 1 Google Veo and tier 2 SeaDance through OmniRoute, tier 3 Hugging Face LTX-Video when a `generate-video` command is installed. Every tier's file is checked with ffprobe (a video stream and a length above zero) before it counts.
 - **When to Use:** When you need a short motion clip or visual video asset.
 - **Example Prompt:**
   ```text

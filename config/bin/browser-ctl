@@ -449,12 +449,80 @@ def release_rendering() -> int:
     return n
 
 
+
+def mcp_configured(name: str) -> bool:
+    """Is MCP server `name` in opencode.json (either `mcp.servers` or the flat v1 layout)?"""
+    import json as _json
+    try:
+        mcp = _json.loads((Path.home() / ".config/opencode/opencode.json").read_text()).get("mcp", {})
+    except Exception:
+        return True  # unknown: do not block
+    servers = mcp.get("servers", mcp) if isinstance(mcp, dict) else {}
+    return name in servers and servers[name].get("enabled", True) is not False
+
+
+def browse_connected(wait: float = 0.0) -> tuple[bool, str]:
+    """(connected, next step) from `browse status --json`; polls up to `wait` seconds."""
+    import json as _json
+    deadline = time.time() + wait
+    note = "the OpenCode Browse extension is not connected"
+    while True:
+        try:
+            r = subprocess.run(["browse", "status", "--json"], capture_output=True, text=True, timeout=10)
+            j = _json.loads(r.stdout or "{}")
+            if j.get("connected") or (j.get("extension") or {}).get("connected"):
+                return True, ""
+            note = j.get("nextStep") or note
+        except Exception as e:
+            note = f"`browse status` failed ({e})"
+        if time.time() >= deadline:
+            return False, note
+        time.sleep(1.5)
+
+
+def not_connected_msg(b: dict, note: str) -> str:
+    return (f"NOT READY: {b['name']} was started, but the `browse` tools cannot drive it: {note} "
+            "Do not retry or open other browsers: tell the user (the extension's browser must be open with "
+            "the extension on), or use webfetch for a plain page.")
+
 def describe_ready(b: dict) -> str:
     if b["engine"] == "gecko":
         return f"ready: {b['name']} (Marionette 127.0.0.1:{MARIONETTE_PORT}) -> use the `my-firefox` MCP tools"
     info = cdp_info() or {}
-    return f"ready: {b['name']} ({info.get('Browser', '?')}, CDP 127.0.0.1:{CDP_PORT}) -> use the `browse` MCP tools"
+    return f"ready: {b['name']} ({info.get('Browser', '?')}), OpenCode Browse extension connected -> use the `browse` MCP tools in a new tab"
 
+
+
+def ready_or_not(b: dict, wait: float = 0.0) -> int:
+    """Print the ready line, or (for `browse` browsers whose extension is not connected) why not: exit 7."""
+    if MCP.get(b["engine"]) == "browse":
+        ok, note = browse_connected(wait)
+        if not ok:
+            print(not_connected_msg(b, note))
+            log(f"{b['id']}: started, browse extension not connected")
+            return 7
+    print(describe_ready(b))
+    return 0
+
+
+def launch_checked(b: dict, url: str | None) -> int:
+    """launch(), then wait for the extension to connect (it does so a few seconds after the browser opens)."""
+    import contextlib, io
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        r = launch(b, url)
+    out = buf.getvalue()
+    if r != 0 or MCP.get(b["engine"]) != "browse":
+        print(out, end="")
+        return r
+    print("".join(l for l in out.splitlines(True) if not l.startswith("ready:")), end="")
+    r = ready_or_not(b, wait=15)
+    if r == 7:
+        # we opened it only to automate it: do not leave a stray window behind
+        with contextlib.redirect_stdout(io.StringIO()):
+            stop(b)
+        print(f"(closed the {b['name']} window this command had opened)")
+    return r
 
 def chromium_profiles(pids: list[int]) -> set[Path]:
     """Profile dirs the running browser has open (read from /proc, so any browser/profile works)."""
@@ -579,6 +647,11 @@ def main() -> int:
     if not b["automatable"]:
         print(f"{b['name']} ({b['engine']}) cannot be automated over a protocol; use the desktop-control skill (real cursor + `see`)")
         return 5
+    tools = MCP.get(b["engine"])
+    if cmd in ("start", "restart") and tools and not mcp_configured(tools):
+        print(f"{b['name']} cannot be driven here: its automation tools (`{tools}` MCP) are not configured, so starting it would only open a window. "
+              "Use a Chrome-family browser with the OpenCode Browse extension (`browse` tools), or webfetch for a plain page.")
+        return 6
     s = state(b)
     if cmd == "status":
         print(describe_ready(b) if s == "ready" else f"{b['name']}: {s}")
@@ -586,19 +659,17 @@ def main() -> int:
     if cmd == "start":
         if s == "ready":
             keep_rendering(b)
-            print(describe_ready(b))
-            return 0
+            return ready_or_not(b)
         if s == "running-without-port":
             print(f"{b['name']} is open without its automation port. Ask the user, then: browser-ctl restart {b['id']}")
             return 3
-        return launch(b, url)
+        return launch_checked(b, url)
     if cmd == "restart":
         if s == "ready":
             keep_rendering(b)
-            print(describe_ready(b))
-            return 0
+            return ready_or_not(b)
         r = stop(b)
-        return r if r else launch(b, url)
+        return r if r else launch_checked(b, url)
     if cmd == "stop":
         return stop(b)
     print(__doc__)

@@ -16,17 +16,20 @@ Four free backends in a fallback chain, best first. `generate.sh` walks them in
 order and stops at the first that returns a valid image, so a quota exhaustion
 or rate limit on one tier never blocks a request.
 
+Run it from the user's folder (do not `cd` into this skill); `-o` is relative to the current directory, so give an absolute path when unsure.
+
 ```bash
-# defaults to ./img.jpg, walks all four tiers
-./generate.sh "a red barn in a snowy field"
+G=~/.config/opencode/skills/image-gen/generate.sh
+# defaults to ./img.jpg in the current directory, walks all four tiers
+$G "a red barn in a snowy field"
 
 # explicit output, named extension is fine - format follows the backend
-./generate.sh "minimalist app icon, indigo and cream" -o /tmp/icon.png
+$G "minimalist app icon, indigo and cream" -o "$PWD/icon.png"
 
 # skip to a specific tier (debugging, or forcing the unlimited one)
-./generate.sh "a lighthouse at dusk" --tier 3
+$G "a lighthouse at dusk" --tier 3
 
-./generate.sh --list
+$G --list
 ```
 
 **Use the script. Don't hand-roll the curl calls** — every tier has a

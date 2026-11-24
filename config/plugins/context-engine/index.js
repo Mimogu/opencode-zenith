@@ -9,6 +9,7 @@
 //   OPENCODE_NO_PLAYBOOKS=1     disable task checklists (playbooks.json)
 //   OPENCODE_NO_LINKCHECK=1     disable the link check (linkcheck.mjs)
 //   OPENCODE_NO_HINTS=1         disable hints on failed tool calls (toolhints.mjs)
+//   OPENCODE_NO_SECRET_GUARD=1 send API keys/tokens to the model unredacted (secrets.mjs)
 //   OPENCODE_NO_GUARDS=1        disable loop-guard and untrusted-content notes (guards.mjs)
 //   OPENCODE_NO_LESSONS=1       disable the learning loop (lessons.mjs): no learning, no injected lessons
 //   OPENCODE_NO_PROGRESS=1      disable progress-update notes for top-level agents (progress.mjs)
@@ -35,6 +36,7 @@ import { Playbooks, appendToUser } from "./playbooks.mjs";
 import { LinkCheck } from "./linkcheck.mjs";
 import { addHints } from "./toolhints.mjs";
 import { addGuardNotes } from "./guards.mjs";
+import { SecretGuard, redactSecrets } from "./secrets.mjs";
 import { Lessons, CORRECTION, turnTranscript } from "./lessons.mjs";
 import { addProgressNotes, REPLY_NOTE, CANCEL_REQUEST, CANCEL_REPLY_NOTE } from "./progress.mjs";
 import { AnswerCheck } from "./answercheck.mjs";
@@ -396,6 +398,7 @@ export default {
       return { blocks, reminder: [pb?.text, brNote].filter(Boolean).join("\n"), fix: !!pb?.ids?.includes("own-machine") };
     }
 
+    const secretGuard = new SecretGuard([path.join(DIR, "free-models.env"), path.join(os.homedir(), ".config", "opencode", "free-models.env")]);
     api.session.hook("context", async (ev) => {
       try {
         if (!Array.isArray(ev.system) || SKIP_AGENTS.has(ev.agent)) capImages(ev);
@@ -484,6 +487,14 @@ export default {
         if (process.env.OPENCODE_CONTEXT_DUMP) dumpSizes(ev, process.env.OPENCODE_CONTEXT_DUMP); // what is actually sent
       } catch (e) {
         log(`context hook error: ${e.stack || e.message}`);
+      } finally {
+        // every path, also subagents and early returns: keys never reach the provider
+        if (process.env.OPENCODE_NO_SECRET_GUARD !== "1" && Array.isArray(ev.messages)) {
+          try {
+            const r = redactSecrets(ev.messages, secretGuard.secrets());
+            if (r.redacted) { ev.messages = r.messages; log(`${ev.sessionID} secret-guard: hid ${r.redacted} secret value(s)`); }
+          } catch (e) { log(`secret-guard: ${e.message}`); }
+        }
       }
     });
 
