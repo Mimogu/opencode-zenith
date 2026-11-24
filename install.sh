@@ -175,7 +175,7 @@ echo "[3/5] Initializing configuration files..."
 if [ -f "${CONFIG_DIR}/opencode.json.template" ]; then
   sed "s|{{CONFIG_DIR}}|${CONFIG_DIR}|g" "${CONFIG_DIR}/opencode.json.template" > "${CONFIG_DIR}/opencode.json"
 
-  # Keep the user's own MCP servers on update; add the template's new ones
+  # On update keep the user's MCP servers, preferences and own providers/models; template settings update
   python3 - "${CONFIG_DIR}/opencode.json" "${BACKUP_DIR:-}/opencode.json" <<'MCP_MERGE' || echo "  [!] Could not merge your MCP servers; your previous config is in ${BACKUP_DIR:-the backup}."
 import json, os, shutil, sys
 
@@ -194,13 +194,38 @@ target = servers(data)
 if 'servers' in data.get('mcp', {}) or not target:
     data.setdefault('mcp', {}).setdefault('servers', target)
 
-old = {}
+old, old_full = {}, {}
 if os.path.isfile(old_path):
     try:
         with open(old_path, encoding='utf-8') as f:
-            old = servers(json.load(f))
+            old_full = json.load(f)
+        old = servers(old_full)
     except (OSError, ValueError) as e:
         print(f'  [!] Previous opencode.json unreadable ({e}); using template MCP servers only.')
+
+# Settings the user chooses; their value survives an update even though the template ships one.
+PREFS = ('model', 'small_model', 'theme', 'share', 'autoupdate', 'update', 'username', 'default_agent', 'keybinds', 'tui', 'layout', 'instructions_extra')
+
+def merge_settings(data, old):
+    for k, v in old.items():
+        if k in ('mcp', 'permission', 'permissions'):
+            continue
+        if k in ('provider', 'providers') and isinstance(v, dict) and isinstance(data.get(k), dict):
+            for pid, pcfg in v.items():
+                if pid not in data[k]:
+                    data[k][pid] = pcfg
+                elif isinstance(pcfg, dict) and isinstance(pcfg.get('models'), dict):
+                    models = data[k][pid].setdefault('models', {})
+                    for mid, mcfg in pcfg['models'].items():
+                        models.setdefault(mid, mcfg)
+            continue
+        if k in PREFS or k not in data:
+            data[k] = v
+    return data
+
+if old_full:
+    merge_settings(data, old_full)
+    print('  [✓] Kept your own settings (default model, theme, your providers and models).')
 
 for name, cfg in old.items():
     if isinstance(cfg, dict):

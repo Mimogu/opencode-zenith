@@ -484,8 +484,8 @@ The two OmniRoute video tiers use the <code>veo-free</code> provider, which need
 </details>
 
 <details>
-<summary><b>What happens to my own MCP servers and skills when I update?</b></summary>
-They stay. Every MCP server in your previous <code>opencode.json</code> is kept with your own settings (yours win over a Zenith server of the same name), and new Zenith servers are added next to them. If a local server's program is no longer installed, the installer prints <code>MCP &lt;name&gt;: command not found, disabled</code> and sets <code>"enabled": false</code> so OpenCode starts cleanly; install the program and set it back to <code>true</code>. Your own skill folders and symlinks in <code>skills/</code> are kept too; only a skill with the same name as a bundled one is replaced. Everything from before the update is in the timestamped backup (<code>~/.config/opencode.bak.&lt;date&gt;</code> on Linux, <code>%USERPROFILE%\.config\opencode.backup-&lt;date&gt;</code> on Windows).
+<summary><b>What happens to my own settings, MCP servers and skills when I update?</b></summary>
+They stay. Every MCP server in your previous <code>opencode.json</code> is kept with your own settings (yours win over a Zenith server of the same name), and new Zenith servers are added next to them. If a local server's program is no longer installed, the installer prints <code>MCP &lt;name&gt;: command not found, disabled</code> and sets <code>"enabled": false</code> so OpenCode starts cleanly; install the program and set it back to <code>true</code>. Your own skill folders and symlinks in <code>skills/</code> are kept too; only a skill with the same name as a bundled one is replaced. Everything from before the update is in the timestamped backup (<code>~/.config/opencode.bak.&lt;date&gt;</code> on Linux, <code>%USERPROFILE%\.config\opencode.backup-&lt;date&gt;</code> on Windows). Your own settings stay too: your default model, theme and other preferences, providers and models you added yourself, and any setting Zenith does not ship. Settings Zenith ships (its providers' timeouts, instructions, plugins) are updated to the new version.
 </details>
 
 <details>

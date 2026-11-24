@@ -201,7 +201,9 @@ class ApplyLadderTest(unittest.TestCase):
         for cat in oclib.CATEGORIES:
             self.assertEqual(out["categories"][cat][0], winner)
         live = set(oclib.list_models())  # models OpenCode no longer offers are dropped, by design
-        self.assertEqual(set(out["categories"]["build"]), {m for m in before if not live or m in live})
+        # measured models join the ladder even when the shipped ladders.json did not list them (Zenith installs)
+        expected = set(before) | {winner, loser}
+        self.assertEqual(set(out["categories"]["build"]), {m for m in expected if not live or m in live})
 
 
 class TierTest(unittest.TestCase):

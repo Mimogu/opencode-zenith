@@ -478,15 +478,34 @@ if 'servers' in data.get('mcp', {}) or not mcp:
 if 'browse' not in mcp:
     mcp['browse'] = {'type': 'local', 'command': ['browse', 'mcp'], 'enabled': True, 'timeout': 60000}
 
-# Keep the user's own MCP servers and other settings on update; add the template's new servers
+# Settings the user chooses; their value survives an update even though the template ships one.
+PREFS = ('model', 'small_model', 'theme', 'share', 'autoupdate', 'update', 'username', 'default_agent', 'keybinds', 'tui', 'layout', 'instructions_extra')
+
+def merge_settings(data, old):
+    for k, v in old.items():
+        if k in ('mcp', 'permission', 'permissions'):
+            continue
+        if k in ('provider', 'providers') and isinstance(v, dict) and isinstance(data.get(k), dict):
+            for pid, pcfg in v.items():
+                if pid not in data[k]:
+                    data[k][pid] = pcfg
+                elif isinstance(pcfg, dict) and isinstance(pcfg.get('models'), dict):
+                    models = data[k][pid].setdefault('models', {})
+                    for mid, mcfg in pcfg['models'].items():
+                        models.setdefault(mid, mcfg)
+            continue
+        if k in PREFS or k not in data:
+            data[k] = v
+    return data
+
+# On update keep the user's MCP servers, preferences and own providers/models; template settings update
 if os.path.isfile(p):
     try:
         with open(p, 'r', encoding='utf-8') as ef:
             old_data = json.load(ef)
         user_mcp = servers(old_data)
-        for k, v in old_data.items():
-            if k not in ('permission', 'permissions', 'mcp'):
-                data[k] = v
+        merge_settings(data, old_data)
+        print('    OK   kept your own settings (default model, theme, your providers and models)')
         for name, cfg in user_mcp.items():
             if isinstance(cfg, dict):
                 mcp[name] = cfg
