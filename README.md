@@ -73,6 +73,7 @@ OpenCode Zenith receives continuous improvements: new engineering skills, update
 
 Updating is **100% safe and non-destructive**:
 * 🛡️ **Your API keys are never touched**: `free-models.env` (Linux) and Windows User Environment variables are preserved intact.
+* 🔌 **Your MCP servers are kept**: every MCP server in your previous `opencode.json` stays with your own settings; new Zenith servers are added next to them. A local server whose program is no longer installed is switched off (`"enabled": false`) instead of failing at startup.
 * 📦 **Automatic Backup**: Your previous configuration is automatically saved with a timestamp (`~/.config/opencode.bak.<timestamp>`).
 * ⚡ **Core Engine Update**: The `opencode` CLI engine itself is automatically updated to the latest upstream release.
 

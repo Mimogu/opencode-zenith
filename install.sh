@@ -148,8 +148,11 @@ if [ -d "$CONFIG_DIR" ]; then
   echo "  [!] Existing config found at $CONFIG_DIR"
   echo "  [+] Creating backup at $BACKUP_DIR"
   cp -r "$CONFIG_DIR" "$BACKUP_DIR"
-  # Remove legacy symlinks that conflict with directory bundles
-  find "$CONFIG_DIR" -type l -exec rm -f {} + 2>/dev/null || true
+  # A bundled skill replaces a same-named skill symlink; other links (npm .bin, the user's own skills) stay
+  for bundled in "${SCRIPT_DIR}/config/skills/"*/; do
+    link="${CONFIG_DIR}/skills/$(basename "$bundled")"
+    if [ -L "$link" ]; then rm -f "$link"; fi
+  done
 fi
 
 mkdir -p "$CONFIG_DIR"
@@ -172,41 +175,54 @@ echo "[3/5] Initializing configuration files..."
 if [ -f "${CONFIG_DIR}/opencode.json.template" ]; then
   sed "s|{{CONFIG_DIR}}|${CONFIG_DIR}|g" "${CONFIG_DIR}/opencode.json.template" > "${CONFIG_DIR}/opencode.json"
 
-  # Validate MCP server availability and cleanly configure enabled/disabled states
-  python3 -c "
-import json, os, urllib.request
+  # Keep the user's own MCP servers on update; add the template's new ones
+  python3 - "${CONFIG_DIR}/opencode.json" "${BACKUP_DIR:-}/opencode.json" <<'MCP_MERGE' || echo "  [!] Could not merge your MCP servers; your previous config is in ${BACKUP_DIR:-the backup}."
+import json, os, shutil, sys
 
-p = '${CONFIG_DIR}/opencode.json'
-if not os.path.isfile(p):
-    exit(0)
-with open(p, 'r', encoding='utf-8') as f:
+new_path, old_path = sys.argv[1], sys.argv[2]
+with open(new_path, encoding='utf-8') as f:
     data = json.load(f)
 
-mcp = data.get('mcp', {})
-if 'servers' in mcp:
-    mcp = mcp['servers']
+def servers(cfg):
+    mcp = cfg.get('mcp')
+    if not isinstance(mcp, dict):
+        return {}
+    inner = mcp.get('servers')
+    return inner if isinstance(inner, dict) else mcp
 
-# Graphify is strictly operated on-demand via the /graphify skill (not as a persistent MCP server)
-# to avoid token-taxing tool schema bloat on every turn, single-project locking, and port conflicts.
-if 'graphify' in mcp:
-    del mcp['graphify']
+target = servers(data)
+if 'servers' in data.get('mcp', {}) or not target:
+    data.setdefault('mcp', {}).setdefault('servers', target)
 
-# Remove legacy persistent browser MCP servers (replaced by official browse extension MCP)
-for legacy in ['my-browser', 'my-firefox', 'camofox']:
-    if legacy in mcp:
-        del mcp[legacy]
+old = {}
+if os.path.isfile(old_path):
+    try:
+        with open(old_path, encoding='utf-8') as f:
+            old = servers(json.load(f))
+    except (OSError, ValueError) as e:
+        print(f'  [!] Previous opencode.json unreadable ({e}); using template MCP servers only.')
 
-if 'browse' not in mcp:
-    mcp['browse'] = {
-        'type': 'local',
-        'command': ['browse', 'mcp'],
-        'enabled': True,
-        'timeout': 60000
-    }
+for name, cfg in old.items():
+    if isinstance(cfg, dict):
+        target[name] = cfg
+if old:
+    print(f'  [✓] Kept your {len(old)} MCP server(s): ' + ', '.join(sorted(old)))
 
-with open(p, 'w', encoding='utf-8') as f:
+def runnable(cfg):
+    cmd = cfg.get('command')
+    if cfg.get('type') != 'local' or not cmd:
+        return True
+    exe = cmd[0] if isinstance(cmd, list) else str(cmd).split()[0]
+    return os.path.isfile(exe) if os.path.isabs(exe) else shutil.which(exe) is not None
+
+for name, cfg in target.items():
+    if isinstance(cfg, dict) and cfg.get('enabled', True) and not runnable(cfg):
+        cfg['enabled'] = False
+        print(f'  [i] MCP {name}: command not found, disabled (enable it after installing it).')
+
+with open(new_path, 'w', encoding='utf-8') as f:
     json.dump(data, f, indent=2)
-" 2>/dev/null || true
+MCP_MERGE
 fi
 
 echo "  [+] Validating OpenCode configuration..."

@@ -1,4 +1,4 @@
-﻿if ($PSVersionTable.PSVersion.Major -lt 5 -or ($PSVersionTable.PSVersion.Major -eq 5 -and $PSVersionTable.PSVersion.Minor -lt 1)) {
+if ($PSVersionTable.PSVersion.Major -lt 5 -or ($PSVersionTable.PSVersion.Major -eq 5 -and $PSVersionTable.PSVersion.Minor -lt 1)) {
     Write-Host "OpenCode Zenith requires Windows PowerShell 5.1 or higher." -ForegroundColor Red
     return
 }
@@ -463,43 +463,55 @@ with open(tpl, 'r', encoding='utf-8') as f:
     text = f.read().replace('{{CONFIG_DIR}}', r'$posixConfig').replace('\"python3\"', '\"python\"')
     data = json.loads(text)
 
-mcp = data.get('mcp', {})
-if 'servers' in mcp:
-    mcp = mcp['servers']
+import shutil
 
-# Graphify is strictly operated on-demand via the /graphify skill (not as a persistent MCP server)
-# to avoid token-taxing tool schema bloat on every turn, single-project locking, and port conflicts.
-if 'graphify' in mcp:
-    del mcp['graphify']
+def servers(cfg):
+    m = cfg.get('mcp')
+    if not isinstance(m, dict):
+        return {}
+    inner = m.get('servers')
+    return inner if isinstance(inner, dict) else m
 
-# Remove legacy persistent browser MCP servers (replaced by official browse extension MCP)
-for legacy in ['my-browser', 'my-firefox', 'camofox']:
-    if legacy in mcp:
-        del mcp[legacy]
-
+mcp = servers(data)
+if 'servers' in data.get('mcp', {}) or not mcp:
+    data.setdefault('mcp', {}).setdefault('servers', mcp)
 if 'browse' not in mcp:
-    mcp['browse'] = {
-        'type': 'local',
-        'command': ['browse', 'mcp'],
-        'enabled': True,
-        'timeout': 60000
-    }
+    mcp['browse'] = {'type': 'local', 'command': ['browse', 'mcp'], 'enabled': True, 'timeout': 60000}
 
+# Keep the user's own MCP servers and other settings on update; add the template's new servers
 if os.path.isfile(p):
     try:
         with open(p, 'r', encoding='utf-8') as ef:
             old_data = json.load(ef)
-            for k, v in old_data.items():
-                if k not in ('permission', 'permissions'):
-                    data[k] = v
-    except Exception:
-        pass
+        user_mcp = servers(old_data)
+        for k, v in old_data.items():
+            if k not in ('permission', 'permissions', 'mcp'):
+                data[k] = v
+        for name, cfg in user_mcp.items():
+            if isinstance(cfg, dict):
+                mcp[name] = cfg
+        if user_mcp:
+            print('    OK   kept your MCP servers: ' + ', '.join(sorted(user_mcp)))
+    except Exception as e:
+        print('    WARN could not read your previous opencode.json (' + str(e) + '); using the template')
+
+def runnable(cfg):
+    cmd = cfg.get('command')
+    if cfg.get('type') != 'local' or not cmd:
+        return True
+    exe = cmd[0] if isinstance(cmd, list) else str(cmd).split()[0]
+    return os.path.isfile(exe) if os.path.isabs(exe) else shutil.which(exe) is not None
+
+for name, cfg in mcp.items():
+    if isinstance(cfg, dict) and cfg.get('enabled', True) and not runnable(cfg):
+        cfg['enabled'] = False
+        print('    INFO MCP ' + name + ': command not found, disabled (enable it after installing it)')
 
 with open(p, 'w', encoding='utf-8') as f:
     json.dump(data, f, indent=2)
 "@
         try {
-            & $Python -c $pyCode 2>$null
+            & $Python -c $pyCode
         } catch {}
 
         $targetConfig = Join-Path $ConfigDir 'opencode.json'
@@ -935,7 +947,7 @@ if (Ask-YesNo 'Run a quick model test now? (uses about 3 free messages, takes a 
 
 Write-Host ''
 Write-Host '==========================================================================' -ForegroundColor Cyan
-Write-Host '               🌐 OpenCode Browser Extension Setup Guide                 ' -ForegroundColor Cyan
+Write-Host '               OpenCode Browser Extension Setup Guide                 ' -ForegroundColor Cyan
 Write-Host '==========================================================================' -ForegroundColor Cyan
 Write-Host "OpenCode uses the official 'OpenCode Browse' extension to drive your real"
 Write-Host 'browser without port conflicts or losing your login sessions.'
@@ -944,11 +956,11 @@ Write-Host '1. Install the Extension (Chrome Web Store):'
 Write-Host '   https://chromewebstore.google.com/detail/mfnicocicmmlkpjnaffgihfjhdgjkdjg' -ForegroundColor Yellow
 Write-Host ''
 Write-Host '2. Browser Compatibility:'
-Write-Host '   • Google Chrome & Chromium : Click "Add to Chrome"'
-Write-Host '   • Brave                    : Click "Add to Brave"'
-Write-Host '   • Microsoft Edge           : Click "Allow extensions from other stores",'
+Write-Host '   * Google Chrome & Chromium : Click "Add to Chrome"'
+Write-Host '   * Brave                    : Click "Add to Brave"'
+Write-Host '   * Microsoft Edge           : Click "Allow extensions from other stores",'
 Write-Host '                                then click "Add to Edge"'
-Write-Host '   • Opera / Vivaldi / Arc    : Installs directly from Chrome Web Store'
+Write-Host '   * Opera / Vivaldi / Arc    : Installs directly from Chrome Web Store'
 Write-Host ''
 Write-Host '   * Note for Firefox users: Firefox does not support Chromium extensions.'
 Write-Host '     Keep a Chromium-based browser (Edge, Chrome, Brave) installed for'
@@ -959,7 +971,7 @@ Write-Host '   Once installed, click the OpenCode Browse icon in your browser to
 Write-Host '   once to connect it to OpenCode.'
 Write-Host ''
 Write-Host '4. Recommended Extension Settings:'
-Write-Host '   • Right-click the Browse extension icon -> Options:'
+Write-Host '   * Right-click the Browse extension icon -> Options:'
 Write-Host "     - Set 'Collapse agent groups' to 'Never' to keep tabs expanded and visible"
 Write-Host '       in your tab strip (otherwise Chromium folds them into a collapsed dot).'
 Write-Host "     - 'Where agents open their tabs': 'Your window' (shared) or 'Own window'."
