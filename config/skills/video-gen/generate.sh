@@ -60,6 +60,17 @@ command -v ffprobe >/dev/null 2>&1 || log "warn: ffprobe not found; verify step 
 # Source environment
 [ -f "$ENV_FILE" ] && { set -a; . "$ENV_FILE" 2>/dev/null; set +a; }
 
+# Why a gateway tier gave no video, in words the user can act on
+gateway_reason() {
+  local msg; msg=$(printf '%s' "$1" | jq -r '.error.message // empty' 2>/dev/null)
+  case "$msg" in
+    *"rate limit"*) log "  veoaifree.com limit: it allows one video every ~5 minutes (about 5 an hour); retrying early restarts the wait" ;;
+    *"login to veoaifree"*) log "  veoaifree.com login missing or expired: paste the wordpress_logged_in cookie value into OmniRoute (Providers > Veo AI Free)" ;;
+    "") log "  no answer from OmniRoute (is it running?)" ;;
+    *) log "  $msg" ;;
+  esac
+}
+
 # ------------------------------------------------ tier 1: OmniRoute Google Veo
 tier_veo() {
   local url="http://127.0.0.1:20128/v1/videos/generations"
@@ -71,7 +82,7 @@ tier_veo() {
     -H "Content-Type: application/json" \
     -d "$(jq -nc --arg p "$PROMPT" '{model:"veo-free/veo", prompt:$p}')" 2>/dev/null)
   vid_url=$(printf '%s' "$body" | jq -r '.data[0].url // .data[0].b64_json // empty' 2>/dev/null)
-  [ -n "$vid_url" ] || return 1
+  [ -n "$vid_url" ] || { gateway_reason "$body"; return 1; }
   if [[ "$vid_url" =~ ^https?:// ]]; then
     curl -s --max-time 120 -o "$OUT" "$vid_url" 2>/dev/null || return 1
   else
@@ -93,7 +104,7 @@ tier_seedance() {
     -H "Content-Type: application/json" \
     -d "$(jq -nc --arg p "$PROMPT" '{model:"veo-free/seedance", prompt:$p}')" 2>/dev/null)
   vid_url=$(printf '%s' "$body" | jq -r '.data[0].url // .data[0].b64_json // empty' 2>/dev/null)
-  [ -n "$vid_url" ] || return 1
+  [ -n "$vid_url" ] || { gateway_reason "$body"; return 1; }
   if [[ "$vid_url" =~ ^https?:// ]]; then
     curl -s --max-time 120 -o "$OUT" "$vid_url" 2>/dev/null || return 1
   else
