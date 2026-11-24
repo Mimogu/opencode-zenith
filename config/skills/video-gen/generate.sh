@@ -55,6 +55,7 @@ esac
 
 command -v jq >/dev/null 2>&1 || die "jq is required"
 command -v curl >/dev/null 2>&1 || die "curl is required"
+command -v ffprobe >/dev/null 2>&1 || log "warn: ffprobe not found; verify step will be skipped"
 
 # Source environment
 [ -f "$ENV_FILE" ] && { set -a; . "$ENV_FILE" 2>/dev/null; set +a; }
@@ -77,6 +78,7 @@ tier_veo() {
     printf '%s' "$vid_url" | tr -d '[:space:]' | base64 -d > "$OUT" 2>/dev/null || return 1
   fi
   file -b --mime-type "$OUT" | grep -q '^video/' || return 1
+  verify_video "$OUT" || return 1
   return 0
 }
 
@@ -98,6 +100,22 @@ tier_seedance() {
     printf '%s' "$vid_url" | tr -d '[:space:]' | base64 -d > "$OUT" 2>/dev/null || return 1
   fi
   file -b --mime-type "$OUT" | grep -q '^video/' || return 1
+  verify_video "$OUT" || return 1
+  return 0
+}
+
+# Verify video has a stream and duration > 0
+verify_video() {
+  local file="$1"
+  if ! command -v ffprobe >/dev/null 2>&1; then
+    log "warn: ffprobe missing, skipping verify"
+    return 0
+  fi
+  local json dur
+  json=$(ffprobe -v error -print_format json -show_streams -show_format "$file" 2>/dev/null) || return 1
+  echo "$json" | jq -e '.streams[] | select(.codec_type=="video")' >/dev/null 2>&1 || { log "verify: no video stream"; return 1; }
+  dur=$(echo "$json" | jq -r '.format.duration // "0"' 2>/dev/null)
+  awk -v d="$dur" 'BEGIN { exit !(d + 0 > 0) }' || { log "verify: duration <= 0"; return 1; }
   return 0
 }
 

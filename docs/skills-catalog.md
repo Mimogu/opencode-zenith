@@ -1190,6 +1190,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 | If your goal is... | Choose this skill | Copy-Paste Example Prompt |
 | :--- | :--- | :--- |
 | Generating an image from a text prompt using free AI backends? | [`image-gen`](#skill-image-gen) | `@image-gen generate a cyberpunk city illustration` |
+| Editing an existing video/audio file (cut, captions, reframe, loudness, exports)? | [`ffmpeg`](#skill-ffmpeg) | `@ffmpeg cut clip.mp4 to 15 seconds and add burned-in captions` |
 | Generating a short video clip from a text prompt? | [`video-gen`](#skill-video-gen) | `@video-gen generate a 5-second video clip` |
 | Directing an animated programmatic film in artistic styles (Oil, Ukiyo-e)? | [`lemo-opuscar`](#skill-lemo-opuscar) | `@lemo-opuscar direct an explainer animation` |
 | Creating interactive generative art, flow fields, or math patterns with p5.js? | [`algorithmic-art`](#skill-algorithmic-art) | `@algorithmic-art build a particle flow field in p5.js` |
@@ -1208,6 +1209,24 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **Example Prompt:**
   ```text
   @algorithmic-art create an interactive flow field particle simulation in p5.js
+  ```
+
+<a id="skill-ffmpeg"></a>
+#### `ffmpeg` — Local Video & Audio Editing (FFmpeg)
+- **Source Folder:** [ffmpeg](../config/skills/ffmpeg)
+- **Upstream Repository:** [kajisho5/ffmpeg-skill](https://github.com/kajisho5/ffmpeg-skill) (MIT)
+- **What It Does:** 40+ deterministic Python scripts around local FFmpeg: cut, join, reframe/fit, speed, captions, overlays, silence removal, sync, loudness, HDR to SDR, platform exports and checks. Needs FFmpeg 6.1+ and Python 3.10+; no cloud, no pip packages.
+- **When to Use:** When you already have a video or audio file and want it edited or checked. For a brand-new clip from a text prompt use `video-gen`; for a story-driven film made in code use `lemo-opuscar`.
+- **How it stays reliable on small models:** run the script with `--dry-run` first (prints the exact ffmpeg command, writes nothing), then for real, then verify with `scripts/probe.py` / `scripts/verify.py`.
+- **Most-used commands:**
+  ```bash
+  python3 ~/.config/opencode/skills/ffmpeg/scripts/probe.py clip.mp4
+  python3 ~/.config/opencode/skills/ffmpeg/scripts/cut.py clip.mp4 --start 5 --duration 15 -o out.mp4 --dry-run
+  python3 ~/.config/opencode/skills/ffmpeg/scripts/render.py --list-templates
+  ```
+- **Example Prompt:**
+  ```text
+  @ffmpeg cut clip.mp4 from 0:05 to 0:20 and export it for TikTok
   ```
 
 <a id="skill-godot4-dev"></a>
@@ -1292,7 +1311,8 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 | Mapping an entire codebase into a searchable graph of functions and calls? | [`graphify`](#skill-graphify) | `@graphify build a knowledge graph of this repo` |
 | Building a custom Model Context Protocol (MCP) server for AI tools? | [`mcp-builder`](#skill-mcp-builder) | `@mcp-builder build a Python MCP server` |
 | Importing saved chat memories from ChatGPT, Claude, or Gemini into local memory? | [`memory-import`](#skill-memory-import) | `@memory-import import memories from memories.json` |
-| Discovering and installing new agent skills from online repositories? | [`find-skills`](#skill-find-skills) | `@find-skills search for Rust skills` |
+| Discovering and installing new agent skills from online repositories? | [`ffmpeg`](#skill-ffmpeg) | [Creative, Media, Gaming & 3D](#creative-media-gaming-3d) | Edits existing video and audio locally with FFmpeg scripts (cut, captions, reframe, loudness, exports), dry-run first and verified after. |
+| [`find-skills`](#skill-find-skills) | `@find-skills search for Rust skills` |
 | Creating or scaffolding brand new custom skills for OpenCode? | [`skill-creator`](#skill-skill-creator) | `@skill-creator scaffold a new skill` |
 | Auditing how many tokens your system prompt and active tools consume? | [`context-budget`](#skill-context-budget) | `@context-budget audit token consumption` |
 | Preventing the model from truncating or cutting off large output files? | [`output-skill`](#skill-output-skill) | `@output-skill ensure the full file is printed` |
@@ -1438,7 +1458,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 
 ---
 
-## Alphabetical Index of All 90 Skills
+## Alphabetical Index of All 91 Skills
 
 | Skill | Category | Quick Purpose |
 | :--- | :--- | :--- |

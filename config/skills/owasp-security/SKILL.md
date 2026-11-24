@@ -32,8 +32,25 @@ Performs an exhaustive security review of application code and configuration aga
 ## Audit Command
 When auditing a repository:
 ```bash
-# Search for raw string interpolations in SQL / shell calls
-git grep -E "(exec|query|raw)\(.*\$\{.*\}\)" || true
-# Scan for hardcoded keys or tokens
-git grep -iE "(api_key|secret|password|bearer|auth)\s*[:=]\s*['\"][a-zA-Z0-9_\-]{8,}['\"]" || true
+# Set the scope first: only the files/directories the user named ("." = whole repo)
+SCOPE=(src/routes src/auth)
+# JS/TS template interpolation in SQL / shell calls
+git grep -nE '(exec|query|raw)\(.*\$\{.*\}' -- "${SCOPE[@]}" || true
+# Python f-string, %, + or .format() in SQL / shell calls
+git grep -nE "\.(execute|executemany|raw|query)\(\s*(f[\"']|.*[\"']\s*(%|\+)|.*\.format\()|os\.system\(|subprocess\..*shell\s*=\s*True" -- "${SCOPE[@]}" || true
+# Hardcoded keys or tokens
+git grep -niE "(api_key|secret|password|bearer|auth)\s*[:=]\s*['\"][a-zA-Z0-9_\-]{8,}['\"]" -- "${SCOPE[@]}" || true
 ```
+Grep only finds candidates: read each hit before reporting it. Outside a git repo use `grep -rnE` with the same patterns.
+
+## Path Scope
+Audit only the files/directories the user declared (the `SCOPE` above). Do not report findings outside them; mention them in one line at most.
+
+## Triage Gate (every finding must pass)
+Every reported finding MUST include all four, otherwise it is **downgraded** (not reported):
+1. `file:line` evidence (exact location from grep/scan)
+2. Concrete exploit path (how an attacker would trigger it)
+3. Severity: CRITICAL / HIGH / MEDIUM / LOW (with justification)
+4. Fix (specific code change or pattern to apply)
+
+No finding is reported without all four. This replaces "exploit further to prove it" with a documentation gate.

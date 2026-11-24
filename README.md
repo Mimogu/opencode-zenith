@@ -257,8 +257,8 @@ OpenCode Zenith integrates natively with the official **OpenCode Browse** extens
 ---
 
 ## 📚 Complete Skills Catalog (90+ Skills)
-OpenCode Zenith bundles **90 production-grade engineering skills**. All skills operate in **Manual On-Demand Invocation Mode** — they consume **zero token budget** during normal conversation and only load instructions when you explicitly invoke them with `@<name>` (e.g. `@docx create a report from notes.txt` or `@web-research search for...`).
-For the full directory of all 90 skills with decision matrices and prompt recipes, see the comprehensive [Skills Catalog Guide](docs/skills-catalog.md).
+OpenCode Zenith bundles **91 production-grade engineering skills**. All skills operate in **Manual On-Demand Invocation Mode** — they consume **zero token budget** during normal conversation and only load instructions when you explicitly invoke them with `@<name>` (e.g. `@docx create a report from notes.txt` or `@web-research search for...`).
+For the full directory of all 91 skills with decision matrices and prompt recipes, see the comprehensive [Skills Catalog Guide](docs/skills-catalog.md).
 
 > [!TIP]
 > **Why is Graphify Run On-Demand (and NOT as a Persistent MCP Server)?**  
@@ -269,7 +269,7 @@ For the full directory of all 90 skills with decision matrices and prompt recipe
 
 ---
 
-### 🗂️ All 90 Available Skills & Original Repositories by Category
+### 🗂️ All 91 Available Skills & Original Repositories by Category
 
 <details open>
 <summary><b>1. Document, Office & Content Creation</b> (6 skills) — <i>Tools for generating, editing, and converting Word, PowerPoint, Excel, PDF, and Markdown files.</i></summary>
@@ -426,11 +426,12 @@ For the full directory of all 90 skills with decision matrices and prompt recipe
 </details>
 
 <details open>
-<summary><b>11. Creative, Media, Gaming & 3D</b> (7 skills) — <i>AI image/video generation, programmatic film direction, Godot 4, generative art, and 3D voxels.</i></summary>
+<summary><b>11. Creative, Media, Gaming & 3D</b> (8 skills) — <i>AI image/video generation, programmatic film direction, Godot 4, generative art, and 3D voxels.</i></summary>
 
 | Skill | Original GitHub Repository | When to Use / Scenario | Example Use / Prompt |
 | :--- | :--- | :--- | :--- |
 | **`image-gen`** | [anthropics/skills](https://github.com/anthropics/skills) | When you need an image, avatar, illustration, or visual asset generated from a prompt. | `@image-gen generate an illustration of a cozy cyberpunk coffee shop` |
+| **`ffmpeg`** | [kajisho5/ffmpeg-skill](https://github.com/kajisho5/ffmpeg-skill) | When you need to edit an existing video or audio file locally: cut, join, reframe, captions, loudness, platform exports. Every edit runs as a dry-run first and is checked with `probe.py` afterwards. | `@ffmpeg cut clip.mp4 from 0:05 to 0:20 and export it for TikTok` |
 | **`video-gen`** | [anthropics/skills](https://github.com/anthropics/skills) | When you need a short motion clip or visual video asset. | `@video-gen generate a 5-second video of ocean waves crashing at sunset` |
 | **`lemo-opuscar`** | [anthropics/skills](https://github.com/anthropics/skills) | When creating programmatic video explainers, educational animations, or artistic short films. | `@lemo-opuscar direct a short animation explaining gravity in watercolor style` |
 | **`algorithmic-art`** | [anthropics/skills](https://github.com/anthropics/skills) | When creating creative coding projects, generative backgrounds, or interactive math visualizers. | `@algorithmic-art create an interactive flow field particle simulation in p5.js` |
@@ -469,6 +470,11 @@ Yes! While Zenith is specialized to maximize free model performance, you can add
 <details>
 <summary><b>Will the installer overwrite my existing tools?</b></summary>
 No. The installer checks if Git, Python, Node, Bun, and ripgrep are already installed and skips them. If you already have a <code>~/.config/opencode</code> folder, it creates a timestamped backup before deploying.
+</details>
+
+<details>
+<summary><b>What happens to my own MCP servers and skills when I update?</b></summary>
+They stay. Every MCP server in your previous <code>opencode.json</code> is kept with your own settings (yours win over a Zenith server of the same name), and new Zenith servers are added next to them. If a local server's program is no longer installed, the installer prints <code>MCP &lt;name&gt;: command not found, disabled</code> and sets <code>"enabled": false</code> so OpenCode starts cleanly; install the program and set it back to <code>true</code>. Your own skill folders and symlinks in <code>skills/</code> are kept too; only a skill with the same name as a bundled one is replaced. Everything from before the update is in the timestamped backup (<code>~/.config/opencode.bak.&lt;date&gt;</code> on Linux, <code>%USERPROFILE%\.config\opencode.backup-&lt;date&gt;</code> on Windows).
 </details>
 
 <details>
