@@ -22,6 +22,8 @@ Standard AI coding assistants either burn expensive cloud tokens or fail miserab
 
 ## 📥 How to Install (Choose Your Preferred Method)
 
+> **Tested with OpenCode 2.4.0.** The installers install the latest OpenCode, and bring an older 2.x install up to date (on Linux, an OpenCode from your system package manager is left to it, with a reminder to update).
+
 You can install OpenCode Zenith in under 2 minutes. The installer is **completely non-destructive** — it checks what you already have installed (Git, Python, Node, Bun) and skips existing tools without overwriting your personal files.
 
 ### Method 1: The 1-Line Terminal Command (Recommended)

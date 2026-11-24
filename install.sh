@@ -123,7 +123,29 @@ if [ -z "$OC_VER" ] || [ "${OC_MAJOR:-0}" -lt 2 ]; then
   OC_VER="$(get_opencode_version)"
   echo "  [✓] OpenCode ${OC_VER:-2.x} ready."
 else
-  echo "  [✓] OpenCode $OC_VER found."
+  # Zenith is tested on this OpenCode version; older 2.x installs are brought up to it
+  OC_TESTED="2.4.0"
+  if [ "$OC_VER" != "$OC_TESTED" ] && [ "$(printf '%s\n%s\n' "$OC_VER" "$OC_TESTED" | sort -V | head -n 1)" = "$OC_VER" ]; then
+    OC_PATH="$(readlink -f "$(command -v opencode)" 2>/dev/null || command -v opencode)"
+    if [[ "$OC_PATH" == /usr/* || "$OC_PATH" == /opt/* ]]; then
+      # a system package: a second copy from npm would shadow it, so the package manager updates it
+      echo "  [!] OpenCode $OC_VER is older than $OC_TESTED, the version Zenith is tested on."
+      echo "      It came from your system package manager: update it there (e.g. 'sudo pacman -Syu', 'paru -Syu' or 'sudo apt upgrade')."
+    else
+      echo "  [+] Updating OpenCode $OC_VER -> latest (Zenith is tested on $OC_TESTED)..."
+      if has_cmd bun && [[ "$OC_PATH" == *"/.bun/"* ]]; then
+        bun install -g @opencode/cli@latest || true
+      elif has_cmd npm && [[ "$OC_PATH" == *node_modules* || "$OC_PATH" == *npm* ]]; then
+        npm install -g @opencode/cli@latest 2>/dev/null || true
+      else
+        curl -fsSL https://opencode.ai/install | bash || true
+      fi
+      OC_VER="$(get_opencode_version)"
+      echo "  [✓] OpenCode ${OC_VER} ready."
+    fi
+  else
+    echo "  [✓] OpenCode $OC_VER found."
+  fi
 fi
 
 # OmniRoute gateway

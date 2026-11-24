@@ -349,6 +349,27 @@ if (-not $oc -or ($oc.Version.Major -lt 2)) {
 }
 
 if (-not $oc) { Fail 'OpenCode is not on PATH after installing. Open a new window and run install.bat again.' }
+
+# Zenith is tested on this OpenCode version; an older 2.x install is updated (a warning if that fails)
+$OcTested = [version]'2.4.0'
+if ($oc.Version.Major -ge 2 -and $oc.Version -lt $OcTested) {
+    Info "Updating OpenCode $($oc.Version) -> latest (Zenith is tested on $OcTested) ..."
+    if (Have 'winget') {
+        try { & winget upgrade --id Anomaly.OpenCode -e --silent --accept-package-agreements --accept-source-agreements 2>$null | Out-Null } catch {}
+        Refresh-Path
+        $oc = Find-ValidOpenCode
+    }
+    if ($oc -and $oc.Version -lt $OcTested -and (Have 'npm') -and ($oc.Path -match 'npm')) {
+        & npm install -g @opencode/cli@latest 2>$null | Out-Null
+        Refresh-Path
+        $oc = Find-ValidOpenCode
+    }
+    if ($oc -and $oc.Version -lt $OcTested) {
+        Warn "OpenCode $($oc.Version) is older than $OcTested, the version Zenith is tested on: update it with 'winget upgrade Anomaly.OpenCode' or 'npm install -g @opencode/cli@latest'"
+    } elseif ($oc) {
+        Ok "OpenCode updated to $($oc.Version)"
+    }
+}
 if ($oc.Version.Major -lt 2) {
     Fail "OpenCode 2.x is required for Zenith (found $($oc.Version) at $($oc.Path)). Run 'npm install -g @opencode/cli@latest' to update."
 }
