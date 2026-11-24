@@ -739,14 +739,14 @@
   ]
  },
  "browser-automation": {
-  "hash": "b854183ca9fb6aae",
+  "hash": "016dbbafdaf53b20",
   "examples": [
-   "Can you open up my dashboard on the staging site, click the export button, and download the PDF report for me?",
-   "Check if the login button on our homepage actually works by running a quick click test in a real browser session.",
-   "The checkout page is hanging when I try to submit payment, can you inspect the network tab and console logs while reproducing the click?",
-   "go to https://news.ycombinator.com and grab the top 5 titles",
-   "I need to capture a performance trace and Core Web Vitals for our main landing page to see why it's loading so slow on mobile.",
-   "Fill out the registration form at app.example.com/signup using a burner email and submit it."
+   "Can you open up Chrome and go to Hacker News, then click on the top story?",
+   "log into my github using my actual browser window and grab a screenshot of the dashboard",
+   "The checkout button on this page isn't responding when I click it manually, can you take a look at the console logs and network tab using the extension?",
+   "Need to fill out this multi-step registration form on localhost:3000, but there's a Cloudflare CAPTCHA halfway through that I'll need to solve myself.",
+   "Por favor, abre Brave y navega a mi cuenta de Jira para ver las tareas pendientes.",
+   "Run a quick script to click through the cookie banner and pagination on this search results page until you find the item with ref @e45."
   ]
  },
  "web-design-guidelines": {
@@ -782,14 +782,14 @@
   ]
  },
  "lemo-opuscar": {
-  "hash": "b133b5b4c3013624",
+  "hash": "ed7548a1d1ce8f70",
   "examples": [
-   "Can you make a short animated promo about our new coffee machine that looks like an oil painting?",
-   "Generate an explainer video breaking down how a jet engine works using that CAD-style teardown look.",
-   "I need a cinematic 30-second animation for a sci-fi teaser, but I have no idea which aesthetic would fit best—can we pick one?",
-   "帮我用浮世绘的风格做一个关于东京樱花季的短片。",
-   "Make a satellite briefing style data visualization showing global migration patterns over the last decade.",
-   "I want to build a completely custom visual style for our brand's announcement video from scratch."
+   "Can you make a cool 30-second animated promo for my coffee shop that looks like an oil painting?",
+   "I need an explainer video for our new drone hardware, showing all the internal parts coming apart like a technical teardown.",
+   "Make a short film about climate change using satellite data views and a military briefing aesthetic.",
+   "帮我用浮世绘的风格做一个关于赛博朋ク京都的短片动画",
+   "Let's create a custom animation from scratch for my portfolio, but I have no idea which visual style would fit best.",
+   "The client wants an archive-style historical documentary piece cut together about the 1969 moon landing."
   ]
  },
  "data-analyze": {
@@ -966,6 +966,50 @@
    "make a churn prediction project I can show clients on Mostaql",
    "add another project to my portfolio site",
    "what portfolio project should I do next to look like a data scientist?"
+  ]
+ },
+ "ffmpeg-skill": {
+  "hash": "c3e97e98428d8a8b",
+  "examples": [
+   "Can you make this mp4 shorter and add auto-captions for my reel?",
+   "fix audio sync on my recording.mov",
+   "Export this footage for TikTok, it keeps failing platform checks.",
+   "The dialogue on this wav file is way too quiet compared to the music, can we normalize it?",
+   "Convert this HDR clip to standard SDR so the colors look right.",
+   "Cut out all the dead air and long pauses from this podcast interview m4a."
+  ]
+ },
+ "line-art-animation": {
+  "hash": "f51b18322da417d8",
+  "examples": [
+   "can you make a cute little doodle of a cat chasing its tail for the header of my blog?",
+   "Need an animated scene for my landing page showing a cozy village at night with lights turning on in the windows and smoke coming from chimneys.",
+   "make it like this clip: a tiny person riding a bicycle across the screen while wind blows leaves past them",
+   "add a hand-drawn walking animation of a delivery guy to the footer, keep it looking like black ink on white paper",
+   "quiero una ilustración animada de un parque con gente caminando y un ciclo de día y noche",
+   "The hero section feels too static. Can we put some sketchy, minimal line-art animations of people going about their day so the page feels alive?"
+  ]
+ },
+ "markitdown": {
+  "hash": "935495c7d47c4943",
+  "examples": [
+   "Can you turn this PDF report into a markdown file so I can read it easier?",
+   "extract text from docx",
+   "I have a zip full of random documents and spreadsheets, and I need to feed all their contents into an LLM, but first I need everything converted into a clean text format like markdown. What's the best way to script this?",
+   "How do I parse an Excel sheet and a couple of PowerPoint decks into markdown format using Python?",
+   "My script is crashing when trying to read tables out of binary files, need a tool to convert these office docs and PDFs to text/markdown.",
+   "Por favor, convierte este archivo EPUB a markdown para que pueda agregarlo a mi base de conocimientos."
+  ]
+ },
+ "cartoon-3d-short": {
+  "hash": "14cd9afbb9e35034",
+  "examples": [
+   "Make another vertical video just like that bridge one with the cartoon characters in the 3D town.",
+   "can you do a historical short about the Apollo 11 moon landing in that 2D bean-head style over 3D painted backgrounds?",
+   "Generate a 60-second vertical cartoon short about Marie Curie using Three.js and Remotion, march music and all.",
+   "The client wants a science story video in the exact same visual style as 'The Bridge That Fell for a Song'.",
+   "创建一段讲达芬奇生平的竖屏动画短片，要那种二维卡通人物加上三维手绘背景的风格。",
+   "we need a quick educational short about the industrial revolution told with those flat ink-outlined characters moving through a depth-of-field 3D world."
   ]
  }
 }

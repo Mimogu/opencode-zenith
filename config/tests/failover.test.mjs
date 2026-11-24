@@ -38,3 +38,16 @@ test("the failover waits for a close reset instead of stopping, and never waits 
   expect(src).toMatch(/isFreeCap && m\.startsWith\("opencode\/"\)/);
   expect(src).not.toMatch(/return candidates\[0\] \|\| currentModel/);
 });
+
+test("big inputs leave flint-40b-free for the next usable model of the same provider (2026-11-24 stall)", async () => {
+  const { bigInputModel, BIG_INPUT_CHARS } = await import("../plugins/auto-failover/index.js");
+  const chain = ["opencode/flint-40b-free", "opencode/iceman-free", "nvidia/nvidia/nemotron-3-ultra", "opencode/beam-free", "opencode/hy4-flash-free"];
+  const meta = { "opencode/iceman-free": { context: 262144 }, "nvidia/nvidia/nemotron-3-ultra": { context: 1048576 },
+    "opencode/beam-free": { context: 1048576 }, "opencode/hy4-flash-free": { context: 1048576 } };
+  const big = BIG_INPUT_CHARS + 1;
+  expect(bigInputModel("opencode/flint-40b-free", big, chain, new Set(), meta)).toBe("opencode/beam-free"); // iceman: 262k, too small
+  expect(bigInputModel("opencode/flint-40b-free", big, chain, new Set(["opencode/beam-free"]), meta)).toBe("opencode/hy4-flash-free");
+  expect(bigInputModel("opencode/flint-40b-free", 500, chain, new Set(), meta)).toBeNull();
+  expect(bigInputModel("opencode/beam-free", big * 2, chain, new Set(), meta)).toBeNull();
+  expect(bigInputModel("opencode/flint-40b-free", big, ["opencode/flint-40b-free", "opencode/iceman-free"], new Set(), meta)).toBeNull();
+});

@@ -384,3 +384,15 @@ describe("motion facts for delivered videos", () => {
     expect(m).not.toContain("STILL PICTURE");
   });
 });
+
+test("a bare status word answering a question is not a change claim (2026-11-24 scheduling puzzle)", () => {
+  const q = user("Seven tasks, two workers. What is the minimum makespan? Give a schedule.");
+  const ans = "Fixed: the minimum makespan is **10 time units**.\n\nWorker 1: A, C, E. Worker 2: B, F, D, G.";
+  expect(check([q, reply(ans)], { stat: statOld })).toBeNull();
+  expect(VC.statusWordOnly("**Done.** The answer is 391.")).toBe(true);
+  // still caught: a fix request, a change verb, a path, or first person
+  expect(check([user("fix my screen sharing"), reply(ans)], { stat: statOld })).not.toBeNull();
+  expect(check([q, reply("Fixed: edited ~/.config/app/conf to set the limit.")], { stat: statOld })).not.toBeNull();
+  expect(VC.statusWordOnly("Done: restarted the portal services")).toBe(false);
+  expect(check([q, reply(HALLUCINATED)], { stat: statOld })).not.toBeNull();
+});

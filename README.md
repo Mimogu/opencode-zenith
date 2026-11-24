@@ -260,9 +260,9 @@ OpenCode Zenith integrates natively with the official **OpenCode Browse** extens
 
 ---
 
-## 📚 Complete Skills Catalog (91 Skills)
-OpenCode Zenith bundles **91 production-grade engineering skills**. All skills operate in **Manual On-Demand Invocation Mode** — they consume **zero token budget** during normal conversation and only load instructions when you explicitly invoke them with `@<name>` (e.g. `@docx create a report from notes.txt` or `@web-research search for...`).
-For the full directory of all 91 skills with decision matrices and prompt recipes, see the comprehensive [Skills Catalog Guide](docs/skills-catalog.md).
+## 📚 Complete Skills Catalog (93 Skills)
+OpenCode Zenith bundles **93 production-grade engineering skills**. All skills operate in **Manual On-Demand Invocation Mode** — they consume **zero token budget** during normal conversation and only load instructions when you explicitly invoke them with `@<name>` (e.g. `@docx create a report from notes.txt` or `@web-research search for...`).
+For the full directory of all 93 skills with decision matrices and prompt recipes, see the comprehensive [Skills Catalog Guide](docs/skills-catalog.md).
 
 > [!TIP]
 > **Why is Graphify Run On-Demand (and NOT as a Persistent MCP Server)?**  
@@ -273,7 +273,7 @@ For the full directory of all 91 skills with decision matrices and prompt recipe
 
 ---
 
-### 🗂️ All 91 Available Skills & Original Repositories by Category
+### 🗂️ All 93 Available Skills & Original Repositories by Category
 
 <details open>
 <summary><b>1. Document, Office & Content Creation</b> (6 skills) — <i>Tools for generating, editing, and converting Word, PowerPoint, Excel, PDF, and Markdown files.</i></summary>
@@ -436,6 +436,8 @@ For the full directory of all 91 skills with decision matrices and prompt recipe
 | :--- | :--- | :--- | :--- |
 | **`image-gen`** | [anthropics/skills](https://github.com/anthropics/skills) | When you need an image, avatar, illustration, or visual asset generated from a prompt. | `@image-gen generate an illustration of a cozy cyberpunk coffee shop` |
 | **`ffmpeg`** | [kajisho5/ffmpeg-skill](https://github.com/kajisho5/ffmpeg-skill) | When you need to edit an existing video or audio file locally: cut, join, reframe, captions, loudness, platform exports. Every edit runs as a dry-run first and is checked with `probe.py` afterwards. | `@ffmpeg cut clip.mp4 from 0:05 to 0:20 and export it for TikTok` |
+| **`line-art-animation`** | [JDhruv14/line-art-animation](https://github.com/JDhruv14/line-art-animation) | Animated line-art / ink illustrations in SVG + TypeScript: walking people, wind, day/night scenes, exported to video frame by frame. |
+| **`cartoon-3d-short`** | [mromidev/claude-animated-shorts](https://github.com/mromidev/claude-animated-shorts) | ~60 s vertical cartoon story shorts (2D characters in a 3D world) with narration and music, rendered with three.js in Remotion. Run its `setup_project.sh` once. |
 | **`video-gen`** | [anthropics/skills](https://github.com/anthropics/skills) | When you need a short motion clip or visual video asset. | `@video-gen generate a 5-second video of ocean waves crashing at sunset` |
 | **`lemo-opuscar`** | [anthropics/skills](https://github.com/anthropics/skills) | When creating programmatic video explainers, educational animations, or artistic short films. | `@lemo-opuscar direct a short animation explaining gravity in watercolor style` |
 | **`algorithmic-art`** | [anthropics/skills](https://github.com/anthropics/skills) | When creating creative coding projects, generative backgrounds, or interactive math visualizers. | `@algorithmic-art create an interactive flow field particle simulation in p5.js` |
@@ -478,7 +480,7 @@ No. The installer checks if Git, Python, Node, Bun, and ripgrep are already inst
 
 <details>
 <summary><b>@video-gen says "all video tiers failed" or "Authentication required: login to veoaifree.com"</b></summary>
-The two OmniRoute video tiers use the <code>veo-free</code> provider, which needs a signed-in veoaifree.com session; when it is signed out, both tiers fail. Reconnect that provider in the OmniRoute dashboard (<code>http://localhost:20128</code>). If a <code>generate-video</code> command is installed, <code>@video-gen</code> falls back to it (Hugging Face LTX-Video, uses <code>HF_TOKEN</code>) as tier 3. Each tier's output is checked with ffprobe, so an empty or broken file is never reported as a video.
+The two OmniRoute video tiers use the <code>veo-free</code> provider, which needs your veoaifree.com login. Being signed in in your browser is not enough: OmniRoute needs a copy of the login cookie. Sign in at veoaifree.com, press F12 → Application → Cookies → <code>https://veoaifree.com</code>, click the <code>wordpress_logged_in_…</code> row and copy the <b>whole</b> value from the box below the table (about 120+ characters, with <code>|</code> or <code>%7C</code> between its parts). Then in the OmniRoute dashboard (<code>http://localhost:20128</code>) open Providers → Veo AI Free → Add PAT and paste <code>wordpress_logged_in_…=VALUE</code> (name, <code>=</code>, value). The cookie works like a password: keep it private. If a <code>generate-video</code> command is installed, <code>@video-gen</code> falls back to it (Hugging Face LTX-Video, uses <code>HF_TOKEN</code>) as tier 3. Each tier's output is checked with ffprobe, so an empty or broken file is never reported as a video.
 </details>
 
 <details>

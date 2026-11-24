@@ -272,6 +272,24 @@ function updateConfigDefaultModel(newModel, previousModel) {
     });
 }
 
+
+// Big inputs. 2026-11-24: flint-40b-free (ladder head) opened a reasoning stream on a 120 KB message
+// and then sent only empty chunks for 15 min: chunkTimeout counts gaps between chunks, so it never
+// fired, no error reached the retry hook and nothing failed over. beam-free (same provider, 1M context)
+// answered the same prompt correctly in 52 s. Such a request starts on the next usable model of the
+// same provider instead (model.resolve can only swap within one provider).
+export const BIG_INPUT_CHARS = 60_000;
+export const BIG_INPUT_AVOID = new Set(["opencode/flint-40b-free"]);
+// The replacement must also be a long-context model: iceman-free (262k) took the same prompt without
+// stalling but answered 8/9/9/12 for 19/23/22/25 ERROR lines; beam-free (1M) was exact.
+export const BIG_INPUT_CONTEXT = 1_000_000;
+export function bigInputModel(current, userChars, chain, cooling = new Set(), meta = {}) {
+  if (!BIG_INPUT_AVOID.has(current) || userChars < BIG_INPUT_CHARS) return null;
+  const provider = current.split("/")[0];
+  return chain.find((m) => m !== current && !BIG_INPUT_AVOID.has(m) && m.startsWith(`${provider}/`) && !cooling.has(m)
+    && Number(meta[m]?.context || 0) >= BIG_INPUT_CONTEXT) || null;
+}
+
 export default {
   id: "auto-failover",
   setup(api) {
@@ -279,6 +297,24 @@ export default {
       log("api.session.hook unavailable in this build — failover disabled");
       return;
     }
+
+    api.session.hook("experimental.model.resolve", async (ev) => {
+      if (process.env.OPENCODE_NO_FAILOVER === "1" || ev.kind === "title" || !ev.model) return;
+      try {
+        const cur = `${ev.model.providerID}/${ev.model.id}`;
+        if (!BIG_INPUT_AVOID.has(cur)) return;
+        const messages = await api.session.context({ sessionID: ev.sessionID });
+        const user = (messages || []).findLast((m) => m?.type === "user");
+        const chars = String(user?.text || "").length;
+        const now = Date.now() / 1000;
+        const st = cooldownState();
+        const resting = new Set(Object.keys(st).filter((m) => Number(st[m]?.cooldown_until || 0) > now));
+        const next = bigInputModel(cur, chars, chainFor(categoryFor(ev.agent, cur)), resting, ladders().meta || {});
+        if (!next) return;
+        ev.model = toModelObj(next);
+        log(`${ev.sessionID} big input (${chars} chars): ${cur} -> ${next} for this request`);
+      } catch (e) { log(`big-input check failed: ${e.message}`); }
+    });
 
     api.session.hook("retry", async (event) => {
       if (process.env.OPENCODE_NO_FAILOVER === "1") return;

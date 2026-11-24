@@ -10,6 +10,7 @@
     ],
     "opt_out_token": "#noskills",
     "strong_model_skills": [
+      "cartoon-3d-short",
       "lemo-opuscar"
     ],
     "_strong_model_skills": "skills that need a strong model: injecting one switches a build session to the strongest measured model (context-engine strongStart)"
@@ -321,6 +322,17 @@
     "ml-workflow": [
       "\\b(train|build|tune|evaluate)\\b(\\W+\\w+){0,4}\\W+(model|classifier|regressor)\\b(?!.*\\b(3d|blender|godot|mesh)\\b)",
       "\\b(xgboost|lightgbm|scikit[- ]learn|sklearn|cross[- ]validation|data leakage|feature importance|shap)\\b"
+    ],
+    "line-art-animation": [
+      "\\b(line[- ]?art|ink(ed)?|pen|doodle|hand[- ]drawn|sketchy?|stick[- ]figure)\\b(\\W+[\\w-]+){0,5}\\W+(animat\\w*|walk\\w*|walking|scene|illustrations?|characters?)\\b",
+      "\\banimated (illustration|doodle|line[- ]?art|scene component)s?\\b",
+      "\\bday[- ]?(and[- ])?night cycle\\b"
+    ],
+    "cartoon-3d-short": [
+      "\\b(3d cartoon|cartoon 3d|cartoon[- ]style 3d|2d characters in (a )?(colou?rful )?3d)\\b",
+      "\\bcartoon (story |history |science )?shorts?\\b",
+      "\\blike the (bridge|soldiers?)( (video|short))?\\b",
+      "\\bcartoon[- ]3d[- ]short\\b"
     ]
   }
 }

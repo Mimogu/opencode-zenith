@@ -171,22 +171,22 @@
           "name": "agy/claude-sonnet-4-6 (vision, auto-added by see --calibrate)"
         },
         "cloudflare-ai/@cf/meta/llama-3.3-70b-instruct-fp8-fast": {
-          "name": "Cloudflare Workers AI \u00b7 Llama 3.3 70B (free daily)"
+          "name": "Cloudflare Workers AI · Llama 3.3 70B (free daily)"
         },
         "cloudflare-ai/@cf/qwen/qwen2.5-coder-32b-instruct": {
-          "name": "Cloudflare Workers AI \u00b7 Qwen 2.5 Coder 32B (free daily)"
+          "name": "Cloudflare Workers AI · Qwen 2.5 Coder 32B (free daily)"
         },
         "cloudflare-ai/@cf/zai-org/glm-4.7-flash": {
-          "name": "Cloudflare Workers AI \u00b7 GLM 4.7 Flash (free daily)"
+          "name": "Cloudflare Workers AI · GLM 4.7 Flash (free daily)"
         },
         "sambanova/gpt-oss-120b": {
-          "name": "SambaNova \u00b7 GPT-OSS 120B (free tier)"
+          "name": "SambaNova · GPT-OSS 120B (free tier)"
         },
         "sambanova/Meta-Llama-3.3-70B-Instruct": {
-          "name": "SambaNova \u00b7 Llama 3.3 70B (free tier)"
+          "name": "SambaNova · Llama 3.3 70B (free tier)"
         },
         "sambanova/MiniMax-M3.1-Flash": {
-          "name": "SambaNova \u00b7 MiniMax M3.1 Flash (free tier)"
+          "name": "SambaNova · MiniMax M3.1 Flash (free tier)"
         }
       }
     },
@@ -220,6 +220,11 @@
         "poolside/laguna-xs-2.1": {
           "name": "Poolside Laguna XS 2.1 (NVIDIA NIM free)"
         }
+      }
+    },
+    "opencode": {
+      "settings": {
+        "chunkTimeout": 45000
       }
     }
   },

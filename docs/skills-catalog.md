@@ -1191,6 +1191,8 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 | :--- | :--- | :--- |
 | Generating an image from a text prompt using free AI backends? | [`image-gen`](#skill-image-gen) | `@image-gen generate a cyberpunk city illustration` |
 | Editing an existing video/audio file (cut, captions, reframe, loudness, exports)? | [`ffmpeg`](#skill-ffmpeg) | `@ffmpeg cut clip.mp4 to 15 seconds and add burned-in captions` |
+| Animated line-art / ink illustrations (walking people, day-night scenes) as an SVG component or video? | [`line-art-animation`](#skill-line-art-animation) | `@line-art-animation a little ink scene of a baker opening his shop at dawn` |
+| A ~60 s vertical cartoon story short (2D characters in a 3D world, narration, music)? | [`cartoon-3d-short`](#skill-cartoon-3d-short) | `@cartoon-3d-short a 60 second short about why the Leaning Tower leans` |
 | Generating a short video clip from a text prompt? | [`video-gen`](#skill-video-gen) | `@video-gen generate a 5-second video clip` |
 | Directing an animated programmatic film in artistic styles (Oil, Ukiyo-e)? | [`lemo-opuscar`](#skill-lemo-opuscar) | `@lemo-opuscar direct an explainer animation` |
 | Creating interactive generative art, flow fields, or math patterns with p5.js? | [`algorithmic-art`](#skill-algorithmic-art) | `@algorithmic-art build a particle flow field in p5.js` |
@@ -1227,6 +1229,30 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **Example Prompt:**
   ```text
   @ffmpeg cut clip.mp4 from 0:05 to 0:20 and export it for TikTok
+  ```
+
+<a id="skill-line-art-animation"></a>
+#### `line-art-animation` — Animated Line-Art SVG Components
+- **Source Folder:** [line-art-animation](../config/skills/line-art-animation)
+- **Upstream Repository:** [JDhruv14/line-art-animation](https://github.com/JDhruv14/line-art-animation) (MIT)
+- **What It Does:** Thin-pen line-art scenes in SVG + TypeScript: people and animals that walk and react with a real gait solver (planted feet, no sliding), springs for scarves and lanterns, wind from the pointer, and a day/night palette. Exports deterministic video frame by frame through headless Chrome/Brave + ffmpeg.
+- **When To Use It:** an animated illustration, doodle or ink scene for a page, or a short line-art video.
+- **How it stays reliable on small models:** a `?debug` mode steps time exactly, so frames can be checked one by one; `scripts/capture.ts` finds Chrome or Brave by itself.
+- **Example Prompt:**
+  ```text
+  @line-art-animation a hand-drawn delivery rider cycling past a row of shops, as a 10 s video
+  ```
+
+<a id="skill-cartoon-3d-short"></a>
+#### `cartoon-3d-short` — Cartoon 3D Story Shorts (three.js + Remotion)
+- **Source Folder:** [cartoon-3d-short](../config/skills/cartoon-3d-short)
+- **Upstream Repository:** [mromidev/claude-animated-shorts](https://github.com/mromidev/claude-animated-shorts) (MIT; its private style-reference frames are not bundled)
+- **What It Does:** A full pipeline for ~60 s vertical story shorts: researched script, narration with word timings (`scripts/make_voice.py`, edge-tts), shot plan timed to the words, a painted 3D town with ink outlines and depth of field, bean-head cartoon characters, synthesized SFX and music, QA of every frame.
+- **Setup:** `bash ~/.config/opencode/skills/cartoon-3d-short/scripts/setup_project.sh` creates `~/remotion-shorts` with pinned versions (React 18; React 19 renders blank frames) and the example "bridge" short.
+- **Needs a strong model:** the router switches the session to the strongest measured model when this skill is used.
+- **Example Prompt:**
+  ```text
+  @cartoon-3d-short a 60 second cartoon short about the Great Molasses Flood of 1919
   ```
 
 <a id="skill-godot4-dev"></a>
@@ -1311,8 +1337,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 | Mapping an entire codebase into a searchable graph of functions and calls? | [`graphify`](#skill-graphify) | `@graphify build a knowledge graph of this repo` |
 | Building a custom Model Context Protocol (MCP) server for AI tools? | [`mcp-builder`](#skill-mcp-builder) | `@mcp-builder build a Python MCP server` |
 | Importing saved chat memories from ChatGPT, Claude, or Gemini into local memory? | [`memory-import`](#skill-memory-import) | `@memory-import import memories from memories.json` |
-| Discovering and installing new agent skills from online repositories? | [`ffmpeg`](#skill-ffmpeg) | [Creative, Media, Gaming & 3D](#creative-media-gaming-3d) | Edits existing video and audio locally with FFmpeg scripts (cut, captions, reframe, loudness, exports), dry-run first and verified after. |
-| [`find-skills`](#skill-find-skills) | `@find-skills search for Rust skills` |
+| Discovering and installing new agent skills from online repositories? | [`find-skills`](#skill-find-skills) | `@find-skills search for Rust skills` |
 | Creating or scaffolding brand new custom skills for OpenCode? | [`skill-creator`](#skill-skill-creator) | `@skill-creator scaffold a new skill` |
 | Auditing how many tokens your system prompt and active tools consume? | [`context-budget`](#skill-context-budget) | `@context-budget audit token consumption` |
 | Preventing the model from truncating or cutting off large output files? | [`output-skill`](#skill-output-skill) | `@output-skill ensure the full file is printed` |
@@ -1458,7 +1483,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 
 ---
 
-## Alphabetical Index of All 91 Skills
+## Alphabetical Index of All 93 Skills
 
 | Skill | Category | Quick Purpose |
 | :--- | :--- | :--- |
@@ -1473,6 +1498,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 | [`brainstorming`](#skill-brainstorming) | [Autonomous Multi-Agent & Orchestration](#autonomous-multi-agent-orchestration) | Facilitates structured brainstorming: explores multiple technical approaches, weighs pros and cons, and clarifies requirements before deciding.. |
 | [`browser-automation`](#skill-browser-automation) | [System, Desktop, Browser & Tooling](#system-desktop-browser-tooling) | Drives the user's real desktop browser via the OpenCode Browse extension with saved logins and CAPTCHA hand-off.. |
 | [`canvas-design`](#skill-canvas-design) | [Document, Office & Content Creation](#document-office-content-creation) | Generates visual artwork, posters, infographics, and book covers rendered into high-resolution PNG or PDF files.. |
+| [`cartoon-3d-short`](#skill-cartoon-3d-short) | [Creative, Media, Gaming & 3D](#creative-media-gaming-3d) | Makes ~60 s vertical cartoon story shorts: 2D characters in an ink-outlined 3D world, narration, music, rendered with three.js in Remotion. |
 | [`chisle`](#skill-chisle) | [Software Architecture, Coding & Refactoring](#software-architecture-coding-refactoring) | A hyper-efficient, minimal-overhead development and audit mode designed to execute changes cleanly with the least tokens possible.. |
 | [`code-review`](#skill-code-review) | [Code Review, Auditing & Security](#code-review-auditing-security) | Conducts thorough code reviews examining correctness, security vulnerabilities, edge cases, maintainability, and code style.. |
 | [`codebase-design`](#skill-codebase-design) | [Software Architecture, Coding & Refactoring](#software-architecture-coding-refactoring) | Guides the design of deep classes and modules (simple public interfaces hiding powerful internal complexity) based on clean architecture principles.. |
@@ -1503,6 +1529,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 | [`dual-viewport-ui`](#skill-dual-viewport-ui) | [Web, Frontend & UI/UX Design](#web-frontend-ui-ux-design) | Architects synchronized dual-pane web interfaces that combine an interactive 3D WebGL scene with a reactive 2D parameter control panel.. |
 | [`engineering-principles`](#skill-engineering-principles) | [Software Architecture, Coding & Refactoring](#software-architecture-coding-refactoring) | Enforces pragmatic software craftsmanship: subtract unnecessary code before adding, fix root causes, avoid over-engineering, and keep codebase lean.. |
 | [`experiment-and-inference`](#skill-experiment-and-inference) | [Data Science, Analytics & Visualizations](#data-science-analytics-visualizations) | Designs controlled experiments and A/B tests: sample size calculations, power analysis, randomization, and causal effect estimation.. |
+| [`ffmpeg`](#skill-ffmpeg) | [Creative, Media, Gaming & 3D](#creative-media-gaming-3d) | Edits existing video and audio locally with FFmpeg scripts (cut, captions, reframe, loudness, exports), dry-run first and verified after. |
 | [`find-skills`](#skill-find-skills) | [System, Desktop, Browser & Tooling](#system-desktop-browser-tooling) | Discovers and installs new agent skills from online repositories (skills.sh, GitHub) matching tasks you want to accomplish.. |
 | [`frontend-design`](#skill-frontend-design) | [Web, Frontend & UI/UX Design](#web-frontend-ui-ux-design) | Helps create visually distinctive, polished, and personality-driven web interfaces with cohesive color schemes, micro-interactions, and typography.. |
 | [`geo-sleuth`](#skill-geo-sleuth) | [Web Research, Academic & Document Intelligence](#web-research-academic-document-intelligence) | Geolocates or chronolocates photos using tool-verified evidence: camera metadata (EXIF), landmarks, sun shadow math, street view, and OCR signs.. |
@@ -1512,6 +1539,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 | [`graphify`](#skill-graphify) | [System, Desktop, Browser & Tooling](#system-desktop-browser-tooling) | Converts an entire codebase into a persistent knowledge graph mapping all functions, classes, imports, and calls for fast architectural queries.. |
 | [`image-gen`](#skill-image-gen) | [Creative, Media, Gaming & 3D](#creative-media-gaming-3d) | Generates images from text prompts using available free backend providers (e.g., OVH AI, Pollinations, HuggingFace Flux/SD).. |
 | [`lemo-opuscar`](#skill-lemo-opuscar) | [Creative, Media, Gaming & 3D](#creative-media-gaming-3d) | Directs and renders short films entirely through code in distinct artistic styles (Oil Painting, Watercolor, Ukiyo-e, Exploded Teardown, Satellite Briefing).. |
+| [`line-art-animation`](#skill-line-art-animation) | [Creative, Media, Gaming & 3D](#creative-media-gaming-3d) | Animated thin-pen line-art SVG scenes (walking figures, wind, day/night) with deterministic video export. |
 | [`markitdown`](#skill-markitdown) | [Document, Office & Content Creation](#document-office-content-creation) | Converts virtually any document or media format (PDF, Word, PPTX, Excel, HTML, CSV, audio, images, ZIP) into clean, readable Markdown.. |
 | [`mcfunction-builder`](#skill-mcfunction-builder) | [Creative, Media, Gaming & 3D](#creative-media-gaming-3d) | Calculates Minecraft survival crafting stacks (64-item base stacks + remainders), chest layout math, and resource gathering quantities.. |
 | [`mcp-builder`](#skill-mcp-builder) | [System, Desktop, Browser & Tooling](#system-desktop-browser-tooling) | Guides the creation of robust, standard-compliant Model Context Protocol (MCP) servers (Python/Node.js) to give AI agents custom tools and resources.. |

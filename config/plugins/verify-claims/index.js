@@ -70,6 +70,20 @@ export function findClaims(text) {
   return claims;
 }
 
+/** True for a claim line that is only a leading status word ("Fixed:", "**Done.**") followed by an
+ *  answer that names no change: no change verb, no path, not first person, not a bullet claim. */
+export function statusWordOnly(line) {
+  const m = String(line).match(/^\s*(?:\*\*)?(fixed|done|resolved)(?:\*\*)?\s*[:!.\-—]/i);
+  if (!m || FIRST_PERSON.test(line)) return false;
+  const rest = line.slice(m[0].length);
+  if (BULLET.test(rest)) return false;
+  if (new RegExp(`\\b(${VERBS})\\b`, "i").test(rest)) return false;
+  PATH_RE.lastIndex = 0;
+  const hasPath = PATH_RE.test(rest);
+  PATH_RE.lastIndex = 0;
+  return !hasPath;
+}
+
 const PATH_RE = /(?:^|[\s`'"(=])((?:~|\/)[\w.@%+\-/]*[\w])/g;
 export function claimedPaths(claims) {
   const out = new Set();
@@ -174,6 +188,10 @@ export function check(messages, { stat = (p) => fs.statSync(p), slackMs = 3000 }
   // "what did you change?" is answered from earlier turns: judge against the whole session then
   const userText = String(turn[0]?.text || "");
   if (CANCEL_REQUEST.test(userText) || NO_REVIEW.test(userText)) return null;
+  // A question asked nothing to be changed, and "Fixed: the minimum makespan is 10" names no action:
+  // only a status word. 2026-11-24 that reply to a scheduling puzzle was sent back and the agent wrote
+  // a pointless answer file to "comply". Claims with a change verb, a path or "I …" are still checked.
+  if (!FIX_REQUEST.test(userText) && claims.every(statusWordOnly)) return null;
   const recap = /\b(what|which)\b.{0,40}\b(did you|have you|you)\b.{0,20}\b(change|do|did|edit|fix|modify|install)|\b(summar|recap|remind me)/i.test(userText);
   // "ok then just remove it" after it was removed in the previous turn: the honest reply is "already
   // done" with nothing changed now. 2026-11-11 that reply was sent back three times and escalated.
