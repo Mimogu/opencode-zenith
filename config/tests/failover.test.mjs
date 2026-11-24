@@ -51,3 +51,27 @@ test("big inputs leave flint-40b-free for the next usable model of the same prov
   expect(bigInputModel("opencode/beam-free", big * 2, chain, new Set(), meta)).toBeNull();
   expect(bigInputModel("opencode/flint-40b-free", big, ["opencode/flint-40b-free", "opencode/iceman-free"], new Set(), meta)).toBeNull();
 });
+
+test("stall guard: empty-delta streams are ended, real output passes through untouched", async () => {
+  const { watchStream, PROGRESS } = await import("../plugins/auto-failover/index.js");
+  const enc = new TextEncoder();
+  const keepalive = 'data: {"choices":[{"delta":{"reasoning_content":""}}]}\n\n';
+  const real = 'data: {"choices":[{"delta":{"content":"Hello"}}]}\n\n';
+  expect(PROGRESS.test(keepalive)).toBe(false);
+  expect(PROGRESS.test(real)).toBe(true);
+  expect(PROGRESS.test('data: {"choices":[{"delta":{"tool_calls":[{"id":"c1"}]}}]}')).toBe(true);
+  expect(PROGRESS.test("data: [DONE]")).toBe(true);
+  // a stream that only ever sends empty deltas
+  const endless = (chunk) => new ReadableStream({ async pull(c) { await new Promise((r) => setTimeout(r, 10)); c.enqueue(enc.encode(chunk)); } });
+  let stalled = false;
+  const s = watchStream(endless(keepalive), { stallMs: 120, tickMs: 20, onStall: () => { stalled = true; } });
+  let err = null;
+  try { const rd = s.getReader(); for (;;) { const { done } = await rd.read(); if (done) break; } } catch (e) { err = e; }
+  expect(stalled).toBe(true);
+  expect(String(err?.message)).toContain("stream idle timeout");
+  // real output keeps it alive and every byte arrives unchanged
+  const parts = [real, real, "data: [DONE]\n\n"];
+  const fin = new ReadableStream({ async pull(c) { await new Promise((r) => setTimeout(r, 60)); const p = parts.shift(); p ? c.enqueue(enc.encode(p)) : c.close(); } });
+  const out = await new Response(watchStream(fin, { stallMs: 100, tickMs: 20 })).text();
+  expect(out).toBe(real + real + "data: [DONE]\n\n");
+});

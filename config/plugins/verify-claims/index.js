@@ -295,17 +295,29 @@ export function frameDiff(a, b) {
   for (let i = 0; i < a.length; i++) sum += Math.abs(a[i] - b[i]);
   return (sum / a.length / 255) * 100;
 }
+/** Share (0-100) of pixels that clearly changed (> 24 of 255): a small figure walking across a still
+ *  background changes 1-3 % of a 160x90 frame, codec noise and a frozen picture change < 0.5 %. The mean
+ *  difference above scored a correct line-art walk (2026-11-24) as "still" because the figure was small. */
+export function changedShare(a, b, thr = 24) {
+  if (!a || !b || a.length !== b.length || !a.length) return null;
+  let n = 0;
+  for (let i = 0; i < a.length; i++) if (Math.abs(a[i] - b[i]) > thr) n++;
+  return (n / a.length) * 100;
+}
+const MW = 160, MH = 90;
 function greyFrame(file, t) {
-  const r = spawnSync("ffmpeg", ["-v", "error", "-ss", String(t), "-i", file, "-frames:v", "1", "-vf", "scale=64:36,format=gray", "-f", "rawvideo", "-"], { timeout: 15000, maxBuffer: 1 << 20 });
-  return r.status === 0 && r.stdout?.length === 64 * 36 ? r.stdout : null;
+  const r = spawnSync("ffmpeg", ["-v", "error", "-ss", String(t), "-i", file, "-frames:v", "1", "-vf", `scale=${MW}:${MH},format=gray`, "-f", "rawvideo", "-"], { timeout: 15000, maxBuffer: 1 << 22 });
+  return r.status === 0 && r.stdout?.length === MW * MH ? r.stdout : null;
 }
 function motionOf(file, dur) {
-  const ts = [0.05, dur / 2, Math.max(0, dur - 0.1)];
-  const fr = ts.map((t) => greyFrame(file, t.toFixed(2)));
-  const d1 = frameDiff(fr[0], fr[1]), d2 = frameDiff(fr[1], fr[2]);
-  if (d1 === null || d2 === null) return "";
-  const still = Math.max(d1, d2) < 0.7;
-  return `, frames at start/middle/end differ by ${d1.toFixed(1)}% / ${d2.toFixed(1)}%${still ? " (PRACTICALLY A STILL PICTURE: nothing visibly moves)" : ""}`;
+  const ts = [0.05, dur * .25, dur * .5, dur * .75, Math.max(0, dur - 0.25)];
+  const fr = ts.map((t) => greyFrame(file, t.toFixed(2))).filter(Boolean);
+  const d = [];
+  for (let i = 1; i < fr.length; i++) d.push(changedShare(fr[i - 1], fr[i]));
+  if (d.length < 2) return "";
+  const most = Math.max(...d);
+  const note = most < 0.5 ? " (PRACTICALLY A STILL PICTURE: nothing visibly moves)" : most < 1.5 ? " (very little moves: check that the subject really moves)" : "";
+  return `, between ${fr.length} points in time at most ${most.toFixed(1)}% of the picture changes${note}`;
 }
 
 /** Measured facts about delivered media (ffprobe), for the reviewer: 2026-11-06 a "20-second film"

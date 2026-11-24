@@ -341,22 +341,20 @@ test("own-machine mode sticks to a session: follow-ups that do not name the app 
   expect(ownMachineSession([u("explain mutexes"), u(follow)], follow)).toBe(false);
 });
 
-test("video routes: films/explainers -> lemo-opuscar, quick clips -> video-gen, UI work -> neither", () => {
+test("video routes: quick clips -> video-gen, UI work -> no video skill; removed film skills stay removed", () => {
   const routes = JSON.parse(fs.readFileSync(new URL("../skill-routes.json", import.meta.url), "utf-8")).routes;
-  const hit = (id, t) => routes[id].some((p) => new RegExp(p, "i").test(t));
-  const film = ["Make a 30-second film in the watercolor style about my grandmother's garden", "make me a short animated explainer video about how a CPU cache works",
-    "can you make a promo video for my bakery in a pixel art style", "make an animation about the water cycle for my class", "which film styles can you do?"];
-  for (const t of film) expect([t, hit("lemo-opuscar", t)]).toEqual([t, true]);
-  const notFilm = ["generate a quick 5 second video clip of a cat surfing", "make a react component that renders a video player", "create a video upload endpoint in express",
-    "build an animation for the loading spinner in css", "add a fade-in animation to the modal"];
-  for (const t of notFilm) expect([t, hit("lemo-opuscar", t)]).toEqual([t, false]);
+  const hit = (id, t) => (routes[id] || []).some((p) => new RegExp(p, "i").test(t));
+  // 2026-11-24: lemo-opuscar and cartoon-3d-short were removed after their test films were not usable
+  expect(routes["lemo-opuscar"]).toBeUndefined();
+  expect(routes["cartoon-3d-short"]).toBeUndefined();
   expect(hit("video-gen", "generate a quick 5 second video clip of a cat surfing")).toBe(true);
-  expect(hit("video-gen", "Make a 30-second film in the watercolor style")).toBe(false);
+  for (const t of ["make a react component that renders a video player", "create a video upload endpoint in express",
+    "build an animation for the loading spinner in css", "add a fade-in animation to the modal"]) expect([t, hit("video-gen", t)]).toEqual([t, false]);
 });
 
 test("strong-model skills are configured, exist, and strong-start is shared by both triggers", () => {
   const settings = JSON.parse(fs.readFileSync(new URL("../skill-routes.json", import.meta.url), "utf-8")).settings;
-  expect(settings.strong_model_skills).toContain("lemo-opuscar");
+  expect(Array.isArray(settings.strong_model_skills)).toBe(true);
   for (const id of settings.strong_model_skills) expect(fs.existsSync(path.join(os.homedir(), ".agents/skills", id)) || fs.existsSync(new URL(`../skills/${id}`, import.meta.url))).toBe(true);
   const src = fs.readFileSync(new URL("../plugins/context-engine/index.js", import.meta.url), "utf-8");
   expect(src.match(/await strongStart\(/g).length).toBe(3);

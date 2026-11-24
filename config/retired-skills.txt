@@ -1,0 +1,4 @@
+# Skills Zenith used to ship and removed; the installers delete these folders on update
+# (a symlink to the user's own copy is left alone). The backup taken before the update still has them.
+lemo-opuscar   # 2026-11-24: test films not usable
+cartoon-3d-short   # 2026-11-24: test clip not usable

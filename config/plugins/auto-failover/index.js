@@ -290,6 +290,50 @@ export function bigInputModel(current, userChars, chain, cooling = new Set(), me
     && Number(meta[m]?.context || 0) >= BIG_INPUT_CONTEXT) || null;
 }
 
+
+// No-progress watchdog. 2026-11-24, twice in one day: flint-40b-free (120 KB prompt) and
+// mimo-v2.6-flash-free (normal prompt) opened a reasoning stream and then sent only empty deltas
+// for 5-15 min. chunkTimeout counts gaps between chunks, so it never fired and nothing failed over.
+// Every SSE response is passed through watchStream: a chunk counts as progress only when it carries
+// text, reasoning text, a tool call or a finish reason. After STALL_MS without progress the stream
+// is ended with "stream idle timeout", which the retry hook below treats as a stall (same model
+// once, then the next model). Off: OPENCODE_NO_STALL_GUARD=1.
+export const STALL_MS = Number(process.env.OPENCODE_STALL_MS) || 120_000;
+export const PROGRESS = /"(content|reasoning_content|reasoning|text|thinking|partial_json|arguments|delta_text)"\s*:\s*"(?!")|"tool_calls"\s*:\s*\[\s*\{|"finish_reason"\s*:\s*"|"type"\s*:\s*"(message_stop|content_block_start)"|\[DONE\]/;
+export function watchStream(body, { stallMs = STALL_MS, onStall = () => {}, isProgress = (s) => PROGRESS.test(s), now = () => Date.now(), tickMs = 5000 } = {}) {
+  const reader = body.getReader();
+  const decoder = new TextDecoder();
+  let last = now(), timer = null, finished = false;
+  return new ReadableStream({
+    start(controller) {
+      const check = () => {
+        if (finished) return;
+        if (now() - last >= stallMs) {
+          finished = true;
+          onStall(now() - last);
+          reader.cancel().catch(() => {});
+          controller.error(new Error(`stream idle timeout: no output for ${Math.round((now() - last) / 1000)} s`));
+          return;
+        }
+        timer = setTimeout(check, tickMs);
+      };
+      timer = setTimeout(check, tickMs);
+    },
+    async pull(controller) {
+      try {
+        const { done, value } = await reader.read();
+        if (finished) return;
+        if (done) { finished = true; clearTimeout(timer); controller.close(); return; }
+        if (isProgress(decoder.decode(value, { stream: true }))) last = now();
+        controller.enqueue(value);
+      } catch (e) {
+        if (!finished) { finished = true; clearTimeout(timer); controller.error(e); }
+      }
+    },
+    cancel(reason) { finished = true; clearTimeout(timer); return reader.cancel(reason); },
+  });
+}
+
 export default {
   id: "auto-failover",
   setup(api) {
@@ -297,6 +341,19 @@ export default {
       log("api.session.hook unavailable in this build — failover disabled");
       return;
     }
+
+    api.session.hook("http.response", async (ev) => {
+      if (process.env.OPENCODE_NO_STALL_GUARD === "1") return;
+      try {
+        const r = ev.response;
+        if (!r?.body || !/event-stream/i.test(r.headers.get("content-type") || "")) return;
+        const test = process.env.OPENCODE_STALL_TEST === "1" ? () => false : undefined;
+        ev.response = new Response(watchStream(r.body, {
+          ...(test ? { isProgress: test } : {}),
+          onStall: (ms) => log(`${ev.sessionID || "?"} stream idle ${Math.round(ms / 1000)} s with no output: ending it so failover can act`),
+        }), { status: r.status, statusText: r.statusText, headers: r.headers });
+      } catch (e) { log(`stall guard skipped: ${e.message}`); }
+    });
 
     api.session.hook("experimental.model.resolve", async (ev) => {
       if (process.env.OPENCODE_NO_FAILOVER === "1" || ev.kind === "title" || !ev.model) return;

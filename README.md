@@ -260,9 +260,9 @@ OpenCode Zenith integrates natively with the official **OpenCode Browse** extens
 
 ---
 
-## 📚 Complete Skills Catalog (93 Skills)
-OpenCode Zenith bundles **93 production-grade engineering skills**. All skills operate in **Manual On-Demand Invocation Mode** — they consume **zero token budget** during normal conversation and only load instructions when you explicitly invoke them with `@<name>` (e.g. `@docx create a report from notes.txt` or `@web-research search for...`).
-For the full directory of all 93 skills with decision matrices and prompt recipes, see the comprehensive [Skills Catalog Guide](docs/skills-catalog.md).
+## 📚 Complete Skills Catalog (91 Skills)
+OpenCode Zenith bundles **91 production-grade engineering skills**. All skills operate in **Manual On-Demand Invocation Mode** — they consume **zero token budget** during normal conversation and only load instructions when you explicitly invoke them with `@<name>` (e.g. `@docx create a report from notes.txt` or `@web-research search for...`).
+For the full directory of all 91 skills with decision matrices and prompt recipes, see the comprehensive [Skills Catalog Guide](docs/skills-catalog.md).
 
 > [!TIP]
 > **Why is Graphify Run On-Demand (and NOT as a Persistent MCP Server)?**  
@@ -273,7 +273,7 @@ For the full directory of all 93 skills with decision matrices and prompt recipe
 
 ---
 
-### 🗂️ All 93 Available Skills & Original Repositories by Category
+### 🗂️ All 91 Available Skills & Original Repositories by Category
 
 <details open>
 <summary><b>1. Document, Office & Content Creation</b> (6 skills) — <i>Tools for generating, editing, and converting Word, PowerPoint, Excel, PDF, and Markdown files.</i></summary>
@@ -437,9 +437,7 @@ For the full directory of all 93 skills with decision matrices and prompt recipe
 | **`image-gen`** | [anthropics/skills](https://github.com/anthropics/skills) | When you need an image, avatar, illustration, or visual asset generated from a prompt. | `@image-gen generate an illustration of a cozy cyberpunk coffee shop` |
 | **`ffmpeg`** | [kajisho5/ffmpeg-skill](https://github.com/kajisho5/ffmpeg-skill) | When you need to edit an existing video or audio file locally: cut, join, reframe, captions, loudness, platform exports. Every edit runs as a dry-run first and is checked with `probe.py` afterwards. | `@ffmpeg cut clip.mp4 from 0:05 to 0:20 and export it for TikTok` |
 | **`line-art-animation`** | [JDhruv14/line-art-animation](https://github.com/JDhruv14/line-art-animation) | Animated line-art / ink illustrations in SVG + TypeScript: walking people, wind, day/night scenes, exported to video frame by frame. |
-| **`cartoon-3d-short`** | [mromidev/claude-animated-shorts](https://github.com/mromidev/claude-animated-shorts) | ~60 s vertical cartoon story shorts (2D characters in a 3D world) with narration and music, rendered with three.js in Remotion. Run its `setup_project.sh` once. |
 | **`video-gen`** | [anthropics/skills](https://github.com/anthropics/skills) | When you need a short motion clip or visual video asset. | `@video-gen generate a 5-second video of ocean waves crashing at sunset` |
-| **`lemo-opuscar`** | [anthropics/skills](https://github.com/anthropics/skills) | When creating programmatic video explainers, educational animations, or artistic short films. | `@lemo-opuscar direct a short animation explaining gravity in watercolor style` |
 | **`algorithmic-art`** | [anthropics/skills](https://github.com/anthropics/skills) | When creating creative coding projects, generative backgrounds, or interactive math visualizers. | `@algorithmic-art create an interactive flow field particle simulation in p5.js` |
 | **`godot4-dev`** | [godotengine/godot](https://github.com/godotengine/godot) | When developing 2D or 3D games, mechanics, or UI inside the Godot 4 engine. | `@godot4-dev create a character controller script with double-jump in GDScript` |
 | **`voxel-craft-cad`** | [anthropics/skills](https://github.com/anthropics/skills) | When building procedural voxel worlds, 3D structures, or algorithmic building generators. | `@voxel-craft-cad generate a procedural spiral castle tower in voxels` |
@@ -485,7 +483,7 @@ The two OmniRoute video tiers use the <code>veo-free</code> provider, which need
 
 <details>
 <summary><b>What happens to my own settings, MCP servers and skills when I update?</b></summary>
-They stay. Every MCP server in your previous <code>opencode.json</code> is kept with your own settings (yours win over a Zenith server of the same name), and new Zenith servers are added next to them. If a local server's program is no longer installed, the installer prints <code>MCP &lt;name&gt;: command not found, disabled</code> and sets <code>"enabled": false</code> so OpenCode starts cleanly; install the program and set it back to <code>true</code>. Your own skill folders and symlinks in <code>skills/</code> are kept too; only a skill with the same name as a bundled one is replaced. Everything from before the update is in the timestamped backup (<code>~/.config/opencode.bak.&lt;date&gt;</code> on Linux, <code>%USERPROFILE%\.config\opencode.backup-&lt;date&gt;</code> on Windows). Your own settings stay too: your default model, theme and other preferences, providers and models you added yourself, and any setting Zenith does not ship. Settings Zenith ships (its providers' timeouts, instructions, plugins) are updated to the new version.
+They stay. Every MCP server in your previous <code>opencode.json</code> is kept with your own settings (yours win over a Zenith server of the same name), and new Zenith servers are added next to them. If a local server's program is no longer installed, the installer prints <code>MCP &lt;name&gt;: command not found, disabled</code> and sets <code>"enabled": false</code> so OpenCode starts cleanly; install the program and set it back to <code>true</code>. Your own skill folders and symlinks in <code>skills/</code> are kept too; only a skill with the same name as a bundled one is replaced. Everything from before the update is in the timestamped backup (<code>~/.config/opencode.bak.&lt;date&gt;</code> on Linux, <code>%USERPROFILE%\.config\opencode.backup-&lt;date&gt;</code> on Windows). Your own settings stay too: your default model, theme and other preferences, providers and models you added yourself, and any setting Zenith does not ship. Settings Zenith ships (its providers' timeouts, instructions, plugins) are updated to the new version. Skills Zenith has removed (listed in <code>config/retired-skills.txt</code>) are deleted on update; your backup keeps a copy, and a skill you linked in yourself is never touched.
 </details>
 
 <details>

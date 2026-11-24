@@ -158,6 +158,14 @@ fi
 mkdir -p "$CONFIG_DIR"
 cp -r --remove-destination "${SCRIPT_DIR}/config/"* "$CONFIG_DIR/" 2>/dev/null || cp -r -f "${SCRIPT_DIR}/config/"* "$CONFIG_DIR/"
 rm -rf "${CONFIG_DIR}/__pycache__" "${CONFIG_DIR}/tests/__pycache__"
+# Skills Zenith removed (config/retired-skills.txt): delete the old copies; a symlink to the user's own copy stays
+if [ -f "${CONFIG_DIR}/retired-skills.txt" ]; then
+  sed -e 's/#.*//' "${CONFIG_DIR}/retired-skills.txt" | while read -r retired; do
+    [ -n "$retired" ] || continue
+    target="${CONFIG_DIR}/skills/${retired}"
+    if [ -d "$target" ] && [ ! -L "$target" ]; then rm -rf "$target" && echo "  [i] Removed retired skill: ${retired}"; fi
+  done
+fi
 
 # Setup OpenCode Browse CLI & MCP (drives real desktop browsers via browser extension)
 echo "  [+] Setting up OpenCode Browse (real browser automation)..."

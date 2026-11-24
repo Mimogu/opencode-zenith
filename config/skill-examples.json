@@ -781,17 +781,6 @@
       "The memory leak is gone, I monitored the profiler for 10 minutes and usage is flat. We're good to merge."
     ]
   },
-  "lemo-opuscar": {
-    "hash": "ed7548a1d1ce8f70",
-    "examples": [
-      "Can you make a cool 30-second animated promo for my coffee shop that looks like an oil painting?",
-      "I need an explainer video for our new drone hardware, showing all the internal parts coming apart like a technical teardown.",
-      "Make a short film about climate change using satellite data views and a military briefing aesthetic.",
-      "帮我用浮世绘的风格做一个关于赛博朋ク京都的短片动画",
-      "Let's create a custom animation from scratch for my portfolio, but I have no idea which visual style would fit best.",
-      "The client wants an archive-style historical documentary piece cut together about the 1969 moon landing."
-    ]
-  },
   "data-analyze": {
     "hash": "9307f5fca5d66f1b",
     "examples": [
@@ -999,17 +988,6 @@
       "How do I parse an Excel sheet and a couple of PowerPoint decks into markdown format using Python?",
       "My script is crashing when trying to read tables out of binary files, need a tool to convert these office docs and PDFs to text/markdown.",
       "Por favor, convierte este archivo EPUB a markdown para que pueda agregarlo a mi base de conocimientos."
-    ]
-  },
-  "cartoon-3d-short": {
-    "hash": "14cd9afbb9e35034",
-    "examples": [
-      "Make another vertical video just like that bridge one with the cartoon characters in the 3D town.",
-      "can you do a historical short about the Apollo 11 moon landing in that 2D bean-head style over 3D painted backgrounds?",
-      "Generate a 60-second vertical cartoon short about Marie Curie using Three.js and Remotion, march music and all.",
-      "The client wants a science story video in the exact same visual style as 'The Bridge That Fell for a Song'.",
-      "创建一段讲达芬奇生平的竖屏动画短片，要那种二维卡通人物加上三维手绘背景的风格。",
-      "we need a quick educational short about the industrial revolution told with those flat ink-outlined characters moving through a depth-of-field 3D world."
     ]
   }
 }

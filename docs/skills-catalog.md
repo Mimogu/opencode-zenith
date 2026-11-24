@@ -1192,9 +1192,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 | Generating an image from a text prompt using free AI backends? | [`image-gen`](#skill-image-gen) | `@image-gen generate a cyberpunk city illustration` |
 | Editing an existing video/audio file (cut, captions, reframe, loudness, exports)? | [`ffmpeg`](#skill-ffmpeg) | `@ffmpeg cut clip.mp4 to 15 seconds and add burned-in captions` |
 | Animated line-art / ink illustrations (walking people, day-night scenes) as an SVG component or video? | [`line-art-animation`](#skill-line-art-animation) | `@line-art-animation a little ink scene of a baker opening his shop at dawn` |
-| A ~60 s vertical cartoon story short (2D characters in a 3D world, narration, music)? | [`cartoon-3d-short`](#skill-cartoon-3d-short) | `@cartoon-3d-short a 60 second short about why the Leaning Tower leans` |
 | Generating a short video clip from a text prompt? | [`video-gen`](#skill-video-gen) | `@video-gen generate a 5-second video clip` |
-| Directing an animated programmatic film in artistic styles (Oil, Ukiyo-e)? | [`lemo-opuscar`](#skill-lemo-opuscar) | `@lemo-opuscar direct an explainer animation` |
 | Creating interactive generative art, flow fields, or math patterns with p5.js? | [`algorithmic-art`](#skill-algorithmic-art) | `@algorithmic-art build a particle flow field in p5.js` |
 | Developing 2D/3D game mechanics or UI in Godot 4 with GDScript 2.0? | [`godot4-dev`](#skill-godot4-dev) | `@godot4-dev build a character controller script` |
 | Generating procedural 3D voxel structures and architectural math models? | [`voxel-craft-cad`](#skill-voxel-craft-cad) | `@voxel-craft-cad generate a spiral tower in voxels` |
@@ -1218,7 +1216,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **Source Folder:** [ffmpeg](../config/skills/ffmpeg)
 - **Upstream Repository:** [kajisho5/ffmpeg-skill](https://github.com/kajisho5/ffmpeg-skill) (MIT)
 - **What It Does:** 40+ deterministic Python scripts around local FFmpeg: cut, join, reframe/fit, speed, captions, overlays, silence removal, sync, loudness, HDR to SDR, platform exports and checks. Needs FFmpeg 6.1+ and Python 3.10+; no cloud, no pip packages.
-- **When to Use:** When you already have a video or audio file and want it edited or checked. For a brand-new clip from a text prompt use `video-gen`; for a story-driven film made in code use `lemo-opuscar`.
+- **When to Use:** When you already have a video or audio file and want it edited or checked. For a brand-new clip from a text prompt use `video-gen`.
 - **How it stays reliable on small models:** run the script with `--dry-run` first (prints the exact ffmpeg command, writes nothing), then for real, then verify with `scripts/probe.py` / `scripts/verify.py`.
 - **Most-used commands:**
   ```bash
@@ -1243,18 +1241,6 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
   @line-art-animation a hand-drawn delivery rider cycling past a row of shops, as a 10 s video
   ```
 
-<a id="skill-cartoon-3d-short"></a>
-#### `cartoon-3d-short` — Cartoon 3D Story Shorts (three.js + Remotion)
-- **Source Folder:** [cartoon-3d-short](../config/skills/cartoon-3d-short)
-- **Upstream Repository:** [mromidev/claude-animated-shorts](https://github.com/mromidev/claude-animated-shorts) (MIT; its private style-reference frames are not bundled)
-- **What It Does:** A full pipeline for ~60 s vertical story shorts: researched script, narration with word timings (`scripts/make_voice.py`, edge-tts), shot plan timed to the words, a painted 3D town with ink outlines and depth of field, bean-head cartoon characters, synthesized SFX and music, QA of every frame.
-- **Setup:** `bash ~/.config/opencode/skills/cartoon-3d-short/scripts/setup_project.sh` creates `~/remotion-shorts` with pinned versions (React 18; React 19 renders blank frames) and the example "bridge" short.
-- **Needs a strong model:** the router switches the session to the strongest measured model when this skill is used.
-- **Example Prompt:**
-  ```text
-  @cartoon-3d-short a 60 second cartoon short about the Great Molasses Flood of 1919
-  ```
-
 <a id="skill-godot4-dev"></a>
 #### `godot4-dev` — Godot 4 Game Engine & GDScript 2.0
 - **Source Folder:** [godot4-dev](../config/skills/godot4-dev)
@@ -1275,17 +1261,6 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **Example Prompt:**
   ```text
   @image-gen generate an illustration of a cozy cyberpunk coffee shop
-  ```
-
-<a id="skill-lemo-opuscar"></a>
-#### `lemo-opuscar` — Programmatic Short Film & Animation Director
-- **Source Folder:** [lemo-opuscar](../config/skills/lemo-opuscar)
-- **Upstream Repository:** [anthropics/skills](https://github.com/anthropics/skills)
-- **What It Does:** Directs and renders short films entirely through code in distinct artistic styles (Oil Painting, Watercolor, Ukiyo-e, Exploded Teardown, Satellite Briefing).
-- **When to Use:** When creating programmatic video explainers, educational animations, or artistic short films.
-- **Example Prompt:**
-  ```text
-  @lemo-opuscar direct a short animation explaining gravity in watercolor style
   ```
 
 <a id="skill-mcfunction-builder"></a>
@@ -1483,7 +1458,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 
 ---
 
-## Alphabetical Index of All 93 Skills
+## Alphabetical Index of All 91 Skills
 
 | Skill | Category | Quick Purpose |
 | :--- | :--- | :--- |
@@ -1498,7 +1473,6 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 | [`brainstorming`](#skill-brainstorming) | [Autonomous Multi-Agent & Orchestration](#autonomous-multi-agent-orchestration) | Facilitates structured brainstorming: explores multiple technical approaches, weighs pros and cons, and clarifies requirements before deciding.. |
 | [`browser-automation`](#skill-browser-automation) | [System, Desktop, Browser & Tooling](#system-desktop-browser-tooling) | Drives the user's real desktop browser via the OpenCode Browse extension with saved logins and CAPTCHA hand-off.. |
 | [`canvas-design`](#skill-canvas-design) | [Document, Office & Content Creation](#document-office-content-creation) | Generates visual artwork, posters, infographics, and book covers rendered into high-resolution PNG or PDF files.. |
-| [`cartoon-3d-short`](#skill-cartoon-3d-short) | [Creative, Media, Gaming & 3D](#creative-media-gaming-3d) | Makes ~60 s vertical cartoon story shorts: 2D characters in an ink-outlined 3D world, narration, music, rendered with three.js in Remotion. |
 | [`chisle`](#skill-chisle) | [Software Architecture, Coding & Refactoring](#software-architecture-coding-refactoring) | A hyper-efficient, minimal-overhead development and audit mode designed to execute changes cleanly with the least tokens possible.. |
 | [`code-review`](#skill-code-review) | [Code Review, Auditing & Security](#code-review-auditing-security) | Conducts thorough code reviews examining correctness, security vulnerabilities, edge cases, maintainability, and code style.. |
 | [`codebase-design`](#skill-codebase-design) | [Software Architecture, Coding & Refactoring](#software-architecture-coding-refactoring) | Guides the design of deep classes and modules (simple public interfaces hiding powerful internal complexity) based on clean architecture principles.. |
@@ -1538,7 +1512,6 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 | [`godot4-dev`](#skill-godot4-dev) | [Creative, Media, Gaming & 3D](#creative-media-gaming-3d) | Engineering guidelines and best practices for Godot 4: GDScript 2.0 static typing, scene hierarchy, state machines, physics, and shader code.. |
 | [`graphify`](#skill-graphify) | [System, Desktop, Browser & Tooling](#system-desktop-browser-tooling) | Converts an entire codebase into a persistent knowledge graph mapping all functions, classes, imports, and calls for fast architectural queries.. |
 | [`image-gen`](#skill-image-gen) | [Creative, Media, Gaming & 3D](#creative-media-gaming-3d) | Generates images from text prompts using available free backend providers (e.g., OVH AI, Pollinations, HuggingFace Flux/SD).. |
-| [`lemo-opuscar`](#skill-lemo-opuscar) | [Creative, Media, Gaming & 3D](#creative-media-gaming-3d) | Directs and renders short films entirely through code in distinct artistic styles (Oil Painting, Watercolor, Ukiyo-e, Exploded Teardown, Satellite Briefing).. |
 | [`line-art-animation`](#skill-line-art-animation) | [Creative, Media, Gaming & 3D](#creative-media-gaming-3d) | Animated thin-pen line-art SVG scenes (walking figures, wind, day/night) with deterministic video export. |
 | [`markitdown`](#skill-markitdown) | [Document, Office & Content Creation](#document-office-content-creation) | Converts virtually any document or media format (PDF, Word, PPTX, Excel, HTML, CSV, audio, images, ZIP) into clean, readable Markdown.. |
 | [`mcfunction-builder`](#skill-mcfunction-builder) | [Creative, Media, Gaming & 3D](#creative-media-gaming-3d) | Calculates Minecraft survival crafting stacks (64-item base stacks + remainders), chest layout math, and resource gathering quantities.. |

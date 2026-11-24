@@ -405,6 +405,20 @@ try {
     Copy-Item -Path (Join-Path $ConfigSrc '*') -Destination $ConfigDir -Recurse -Force -ErrorAction Stop
     $pycache = Join-Path $ConfigDir '__pycache__'
     if (Test-Path $pycache) { Remove-Item $pycache -Recurse -Force -ErrorAction SilentlyContinue }
+    # Skills Zenith removed (config/retired-skills.txt): delete the old copies; a link to the user's own copy stays
+    $retiredList = Join-Path $ConfigDir 'retired-skills.txt'
+    if (Test-Path $retiredList) {
+        foreach ($line in Get-Content $retiredList) {
+            $name = ($line -replace '#.*', '').Trim()
+            if (-not $name) { continue }
+            $target = Join-Path (Join-Path $ConfigDir 'skills') $name
+            $item = Get-Item $target -ErrorAction SilentlyContinue
+            if ($item -and $item.PSIsContainer -and -not $item.LinkType) {
+                Remove-Item $target -Recurse -Force -ErrorAction SilentlyContinue
+                Write-Host "    INFO removed retired skill: $name"
+            }
+        }
+    }
     $testPycache = Join-Path $ConfigDir 'tests\__pycache__'
     if (Test-Path $testPycache) { Remove-Item $testPycache -Recurse -Force -ErrorAction SilentlyContinue }
     $targetVbs = Join-Path $ConfigDir 'run-hidden.vbs'

@@ -380,8 +380,15 @@ describe("motion facts for delivered videos", () => {
     const moving = mk("moving", "testsrc2=s=320x180:r=24");
     const [s, m] = VC.mediaFacts([still, moving]);
     expect(s).toContain("PRACTICALLY A STILL PICTURE");
-    expect(m).toContain("differ by");
+    expect(m).toContain("of the picture changes");
     expect(m).not.toContain("STILL PICTURE");
+  });
+  test("a small figure crossing a still background is motion, not a still (2026-11-24 line-art walk)", () => {
+    const small = mk("small", "color=c=white:s=320x180:r=24[bg];color=c=black:s=10x24:r=24[b];[bg][b]overlay=x='20+t*90':y=140[out0]");
+    const [m] = VC.mediaFacts([small]);
+    expect(m).toContain("of the picture changes");
+    expect(m).not.toContain("STILL PICTURE");
+    expect(VC.changedShare(Buffer.from([0, 0, 0, 0]), Buffer.from([0, 0, 200, 0]))).toBe(25);
   });
 });
 

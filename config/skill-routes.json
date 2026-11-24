@@ -9,10 +9,7 @@
       "compaction"
     ],
     "opt_out_token": "#noskills",
-    "strong_model_skills": [
-      "cartoon-3d-short",
-      "lemo-opuscar"
-    ],
+    "strong_model_skills": [],
     "_strong_model_skills": "skills that need a strong model: injecting one switches a build session to the strongest measured model (context-engine strongStart)"
   },
   "never": [
@@ -127,11 +124,6 @@
     "video-gen": [
       "\\b(generate|create|make|render)\\b(\\W+\\w+){0,6}\\W+clips?\\b",
       "\\b(veo|seedance|text[- ]to[- ]video|image[- ]to[- ]video|ai[- ]generated video|video (model|placeholder|mockup))\\b"
-    ],
-    "lemo-opuscar": [
-      "\\b(make|create|produce|direct|render|generate|build|animate)\\b(\\W+[\\w'-]+){0,6}\\W+(film|movie|short film|explainer|promo|teaser|trailer|documentary|newsreel|animation(?=\\W+(about|explaining|showing|telling|on (the )?(history|story|life)|in (a|an|the)?\\W*[\\w-]+(\\W+[\\w-]+)?\\W+(style|look)))|animated (video|short|explainer|film)|video(?!\\W+(clip|player|component|element|file|tag|upload|stream|call|chat|codec|editor)))s?\\b(?!\\W+(player|component|element|tag))",
-      "\\b(film|video|animation|explainer)s? styles?\\b",
-      "\\bopuscar\\b"
     ],
     "canvas-design": [
       "\\b(poster|flyer|banner|infographic|cover art)\\b"
@@ -327,12 +319,6 @@
       "\\b(line[- ]?art|ink(ed)?|pen|doodle|hand[- ]drawn|sketchy?|stick[- ]figure)\\b(\\W+[\\w-]+){0,5}\\W+(animat\\w*|walk\\w*|walking|scene|illustrations?|characters?)\\b",
       "\\banimated (illustration|doodle|line[- ]?art|scene component)s?\\b",
       "\\bday[- ]?(and[- ])?night cycle\\b"
-    ],
-    "cartoon-3d-short": [
-      "\\b(3d cartoon|cartoon 3d|cartoon[- ]style 3d|2d characters in (a )?(colou?rful )?3d)\\b",
-      "\\bcartoon (story |history |science )?shorts?\\b",
-      "\\blike the (bridge|soldiers?)( (video|short))?\\b",
-      "\\bcartoon[- ]3d[- ]short\\b"
     ]
   }
 }
