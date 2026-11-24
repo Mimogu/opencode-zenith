@@ -29,6 +29,7 @@ let lastOk = 0;
 // After KEEP_ALIVE idle the model is unloaded and the next request reloads it from disk (measured
 // 1.6 s cold here, 56 ms warm): give that one query room instead of falling back to keywords.
 const WARM_MS = 1500, COLD_MS = 3500, COLD_AFTER = 19 * 60_000;
+export const QUERY_CHARS = Number(process.env.OPENCODE_EMBED_QUERY_CHARS) || 1200;
 
 export function normalize(v) {
   let n = 0;
@@ -76,7 +77,9 @@ async function call(inputs, timeoutMs) {
 
 /** Embed one query; cached. Returns Float32Array or null. */
 export async function embedQuery(text, timeoutMs = Date.now() - lastOk > COLD_AFTER ? COLD_MS : WARM_MS) {
-  const key = text.slice(0, 2000);
+  // 1,200 chars: on this CPU (no usable GPU) 2,000 chars took 1.67 s, over the 1.5 s warm timeout, so every long
+  // prompt lost recall and skill matching (2026-11-24); 1,200 chars take ~0.95 s and keep the request's intent.
+  const key = text.slice(0, QUERY_CHARS);
   const hit = cache.get(key);
   if (hit) {
     cache.delete(key);

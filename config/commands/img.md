@@ -3,7 +3,7 @@ description: Generate an image via the free backend chain (best tier first, auto
 agent: build
 ---
 
-# /image: Generate Image
+# /img: Generate Image
 
 Generate a raster image using the tiered free backend chain: $ARGUMENTS
 

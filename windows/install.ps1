@@ -915,6 +915,7 @@ if (Have 'ollama') {
 Step 'Background: sentinel, OmniRoute at login, daily model benchmark'
 $vbs = Join-Path $ConfigDir 'run-hidden.vbs'
 $startup = [Environment]::GetFolderPath('Startup')
+if ([string]::IsNullOrWhiteSpace($startup)) { $startup = Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs\Startup' }
 $launcher = Join-Path $startup 'OpenCode-background.vbs'
 $lines = @(
     "' Started at login by the OpenCode setup. Delete this file to stop it.",
@@ -922,14 +923,29 @@ $lines = @(
     ('shell.Run """' + $PythonW + '"" ""' + (Join-Path $ConfigDir 'sentinel.py') + '""", 0, False')
 )
 if ($OmniMjs) { $lines += ('shell.Run "node ""' + $OmniMjs + '"" serve --no-open", 0, False') }
-Set-Content -Path $launcher -Value $lines -Encoding ASCII
-Ok "login launcher: $launcher"
+try {
+    New-Item -ItemType Directory -Force -Path $startup -ErrorAction Stop | Out-Null
+    Set-Content -Path $launcher -Value $lines -Encoding ASCII -ErrorAction Stop
+    Ok "login launcher: $launcher"
+} catch {
+    Warn "could not write the login launcher ($($_.Exception.Message)); start the background services by running install.bat again later"
+}
 
 Get-CimInstance Win32_Process -Filter "Name like 'python%'" -ErrorAction SilentlyContinue |
     Where-Object { $_.CommandLine -match 'sentinel\.py' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
 Start-Process -FilePath $PythonW -ArgumentList @("`"$(Join-Path $ConfigDir 'sentinel.py')`"") -WorkingDirectory $ConfigDir -WindowStyle Hidden
 Ok 'sentinel started'
-Get-Process -Name 'opencode-cli', 'OpenCode' -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+# Open OpenCode windows keep the old setup until restarted. Closing them loses replies in progress,
+# so ask first (default no; never without asking): the background service is restarted below either way.
+$openOc = @(Get-Process -Name 'OpenCode', 'opencode-cli' -ErrorAction SilentlyContinue)
+if ($openOc.Count -gt 0) {
+    if (Ask-YesNo "OpenCode is running. Close it now so the new setup loads? (replies in progress are lost)" $false) {
+        $openOc | Stop-Process -Force -ErrorAction SilentlyContinue
+        Ok 'closed the running OpenCode'
+    } else {
+        Warn 'OpenCode is still running: close and reopen it to load the new setup'
+    }
+}
 try {
     $svcStatus = (& $OpenCodeExe service status 2>$null | Select-Object -First 1)
     if ($svcStatus -and $svcStatus -match '^https?://') {

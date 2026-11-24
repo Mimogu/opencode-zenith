@@ -197,10 +197,18 @@ class ApplyLadderTest(unittest.TestCase):
             loser: {c: 20.0 for c in oclib.CATEGORIES},
         }
         facts = {winner: {"latency": 5.0}, loser: {"latency": 40.0}}
-        out = model_lab.apply_ladders(scores, facts, {winner, loser}, set(before), steps={})
+        # fixed model list: the live `opencode models` answer varies with network and free-tier state, which
+        # made this test flaky (and slow, ~60 s) on fresh installs (2026-11-24)
+        offered = sorted(set(before) | {winner, loser})
+        real_list = oclib.list_models
+        oclib.list_models = lambda: list(offered)
+        try:
+            out = model_lab.apply_ladders(scores, facts, {winner, loser}, set(before), steps={})
+        finally:
+            oclib.list_models = real_list
         for cat in oclib.CATEGORIES:
             self.assertEqual(out["categories"][cat][0], winner)
-        live = set(oclib.list_models())  # models OpenCode no longer offers are dropped, by design
+        live = set(offered)  # models OpenCode no longer offers are dropped, by design
         # measured models join the ladder even when the shipped ladders.json did not list them (Zenith installs)
         expected = set(before) | {winner, loser}
         self.assertEqual(set(out["categories"]["build"]), {m for m in expected if not live or m in live})

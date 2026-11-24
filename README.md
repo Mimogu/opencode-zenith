@@ -205,7 +205,7 @@ opencode
 | **`/debug <issue>`** | 4-phase systematic root-cause debugging (Evidence → Isolation → Surgical Fix → Verification). | Use whenever an error or unexpected behavior occurs in code. | `/debug why does the session token expire immediately on reload?` |
 | **`/verify`** | Executes comprehensive validation across type-checks (`tsc`), linters, unit tests, and build scripts. | Use before committing or declaring work finished. | `/verify ensure all TypeScript types and unit tests pass cleanly` |
 | **`/explore <topic>`** | Fast, read-only survey of repository structure and key entry points without modifying files. | Use when exploring a new or unfamiliar codebase. | `/explore find where user permissions are checked in the backend` |
-| **`/status`** | Displays live benchmark scores, active model ladders, and router health. | Use to check current model rankings and server status. | `/status` |
+| **`/oc-status`** | Displays live benchmark scores, active model ladders, and router health. | Use to check current model rankings and server status. | `/oc-status` |
 
 ---
 

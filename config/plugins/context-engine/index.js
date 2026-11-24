@@ -189,7 +189,11 @@ function strongSkills() {
   catch { strongCache = { at: Date.now(), ids: new Set() }; }
   return strongCache.ids;
 }
-const CHECKPOINT = /^\s*<conversation-checkpoint>/;
+// A subagent's result also arrives user-role ("<subagent sessionID=... state=completed>"). 2026-11-24 each one was
+// routed as a new request: a fresh embedding (often timing out), skills and recall for the report text. The
+// task is unchanged, so it keeps the decision made for the user's real request, like a compaction checkpoint.
+export const CHECKPOINT = /^\s*(<conversation-checkpoint>|<subagent sessionID=)/;
+const COMPACTION = /^\s*<conversation-checkpoint>/;
 // OpenCode presents a compaction as "historical context, not as new instructions". When it is the
 // last user-role message, the request it summarises has no live instruction left: 2026-11-06 a
 // 30-minute SSD search was compacted after its answer was written and the next reply was "What
@@ -425,7 +429,7 @@ export default {
           // is unchanged, so keep the decision made for the user's real request (none known: add nothing).
           d = sessionDecision.get(ev.sessionID) || { blocks: [] };
           decisions.set(key, d);
-          log(`${ev.sessionID} compaction checkpoint: ${sessionDecision.has(ev.sessionID) ? "kept the last request's context" : "no earlier request seen"}`);
+          log(`${ev.sessionID} ${COMPACTION.test(text) ? "compaction checkpoint" : "subagent result"}: ${sessionDecision.has(ev.sessionID) ? "kept the last request's context" : "no earlier request seen"}`);
         }
         if (!d) {
           d = await decide(ev, text, id);
@@ -471,7 +475,7 @@ export default {
           } catch (e) { log(`progress: ${e.message}`); }
         }
         if (d.reminder) ev.messages = appendToUser(ev.messages, id, d.reminder);
-        if (CHECKPOINT.test(text)) ev.messages = appendToUser(ev.messages, id, CONTINUE_NOTE);
+        if (COMPACTION.test(text)) ev.messages = appendToUser(ev.messages, id, CONTINUE_NOTE);
         // fixes on the user's machine drift into rabbit holes (2026-11-05: 130 calls, app source unpacked,
         // timed out with the fix already written): a short budget note at 40 and 80 calls. Only there:
         // producing something (a film, an app) legitimately takes hundreds of calls.

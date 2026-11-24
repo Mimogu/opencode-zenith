@@ -10,6 +10,8 @@ description: >
 
 Write comprehensive implementation plans assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. TDD. Frequent commits.
 
+**Writing a plan is not executing it.** Produce the plan document only. Do not edit code, run its steps, or `git commit` unless the user asked you to carry the plan out (the commit steps below are for whoever executes the plan).
+
 Assume they are a skilled developer, but know almost nothing about our toolset or problem domain. Assume they don't know good test design very well.
 
 **Announce at start:** "I'm using the plans skill to create the implementation plan."

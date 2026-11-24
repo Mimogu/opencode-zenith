@@ -409,3 +409,10 @@ test("judgement playbooks (own machine, research/shopping) are marked strong; co
   expect((await pb.select("my laptop is slow when gaming, what should I do", "build")).strong).toContain("own-machine");
   expect((await pb.select("the build fails with undefined is not a function", "build")).strong).toEqual([]);
 });
+
+test("a subagent's result keeps the request's decision instead of being routed as a new request", async () => {
+  const { CHECKPOINT } = await import("../plugins/context-engine/index.js");
+  expect(CHECKPOINT.test('<subagent sessionID="ses_1" state="completed" description="Check frames">report')).toBe(true);
+  expect(CHECKPOINT.test("<conversation-checkpoint>\nObjective: x")).toBe(true);
+  expect(CHECKPOINT.test("please check the subagent output")).toBe(false);
+});

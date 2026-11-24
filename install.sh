@@ -621,8 +621,8 @@ if has_cmd opencode-stack; then
   opencode-stack down >/dev/null 2>&1 || true
   opencode-stack up >/dev/null 2>&1 || true
 elif has_cmd pkill; then
+  # only the background service (exact command line); "opencode-cli serve --stdio" belongs to open sessions
   pkill -fx "/usr/lib/opencode-desktop/opencode-cli serve --service" 2>/dev/null || true
-  pkill -f "opencode-cli serve" 2>/dev/null || true
 fi
 
 if [ "$CLEANUP_TEMP" = true ]; then

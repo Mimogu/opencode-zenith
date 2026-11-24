@@ -36,8 +36,10 @@ def main() -> int:
     active = [name for name in ("opencode-sentinel", "camofox-browser", "omniroute")
               if sh(["systemctl", "--user", "is-active", name]) == "active"]
     print(f"services   {', '.join(active) or 'none active'}")
-    print(f"mcp        {len((cfg.get('mcp') or {}))} configured, "
-          f"{sum(1 for v in (cfg.get('mcp') or {}).values() if v.get('enabled', True))} enabled")
+    mcp = cfg.get('mcp') or {}
+    mcp = mcp.get('servers', mcp) if isinstance(mcp.get('servers'), dict) else mcp   # v2 nests them under "servers"
+    print(f"mcp        {len(mcp)} configured, "
+          f"{sum(1 for v in mcp.values() if isinstance(v, dict) and v.get('enabled', True))} enabled: {', '.join(sorted(mcp))}")
 
     # Gateway & Provider checks
     omni_ok = False

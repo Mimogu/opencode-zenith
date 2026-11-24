@@ -51,7 +51,7 @@ const RULES = [
     // 2026-11-06 the read-only verifier had python3 refused 5 times in rephrased forms, then spent
     // 8 minutes hand-computing float arithmetic it could not run
     when: (name, text) => /^(shell|bash)$/.test(name) && /permission\.rejected|Permission denied: shell\b/i.test(text),
-    hint: "This command is not allowed for this agent, and rephrasing it (cd …&&, another interpreter, a pipe) is refused too. If you are a read-only subagent: do not work the result out by hand at length; read the code, and put the exact command under \"Needs running\" in your report for the caller to run. Otherwise it needs the user's approval: ask, or report it.",
+    hint: "Only this command was refused, not the shell: commands on your allow-list (git status/diff/log, ls, cat, grep, tests and linters for a verifier) still work when run alone, one per call. A chain (&&, ;, |) is refused when any part is not allowed, so split it (2026-11-24: one refused chain made the verifier report every phase BLOCKED). Rephrasing a refused command (cd …&&, another interpreter, a pipe) is refused too. If you are a read-only subagent: do not work the result out by hand at length; read the code, and put the exact command under \"Needs running\" in your report for the caller to run. Otherwise it needs the user's approval: ask, or report it.",
   },
   {
     // OpenCode connects MCP servers on first use (4-10 s): until then a call answers "Unknown tool
