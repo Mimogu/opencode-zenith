@@ -50,11 +50,70 @@ done
 
 # 1. Dependency Checks & Setup
 echo "[1/5] Checking prerequisites..."
+
+# System packages Zenith needs. Fresh installs of Ubuntu, Debian, Fedora and Arch all lack git (and often
+# unzip, pip, ripgrep, fd); the installer used to stop at "Missing git" there. Now it installs them with the
+# system's package manager (sudo asks for the password on the terminal), and only stops if a required one is
+# still missing afterwards, printing the exact command.
+SUDO=""
+if [ "$(id -u)" -ne 0 ] && has_cmd sudo; then SUDO="sudo"; fi
+PKG_MGR=""
+for m in apt-get dnf pacman zypper apk; do if has_cmd "$m"; then PKG_MGR="$m"; break; fi; done
+
+pkg_names() {  # logical name -> package name for this package manager
+  case "$PKG_MGR:$1" in
+    apt-get:git|dnf:git|pacman:git|zypper:git|apk:git) echo git ;;
+    pacman:python3) echo python ;;
+    *:python3) echo python3 ;;
+    apt-get:pip|dnf:pip|zypper:pip) echo python3-pip ;;
+    pacman:pip) echo python-pip ;;
+    apk:pip) echo py3-pip ;;
+    *:unzip) echo unzip ;;
+    apt-get:xz) echo xz-utils ;;
+    *:xz) echo xz ;;
+    *:ripgrep) echo ripgrep ;;
+    apt-get:fd|dnf:fd) echo fd-find ;;
+    *:fd) echo fd ;;
+  esac
+}
+pkg_install() {
+  [ -n "$PKG_MGR" ] || return 1
+  local names=()
+  for n in "$@"; do names+=("$(pkg_names "$n")"); done
+  echo "  [+] Installing system packages with ${PKG_MGR}: ${names[*]}"
+  [ -n "$SUDO" ] && echo "      (sudo may ask for your password)"
+  case "$PKG_MGR" in
+    apt-get) $SUDO env DEBIAN_FRONTEND=noninteractive apt-get update -qq || true
+             $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq "${names[@]}" ;;
+    dnf)     $SUDO dnf install -y -q "${names[@]}" ;;
+    pacman)  $SUDO pacman -Sy --noconfirm --needed "${names[@]}" ;;
+    zypper)  $SUDO zypper --non-interactive install "${names[@]}" ;;
+    apk)     $SUDO apk add --no-cache "${names[@]}" ;;
+  esac
+}
+
+missing=()
+has_cmd git || missing+=(git)
+has_cmd python3 || missing+=(python3 pip)
+if has_cmd python3 && ! python3 -m pip --version >/dev/null 2>&1; then missing+=(pip); fi
+has_cmd unzip || missing+=(unzip)
+has_cmd xz || missing+=(xz)
+has_cmd rg || missing+=(ripgrep)
+{ has_cmd fd || has_cmd fdfind; } || missing+=(fd)
+if [ ${#missing[@]} -gt 0 ]; then
+  pkg_install "${missing[@]}" || echo "  [!] Could not install all system packages automatically."
+  hash -r 2>/dev/null || true
+fi
+# Debian/Ubuntu name the fd binary fdfind
+if ! has_cmd fd && has_cmd fdfind; then ln -sf "$(command -v fdfind)" "${HOME}/.local/bin/fd"; fi
+
 for tool in git python3; do
   if has_cmd "$tool"; then
     echo "  [✓] $tool found"
   else
-    echo "  [!] Missing $tool. Please install it with your system package manager."
+    echo "  [!] $tool is required and could not be installed automatically."
+    if [ -n "$PKG_MGR" ]; then echo "      Install it, then run the installer again:  sudo ${PKG_MGR} install $(pkg_names "$tool")"
+    else echo "      Install it with your system package manager, then run the installer again."; fi
     exit 1
   fi
 done
@@ -89,6 +148,35 @@ if has_cmd npm; then
   fi
 fi
 
+# Node.js: OmniRoute starts with `#!/usr/bin/env node` and needs Node >=22.22.2 <23 or 24-26. Distro packages are
+# too old (Ubuntu 24.04 / Debian 12: 18, Fedora 41: 22.21.1), and with only Bun the gateway fails with
+# "node: No such file or directory". So the official Node 24 LTS goes into ~/.local (no root) when needed.
+node_ok() {
+  has_cmd node && node -e 'const [a,b,c]=process.versions.node.split(".").map(Number);process.exit((a===22&&(b>22||(b===22&&c>=2)))||(a>=24&&a<27)?0:1)' 2>/dev/null
+}
+install_node_local() {
+  local arch dest base file
+  case "$(uname -m)" in x86_64) arch=x64 ;; aarch64|arm64) arch=arm64 ;; *) return 1 ;; esac
+  base="https://nodejs.org/dist/latest-v24.x"
+  file="$(curl -fsSL --connect-timeout 15 "$base/SHASUMS256.txt" | grep -oE "node-v[0-9.]+-linux-${arch}\.tar\.xz" | head -n 1)" || return 1
+  [ -n "$file" ] || return 1
+  dest="${HOME}/.local/share/zenith-node"
+  mkdir -p "$dest"
+  curl -fsSL --connect-timeout 15 "$base/$file" | tar -xJ -C "$dest" --strip-components=1 || return 1
+  for b in node npm npx; do ln -sf "$dest/bin/$b" "${HOME}/.local/bin/$b"; done
+  hash -r 2>/dev/null || true
+  # global npm packages go to ~/.npm-global/bin (on PATH), not into the Node folder
+  mkdir -p "${HOME}/.npm-global"; npm config set prefix "${HOME}/.npm-global" >/dev/null 2>&1 || true
+}
+if node_ok; then
+  echo "  [✓] Node.js $(node --version) found"
+else
+  if has_cmd node; then echo "  [+] Node.js $(node --version) is too old for the OmniRoute gateway; installing Node.js 24 LTS into ~/.local ..."
+  else echo "  [+] Node.js not found; installing Node.js 24 LTS into ~/.local ..."; fi
+  if install_node_local && node_ok; then echo "  [✓] Node.js $(node --version) ready"
+  else echo "  [!] Could not install Node.js automatically; the OmniRoute gateway needs it (https://nodejs.org)."; fi
+fi
+
 if ! has_cmd bun && ! has_cmd node; then
   echo "  [+] Node/Bun missing. Installing Bun..."
   curl -fsSL --connect-timeout 15 --max-time 120 https://bun.sh/install | bash
@@ -104,6 +192,16 @@ get_opencode_version() {
   fi
 }
 
+# Bun blocks packages' install scripts by default; @opencode/cli's postinstall fetches the real program, so
+# without this `opencode` only prints "postinstall script was not run" (2026-11-26, fresh Ubuntu/Debian/Arch).
+# Global npm install that shows its progress. These downloads are big (OpenCode ~100 MB, OmniRoute more) and took
+# 12-13 minutes on a slow link in tests; with output hidden the installer looked frozen and people cancelled it.
+npm_global() {
+  echo "      (downloading $* - this can take several minutes on a slow connection; progress below)"
+  npm install -g --no-fund --no-audit "$@"
+}
+bun_trust() { has_cmd bun && (cd "$HOME" && bun pm -g trust "$@" >/dev/null 2>&1) || true; }
+oc_works() { opencode --version 2>/dev/null | grep -qE '[0-9]+\.[0-9]+\.[0-9]+'; }
 OC_VER="$(get_opencode_version)"
 OC_MAJOR="${OC_VER%%.*}"
 
@@ -112,16 +210,28 @@ if [ -z "$OC_VER" ] || [ "${OC_MAJOR:-0}" -lt 2 ]; then
     echo "  [!] Found outdated OpenCode $OC_VER. OpenCode Zenith requires OpenCode 2.x."
   fi
   echo "  [+] Installing/upgrading to OpenCode 2 (@opencode/cli)..."
-  if has_cmd bun; then
-    bun install -g @opencode/cli || curl -fsSL https://opencode.ai/install | bash
-  elif has_cmd npm; then
-    npm install -g @opencode/cli 2>/dev/null || curl -fsSL https://opencode.ai/install | bash
+  if has_cmd npm; then
+    npm_global @opencode/cli || curl -fsSL https://opencode.ai/install | bash
+  elif has_cmd bun; then
+    { bun install -g @opencode/cli && bun_trust @opencode/cli; } || curl -fsSL https://opencode.ai/install | bash
   else
     curl -fsSL https://opencode.ai/install | bash
   fi
-  export PATH="${HOME}/.local/bin:${HOME}/.npm-global/bin:${HOME}/.bun/bin:${PATH}"
+  export PATH="${HOME}/.local/bin:${HOME}/.npm-global/bin:${HOME}/.bun/bin:${HOME}/.opencode/bin:${PATH}"
+  hash -r 2>/dev/null || true
+  if ! oc_works; then
+    echo "  [!] OpenCode did not start after installing; trying another install method..."
+    if has_cmd npm; then npm_global @opencode/cli || true; fi
+    hash -r 2>/dev/null || true
+    oc_works || curl -fsSL https://opencode.ai/install | bash || true
+    export PATH="${HOME}/.opencode/bin:${PATH}"; hash -r 2>/dev/null || true
+  fi
   OC_VER="$(get_opencode_version)"
-  echo "  [✓] OpenCode ${OC_VER:-2.x} ready."
+  if oc_works; then
+    echo "  [✓] OpenCode ${OC_VER} ready."
+  else
+    echo "  [!] OpenCode is installed but does not start. Run 'opencode --version' to see why, or install it from https://opencode.ai"
+  fi
 else
   # Zenith is tested on this OpenCode version; older 2.x installs are brought up to it
   OC_TESTED="2.4.0"
@@ -134,9 +244,9 @@ else
     else
       echo "  [+] Updating OpenCode $OC_VER -> latest (Zenith is tested on $OC_TESTED)..."
       if has_cmd bun && [[ "$OC_PATH" == *"/.bun/"* ]]; then
-        bun install -g @opencode/cli@latest || true
+        bun install -g @opencode/cli@latest && bun_trust @opencode/cli || true
       elif has_cmd npm && [[ "$OC_PATH" == *node_modules* || "$OC_PATH" == *npm* ]]; then
-        npm install -g @opencode/cli@latest 2>/dev/null || true
+        npm_global @opencode/cli@latest || true
       else
         curl -fsSL https://opencode.ai/install | bash || true
       fi
@@ -151,10 +261,10 @@ fi
 # OmniRoute gateway
 if ! has_cmd omniroute; then
   echo "  [+] Installing OmniRoute gateway..."
-  if has_cmd bun; then
-    bun install -g omniroute || true
-  elif has_cmd npm; then
-    npm install -g omniroute 2>/dev/null || true
+  if has_cmd npm; then
+    npm_global omniroute || true
+  elif has_cmd bun; then
+    bun install -g omniroute && bun_trust omniroute onnxruntime-node || true
   fi
 fi
 if has_cmd omniroute; then
@@ -165,7 +275,9 @@ fi
 
 # 2. Backup existing configuration
 echo "[2/5] Deploying Zenith configuration..."
-if [ -d "$CONFIG_DIR" ]; then
+# only a real setup counts: running `opencode --version` above already creates an empty config folder, which made
+# every fresh install report "Existing config found" and back it up
+if [ -f "$CONFIG_DIR/opencode.json" ] || [ -f "$CONFIG_DIR/opencode.jsonc" ] || [ -f "$CONFIG_DIR/AGENTS.md" ]; then
   BACKUP_DIR="${CONFIG_DIR}.bak.$(date +%Y%m%d%H%M%S)"
   echo "  [!] Existing config found at $CONFIG_DIR"
   echo "  [+] Creating backup at $BACKUP_DIR"

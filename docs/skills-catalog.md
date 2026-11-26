@@ -120,7 +120,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 8. [Data Science, Analytics & Visualizations](#data-science-analytics-visualizations) *(12 skills)* — Exploratory data analysis, statistics, A/B testing, dashboards, machine learning, and plotting.
 9. [Web Research, Academic & Document Intelligence](#web-research-academic-document-intelligence) *(8 skills)* — Web queries, deep research dossiers, academic paper pipelines, and photo geolocation.
 10. [Autonomous Multi-Agent & Orchestration](#autonomous-multi-agent-orchestration) *(7 skills)* — Lifecycle planning, subagent task execution, prompt sharpening, and structured ideation.
-11. [Creative, Media, Gaming & 3D](#creative-media-gaming-3d) *(7 skills)* — AI image/video generation, programmatic film direction, Godot 4, generative art, and 3D voxels.
+11. [Creative, Media, Gaming & 3D](#creative-media-gaming-3d) *(13 skills)* — AI image/video generation, video editing with FFmpeg, line-art animation, generative art, posters, Godot 4 game development (Jolt physics, navigation, Terrain3D, Voxel Tools, Effekseer VFX) and 3D voxel modelling.
 12. [System, Desktop, Browser & Tooling](#system-desktop-browser-tooling) *(9 skills)* — Linux desktop control, browser automation, knowledge graphs, MCP builders, and memory tools.
 
 ---
@@ -1183,7 +1183,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 <a id="creative-media-gaming-3d"></a>
 ## 11. Creative, Media, Gaming & 3D
 
-*AI image/video generation, programmatic film direction, Godot 4, generative art, and 3D voxels.*
+*AI image/video generation, video editing with FFmpeg, line-art animation, generative art, posters, Godot 4 game development (Jolt physics, navigation, Terrain3D, Voxel Tools, Effekseer VFX) and 3D voxel modelling.*
 
 ### 🧭 Which One Should I Pick? (Decision Guide)
 

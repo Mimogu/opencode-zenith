@@ -13,7 +13,7 @@ Standard AI coding assistants either burn expensive cloud tokens or fail miserab
 
 * 🔄 **Zero-Cost Automated Fallback Ladders**: Combines free endpoints from OpenRouter, NVIDIA NIM, and local gateways into a resilient chain (Primary → Secondary → Standby → Local). If one hits a rate limit or 503 error, it seamlessly continues on the next tier.
 * 📊 **Self-Healing Daily Benchmarks**: Runs an automated live test every morning at 04:00 AM, scoring available free models on real tasks and dynamically promoting the best-performing model to the top of your ladder.
-* 🛠️ **90+ Curated Skills**: Instant access to specialized workflows for Word (`.docx`), PowerPoint (`.pptx`), Excel (`.xlsx`), PDF extraction, high-performance TypeScript, systematic debugging, OWASP security scanning, and film direction.
+* 🛠️ **90+ Curated Skills**: Instant access to specialized workflows for Word (`.docx`), PowerPoint (`.pptx`), Excel (`.xlsx`), PDF extraction, high-performance TypeScript, systematic debugging, OWASP security scanning, video editing, and Godot game development.
 * 🔐 **Secret Guard**: API keys and tokens from `free-models.env` are replaced with `<redacted:NAME>` before anything is sent to a model, so a model that prints your key file while debugging cannot leak the keys to its provider. Commands that use `$NAME` keep working.
 * 🚦 **Human Review Gates (`#noreview`)**: Built-in verification checks ensure models never hallucinate file changes. For quick visual or browser tasks, simply append `#noreview` to finish cleanly in one turn without delays.
 * 🌐 **Dynamic Desktop Browser Control**: Remotely drives any installed desktop browser (Brave, Chrome, Chromium, Firefox) with programmatic media timing and clean process termination.
@@ -24,7 +24,9 @@ Standard AI coding assistants either burn expensive cloud tokens or fail miserab
 
 > **Tested with OpenCode 2.4.0.** The installers install the latest OpenCode, and bring an older 2.x install up to date (on Linux, an OpenCode from your system package manager is left to it, with a reminder to update).
 
-You can install OpenCode Zenith in under 2 minutes. The installer is **completely non-destructive** — it checks what you already have installed (Git, Python, Node, Bun) and skips existing tools without overwriting your personal files.
+The installer is **non-destructive**: it checks what you already have and skips existing tools without overwriting your personal files. On a fresh system it **installs what is missing by itself**: on Linux, Git, Python with pip, unzip, xz, ripgrep and fd through your package manager (apt, dnf, pacman, zypper or apk; sudo asks for your password), plus **Node.js 24 LTS** into `~/.local` when Node is missing or too old for the OmniRoute gateway; on Windows, Git, Node.js LTS and Python through winget (ripgrep and fd are optional).
+
+> **Expect 10-30 minutes on a first install.** OpenCode and the OmniRoute gateway are large downloads; the installer shows their progress, so a long wait is normal. If an install was interrupted, or `opencode` prints *"postinstall script was not run"*, just run the installer again: it repairs what is missing or broken.
 
 ### Method 1: The 1-Line Terminal Command (Recommended)
 
@@ -432,7 +434,7 @@ For the full directory of all 96 skills with decision matrices and prompt recipe
 </details>
 
 <details open>
-<summary><b>11. Creative, Media, Gaming & 3D</b> (8 skills) — <i>AI image/video generation, programmatic film direction, Godot 4, generative art, and 3D voxels.</i></summary>
+<summary><b>11. Creative, Media, Gaming & 3D</b> (13 skills) — <i>AI image/video generation, video editing with FFmpeg, line-art animation, generative art, posters, and Godot 4 game development with Jolt physics, navigation, Terrain3D, Voxel Tools and Effekseer VFX, plus 3D voxel modelling.</i></summary>
 
 | Skill | Original GitHub Repository | When to Use / Scenario | Example Use / Prompt |
 | :--- | :--- | :--- | :--- |
@@ -491,6 +493,21 @@ The two OmniRoute video tiers use the <code>veo-free</code> provider, which need
 <details>
 <summary><b>What happens to my own settings, MCP servers and skills when I update?</b></summary>
 They stay. Every MCP server in your previous <code>opencode.json</code> is kept with your own settings (yours win over a Zenith server of the same name), and new Zenith servers are added next to them. If a local server's program is no longer installed, the installer prints <code>MCP &lt;name&gt;: command not found, disabled</code> and sets <code>"enabled": false</code> so OpenCode starts cleanly; install the program and set it back to <code>true</code>. Your own skill folders and symlinks in <code>skills/</code> are kept too; only a skill with the same name as a bundled one is replaced. Everything from before the update is in the timestamped backup (<code>~/.config/opencode.bak.&lt;date&gt;</code> on Linux, <code>%USERPROFILE%\.config\opencode.backup-&lt;date&gt;</code> on Windows). Your own settings stay too: your default model, theme and other preferences, providers and models you added yourself, and any setting Zenith does not ship. Settings Zenith ships (its providers' timeouts, instructions, plugins) are updated to the new version. Skills Zenith has removed (listed in <code>config/retired-skills.txt</code>) are deleted on update; your backup keeps a copy, and a skill you linked in yourself is never touched.
+</details>
+
+<details>
+<summary><b>The installer stopped, showed errors, or some parts are missing</b></summary>
+Run the same install command again: it skips what already works and repairs the rest. It installs missing system tools itself, installs Node.js 24 LTS when yours is missing or older than the OmniRoute gateway needs (22.22.2+), and checks that OpenCode really starts before it says "ready". If it still stops, the last lines it printed name the missing piece and the exact command to install it. On Windows, if winget is missing, install "App Installer" from the Microsoft Store and run install.bat again.
+</details>
+
+<details>
+<summary><b>How do I use a skill?</b></summary>
+Write its name with an @ in your message, e.g. <code>@godot-jolt-physics my CharacterBody3D slides off slopes</code> or <code>@image-gen a fox icon</code>. Zenith loads the named skill (at most two per message) before the model starts; skills you do not name cost nothing. Every skill is listed below.
+</details>
+
+<details>
+<summary><b>Will OpenCode open Godot windows on my screen?</b></summary>
+No. The <code>godot-headless</code> plugin adds <code>--headless</code> to every Godot command the agent runs (except an explicit editor launch with <code>-e</code>), so checks and test runs never pop up dialogs or wait for a click.
 </details>
 
 <details>

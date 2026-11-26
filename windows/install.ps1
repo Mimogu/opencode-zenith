@@ -212,14 +212,22 @@ function Node-Major {
     if (-not (Have 'node')) { return 0 }
     try { return [int]((& node --version) -replace '^v(\d+).*', '$1') } catch { return 0 }
 }
+# OmniRoute's own requirement (package.json engines): >=22.22.2 <23 or >=24 <27
+function Node-Ok {
+    if (-not (Have 'node')) { return $false }
+    try {
+        $v = [version](((& node --version) -replace '^v', '').Trim())
+        return (($v.Major -eq 22 -and $v -ge [version]'22.22.2') -or ($v.Major -ge 24 -and $v.Major -lt 27))
+    } catch { return $false }
+}
 
 $Programs = @(
     @{ Name = 'Git (includes Git Bash)'; Id = 'Git.Git';                  Test = { Have 'git' } },
-    @{ Name = 'Node.js LTS';            Id = 'OpenJS.NodeJS.LTS';        Test = { $n = Node-Major; ($n -ge 22 -and $n -ne 23 -and $n -lt 27) } },
+    @{ Name = 'Node.js LTS';            Id = 'OpenJS.NodeJS.LTS';        Test = { Node-Ok } },
     @{ Name = 'Python 3';               Id = 'Python.Python.3.13';       Test = { [bool](Find-Python) };
        Override = '/quiet InstallAllUsers=0 PrependPath=1 Include_launcher=1 Include_test=0' },
-    @{ Name = 'ripgrep (rg)';           Id = 'BurntSushi.ripgrep.MSVC';  Test = { Have 'rg' } },
-    @{ Name = 'fd';                     Id = 'sharkdp.fd';               Test = { Have 'fd' } }
+    @{ Name = 'ripgrep (rg)';           Id = 'BurntSushi.ripgrep.MSVC';  Test = { Have 'rg' }; Optional = $true },
+    @{ Name = 'fd';                     Id = 'sharkdp.fd';               Test = { Have 'fd' }; Optional = $true }
 )
 
 Step 'Checking required programs'
@@ -228,13 +236,29 @@ $missing = @($Programs | Where-Object { -not (& $_.Test) })
 foreach ($p in $Programs) {
     if ($missing -contains $p) { Warn "$($p.Name): missing" } else { Ok "$($p.Name)" }
 }
+$missingRequired = @($missing | Where-Object { -not $_.Optional })
 if ($missing.Count -gt 0) {
-    if ($SkipPrograms) { Fail 'Programs are missing and -SkipPrograms was given.' }
-    if (-not (Have 'winget')) {
-        Fail "winget is not available. Install 'App Installer' from the Microsoft Store, then run install.bat again."
+    if ($SkipPrograms) {
+        if ($missingRequired.Count -gt 0) { Fail 'Programs are missing and -SkipPrograms was given.' }
+        $missing = @()
     }
-    if (-not (Ask-YesNo "Install the missing programs now with winget? (Windows may ask for permission)")) {
-        Fail 'The missing programs are required.'
+    # winget ships with Windows 10/11 but on a fresh account it is often not registered yet: register it first
+    if ($missing.Count -gt 0 -and -not (Have 'winget')) {
+        try {
+            Add-AppxPackage -RegisterByFamilyName -MainPackage Microsoft.DesktopAppInstaller_8wekyb3d8bbwe -ErrorAction Stop
+            Refresh-Path
+        } catch {}
+    }
+    if ($missing.Count -gt 0 -and -not (Have 'winget')) {
+        if ($missingRequired.Count -gt 0) {
+            Fail ("winget is not available, so these could not be installed: " + (($missingRequired | ForEach-Object { $_.Name }) -join ', ') + ". Install 'App Installer' from the Microsoft Store (or install them by hand), then run install.bat again.")
+        }
+        Warn 'winget is not available: skipping the optional tools (ripgrep, fd)'
+        $missing = @()
+    }
+    if ($missing.Count -gt 0 -and -not (Ask-YesNo "Install the missing programs now with winget? (Windows may ask for permission)")) {
+        if ($missingRequired.Count -gt 0) { Fail 'The missing programs are required.' }
+        $missing = @()
     }
     foreach ($p in $missing) {
         Info "installing $($p.Name) ..."
@@ -243,6 +267,7 @@ if ($missing.Count -gt 0) {
         & winget @wgArgs
         Refresh-Path
         if (& $p.Test) { Ok "$($p.Name) installed" }
+        elseif ($p.Optional) { Warn "$($p.Name) did not install (winget exit $LASTEXITCODE); it is optional, continuing" }
         else { Fail "$($p.Name) did not install correctly (winget exit $LASTEXITCODE). Install it manually and run install.bat again." }
     }
 }
@@ -258,10 +283,15 @@ if (-not (Have 'graphify')) {
     Info "installing Graphify CLI for on-demand codebase knowledge graphs..."
     try {
         & $Python -m pip install -q --user graphifyy 2>$null
+        # pip --user puts graphify.exe in Python's per-user Scripts folder, which is not on PATH (2026-11-26 real
+        # Windows test: installed but "graphify" not found). Add that folder to the user PATH.
+        $userScripts = (& $Python -c "import sysconfig;print(sysconfig.get_path('scripts', 'nt_user'))" 2>$null | Select-Object -First 1)
+        if ($userScripts -and (Test-Path $userScripts.Trim())) { Add-UserPath $userScripts.Trim() }
         Refresh-Path
     } catch {}
 }
 if (Have 'graphify') { Ok "Graphify CLI ready (on-demand /graphify skill)" }
+else { Warn "Graphify CLI not available (optional; install later with: python -m pip install --user graphifyy)" }
 
 # ----------------------------------------------------------------- opencode
 Step 'OpenCode'
