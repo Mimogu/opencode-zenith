@@ -82,3 +82,13 @@ test("a loop note in an earlier turn stays when a new turn starts (stable bytes 
   expect(JSON.stringify(after.messages[4])).toBe(before);
   expect(before).toContain("loop guard");
 });
+
+test("godot-headless: agent Godot commands never open a window (2026-11-25 ALERT dialog on the user's desktop)", async () => {
+  const { headless } = await import("../plugins/godot-headless.js");
+  expect(headless("godot -s /tmp/test_voxel.gd")).toBe("godot --headless -s /tmp/test_voxel.gd");
+  expect(headless("cd p && timeout 60 godot --path . --quit-after 5 2>&1 | tail")).toBe("cd p && timeout 60 godot --headless --path . --quit-after 5 2>&1 | tail");
+  expect(headless("godot --headless --path . --import")).toBe("godot --headless --path . --import");
+  expect(headless("godot -e --path .")).toBe("godot -e --path .");
+  expect(headless("ls addons/godot-jolt; cat godot.log")).toBe("ls addons/godot-jolt; cat godot.log");
+  expect(headless("grep -r godot src")).toBe("grep -r godot src");
+});

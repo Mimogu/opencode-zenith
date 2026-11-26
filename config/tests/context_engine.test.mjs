@@ -416,3 +416,28 @@ test("a subagent's result keeps the request's decision instead of being routed a
   expect(CHECKPOINT.test("<conversation-checkpoint>\nObjective: x")).toBe(true);
   expect(CHECKPOINT.test("please check the subagent output")).toBe(false);
 });
+
+test("godot add-on skills route on Godot requests only; voxel-craft-cad stays out of Godot", () => {
+  const routes = JSON.parse(fs.readFileSync(new URL("../skill-routes.json", import.meta.url), "utf-8")).routes;
+  const hit = (id, t) => (routes[id] || []).some((p) => new RegExp(p, "i").test(t));
+  const yes = [["godot-effekseer", "add an Effekseer slash effect when the sword hits"], ["godot-jolt-physics", "switch my godot project to jolt physics"],
+    ["godot-jolt-physics", "the projectile in my godot shooter goes through walls"], ["godot-navigation-recast", "make enemies chase the player using pathfinding in godot"],
+    ["godot-terrain3d", "add a big open-world terrain to my godot scene with a heightmap"], ["godot-voxel-tools", "make a minecraft-like block world in godot"],
+    ["voxel-craft-cad", "build a voxel model viewer in three.js"]];
+  const no = [["godot-effekseer", "add a particle effect to my react landing page"], ["godot-jolt-physics", "fix collisions in my unity game"],
+    ["godot-terrain3d", "explain terrain types in geography"], ["godot-voxel-tools", "build a voxel model viewer in three.js"],
+    ["godot-navigation-recast", "add navigation links to my website header"], ["voxel-craft-cad", "make a minecraft-like voxel world in godot"]];
+  for (const [id, t] of yes) expect([id, t, hit(id, t)]).toEqual([id, t, true]);
+  for (const [id, t] of no) expect([id, t, hit(id, t)]).toEqual([id, t, false]);
+});
+
+test("manual mode: skills named as @id are loaded, others never (2026-11-24 @godot-effekseer ignored)", async () => {
+  const { mentionedSkills } = await import("../plugins/context-engine/index.js");
+  const installed = [{ id: "godot-effekseer" }, { id: "image-gen" }, { id: "docx" }];
+  const ids = (t, loaded) => mentionedSkills(t, installed, loaded).map((s) => s.id);
+  expect(ids("@godot-effekseer This is a Godot 4.7 project")).toEqual(["godot-effekseer"]);
+  expect(ids("Use @image-gen and @docx, then (@godot-effekseer)")).toEqual(["image-gen", "docx"]);
+  expect(ids("mail me at a@docx.com about @unknown-skill")).toEqual([]);
+  expect(ids("make a poster")).toEqual([]);
+  expect(ids("@image-gen again", new Set(["image-gen"]))).toEqual([]);
+});

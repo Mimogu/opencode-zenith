@@ -201,6 +201,14 @@ const COMPACTION = /^\s*<conversation-checkpoint>/;
 const CONTINUE_NOTE = "<system-reminder>\nThe conversation was compacted while you were working (from the harness, not the user). The user's request and the state of the work are in the summary above: its Objective is the task, its next steps are what is left. Continue that task now; do not ask the user what they want. If the work is already done, send the user the final answer the summary describes, in full.\n</system-reminder>";
 const CHANGE_REQUEST = /\b(fix|repair|install|uninstall|configure|set ?up|enable|disable|change|update|upgrade|remove|delete|make (it|them|my)|get .{0,20} working)\b/i;
 
+
+/** Skills the user named as @<id> (installed, not already loaded), first two in order of mention. */
+export function mentionedSkills(text, installed, loaded = new Set()) {
+  const byId = new Map((installed || []).map((s) => [s.id, s]));
+  const ids = [...new Set([...String(text || "").matchAll(/(?:^|[\s(\[,;:])@([a-z0-9][a-z0-9-]{1,60})(?![\w-])/gi)].map((m) => m[1].toLowerCase()))];
+  return ids.filter((id) => byId.has(id) && !loaded.has(id)).slice(0, 2).map((id) => byId.get(id));
+}
+
 export default {
   id: "context-engine",
   setup(api) {
@@ -366,6 +374,16 @@ export default {
         if (h) blocks.push(h);
         if (sk.inject.length || sk.hint.length) {
           notes.push(`skills:${sk.inject.map((s) => `+${s.id}(${s.why})`).concat(sk.hint.map((s) => `?${s.id}(${s.why})`)).join(" ")}`);
+        }
+      }
+      // Manual mode (OPENCODE_NO_SKILL_ROUTER=1): a skill the user names with @<id> is still loaded. 2026-11-24
+      // "@godot-effekseer This is a Godot project..." was read as decoration: no skill call, 40 shell commands
+      // and 4 web fetches rediscovering what the skill documents. Only named skills, at most 2, never guessed.
+      if (!doSkills && !text.includes("#noskills") && !SUBAGENT.test(text)) {
+        const named = mentionedSkills(text, skills.refresh().skills, loadedSkills(ev.messages));
+        if (named.length) {
+          blocks.push(injectedNote(named.map((s) => s.id)), ...named.map((s) => skillContent({ id: s.id, ...(skills.meta.get(s.id) || {}) })));
+          notes.push(`skills:${named.map((s) => `+${s.id}(@named)`).join(" ")}`);
         }
       }
       if (doLessons && !SUBAGENT.test(text)) {

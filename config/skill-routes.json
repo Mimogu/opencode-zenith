@@ -110,7 +110,7 @@
       "\\b(godot|gdscript|\\.tscn|\\.gd\\b|autoload)"
     ],
     "voxel-craft-cad": [
-      "\\b(voxel|three\\.js|threejs|webgl|3d model(ing)?|parametric)\\b"
+      "^(?!.*\\b(godot|gdscript)\\b).*\\b(voxel|three\\.js|threejs|webgl|3d model(ing)?|parametric)\\b"
     ],
     "mcfunction-builder": [
       "\\b(minecraft|mcfunction|datapack|command blocks?)\\b"
@@ -319,6 +319,32 @@
       "\\b(line[- ]?art|ink(ed)?|pen|doodle|hand[- ]drawn|sketchy?|stick[- ]figure)\\b(\\W+[\\w-]+){0,5}\\W+(animat\\w*|walk\\w*|walking|scene|illustrations?|characters?)\\b",
       "\\banimated (illustration|doodle|line[- ]?art|scene component)s?\\b",
       "\\bday[- ]?(and[- ])?night cycle\\b"
+    ],
+    "godot-effekseer": [
+      "\\b(effekseer|efkefc)\\b",
+      "(godot|gdscript|\\.tscn|\\.gd\\b).{0,80}\\b(vfx|particle effects?|hit effects?|spell effects?|slash effects?)\\b",
+      "\\b(vfx|particle effects?|hit effects?|spell effects?|slash effects?)\\b.{0,80}(godot|gdscript|\\.tscn|\\.gd\\b)"
+    ],
+    "godot-jolt-physics": [
+      "\\bjolt\\b",
+      "(godot|gdscript|\\.tscn|\\.gd\\b).{0,80}\\b(physics|collisions?|ragdolls?|rigid ?body|characterbody3d|raycasts?|projectiles?)\\b",
+      "\\b(physics|collisions?|ragdolls?|rigid ?body|characterbody3d|raycasts?|projectiles?)\\b.{0,80}(godot|gdscript|\\.tscn|\\.gd\\b)",
+      "\\b(characterbody3d|rigidbody3d|physicalbone3d|ragdoll)\\b"
+    ],
+    "godot-navigation-recast": [
+      "\\b(navmesh|navigation ?mesh|navigationagent[23]d|navigationregion[23]d|navigationserver[23]d|navigationobstacle[23]d)\\b",
+      "(godot|gdscript|\\.tscn|\\.gd\\b).{0,80}\\b(path ?finding|navigation|nav ?mesh|enemies? (that )?(chase|follow)|avoidance)\\b",
+      "\\b(path ?finding|navigation|nav ?mesh|enemies? (that )?(chase|follow)|avoidance)\\b.{0,80}(godot|gdscript|\\.tscn|\\.gd\\b)"
+    ],
+    "godot-terrain3d": [
+      "\\bterrain ?3d\\b",
+      "(godot|gdscript|\\.tscn|\\.gd\\b).{0,80}\\b(terrains?|heightmaps?|landscapes?|open[- ]world map)\\b",
+      "\\b(terrains?|heightmaps?|landscapes?|open[- ]world map)\\b.{0,80}(godot|gdscript|\\.tscn|\\.gd\\b)"
+    ],
+    "godot-voxel-tools": [
+      "\\b(godot_voxel|voxel ?tools|voxelterrain|voxellodterrain|voxelgenerator\\w*)\\b",
+      "(godot|gdscript|\\.tscn|\\.gd\\b).{0,80}\\b(voxels?|minecraft[- ]like|block world|destructible terrain|diggable)\\b",
+      "\\b(voxels?|minecraft[- ]like|block world|destructible terrain|diggable)\\b.{0,80}(godot|gdscript|\\.tscn|\\.gd\\b)"
     ]
   }
 }

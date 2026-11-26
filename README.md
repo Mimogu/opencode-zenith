@@ -262,9 +262,9 @@ OpenCode Zenith integrates natively with the official **OpenCode Browse** extens
 
 ---
 
-## 📚 Complete Skills Catalog (91 Skills)
-OpenCode Zenith bundles **91 production-grade engineering skills**. All skills operate in **Manual On-Demand Invocation Mode** — they consume **zero token budget** during normal conversation and only load instructions when you explicitly invoke them with `@<name>` (e.g. `@docx create a report from notes.txt` or `@web-research search for...`).
-For the full directory of all 91 skills with decision matrices and prompt recipes, see the comprehensive [Skills Catalog Guide](docs/skills-catalog.md).
+## 📚 Complete Skills Catalog (96 Skills)
+OpenCode Zenith bundles **96 production-grade engineering skills**. All skills operate in **Manual On-Demand Invocation Mode** — they consume **zero token budget** during normal conversation and only load instructions when you explicitly invoke them with `@<name>` (e.g. `@docx create a report from notes.txt` or `@web-research search for...`).
+For the full directory of all 96 skills with decision matrices and prompt recipes, see the comprehensive [Skills Catalog Guide](docs/skills-catalog.md).
 
 > [!TIP]
 > **Why is Graphify Run On-Demand (and NOT as a Persistent MCP Server)?**  
@@ -275,7 +275,7 @@ For the full directory of all 91 skills with decision matrices and prompt recipe
 
 ---
 
-### 🗂️ All 91 Available Skills & Original Repositories by Category
+### 🗂️ All 96 Available Skills & Original Repositories by Category
 
 <details open>
 <summary><b>1. Document, Office & Content Creation</b> (6 skills) — <i>Tools for generating, editing, and converting Word, PowerPoint, Excel, PDF, and Markdown files.</i></summary>
@@ -442,6 +442,11 @@ For the full directory of all 91 skills with decision matrices and prompt recipe
 | **`video-gen`** | [anthropics/skills](https://github.com/anthropics/skills) | When you need a short motion clip or visual video asset. | `@video-gen generate a 5-second video of ocean waves crashing at sunset` |
 | **`algorithmic-art`** | [anthropics/skills](https://github.com/anthropics/skills) | When creating creative coding projects, generative backgrounds, or interactive math visualizers. | `@algorithmic-art create an interactive flow field particle simulation in p5.js` |
 | **`godot4-dev`** | [godotengine/godot](https://github.com/godotengine/godot) | When developing 2D or 3D games, mechanics, or UI inside the Godot 4 engine. | `@godot4-dev create a character controller script with double-jump in GDScript` |
+| **`godot-effekseer`** | [effekseer/EffekseerForGodot4](https://github.com/effekseer/EffekseerForGodot4) | Plays particle effects made in the free Effekseer editor (slashes, hits, spells, ultimates) in Godot 4: install, importing .efkefc effects, the EffekseerEmitter3D/2D API, triggers, pooling. | `@godot-effekseer add a slash effect when the sword hits an enemy` |
+| **`godot-jolt-physics`** | [godotengine/godot-docs](https://github.com/godotengine/godot-docs) | Godot's built-in Jolt 3D physics: switching engines, the settings that cause bugs (margins, joints, ghost collisions), character controllers, ragdolls, fast projectiles, queries. | `@godot-jolt-physics my CharacterBody3D slides off slopes` |
+| **`godot-navigation-recast`** | [godotengine/godot-docs](https://github.com/godotengine/godot-docs) | Pathfinding in Godot 4: navmesh baking in the editor and at runtime, NavigationAgent, avoidance, links for jumps and ladders, different agent sizes, large worlds. | `@godot-navigation-recast make enemies chase the player around obstacles` |
+| **`godot-terrain3d`** | [TokisanGames/Terrain3D](https://github.com/TokisanGames/Terrain3D) | Large editable terrains with the Terrain3D add-on: regions, sculpting and texture painting, heightmap import, foliage, collision and height queries, navigation baking. | `@godot-terrain3d add an open-world terrain with a heightmap and collision` |
+| **`godot-voxel-tools`** | [Zylann/godot_voxel](https://github.com/Zylann/godot_voxel) | Voxel terrain with Zylann's Voxel Tools: blocky (Minecraft-like) or smooth diggable terrain, generators, editing, saving, LOD and performance. | `@godot-voxel-tools make a Minecraft-like block world that players can dig` |
 | **`voxel-craft-cad`** | [anthropics/skills](https://github.com/anthropics/skills) | When building procedural voxel worlds, 3D structures, or algorithmic building generators. | `@voxel-craft-cad generate a procedural spiral castle tower in voxels` |
 | **`mcfunction-builder`** | [anthropics/skills](https://github.com/anthropics/skills) | When planning large Minecraft survival construction projects and calculating required stacks. | `@mcfunction-builder calculate how many shulker boxes of cobblestone are needed for a 50x50 pyramid` |
 

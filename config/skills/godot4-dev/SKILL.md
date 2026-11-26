@@ -21,3 +21,8 @@ When developing or debugging Godot 4 / GDScript projects:
    - Never define duplicate lifecycle or callback functions (such as two `_draw()` methods) in the same script.
 6. **Headless Testing**:
    - When running standalone script checks via `godot-mono -s test.gd`, Autoloads are not loaded automatically. Test scripts should instantiate classes directly or run full scenes via `godot-mono --headless path/to/project scene.tscn`.
+
+## Reference material & related skills
+- Full Godot docs (rst text, 4.x) offline: `~/godot-addons/docs/godot-docs-4.x/`, class reference in `classes/class_<name>.rst`: grep there before guessing an API (online: https://docs.godotengine.org/en/stable/).
+- Add-on skills: `godot-jolt-physics` (3D physics), `godot-navigation-recast` (pathfinding), `godot-terrain3d` (large terrains), `godot-voxel-tools` (voxel/Minecraft-like terrain), `godot-effekseer` (VFX). Downloaded add-on releases live in `~/godot-addons/`.
+- Check a project without a screen: `godot --headless --path <project> --import`, then `godot --headless --path <project> --quit-after 300` and read errors.

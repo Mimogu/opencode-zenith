@@ -1195,6 +1195,11 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 | Generating a short video clip from a text prompt? | [`video-gen`](#skill-video-gen) | `@video-gen generate a 5-second video clip` |
 | Creating interactive generative art, flow fields, or math patterns with p5.js? | [`algorithmic-art`](#skill-algorithmic-art) | `@algorithmic-art build a particle flow field in p5.js` |
 | Developing 2D/3D game mechanics or UI in Godot 4 with GDScript 2.0? | [`godot4-dev`](#skill-godot4-dev) | `@godot4-dev build a character controller script` |
+| Particle effects made in the Effekseer editor in a Godot game? | [`godot-effekseer`](#skill-godot-effekseer) | `@godot-effekseer add a slash effect when the sword hits an enemy` |
+| 3D physics, collisions, ragdolls or a character controller in Godot? | [`godot-jolt-physics`](#skill-godot-jolt-physics) | `@godot-jolt-physics my CharacterBody3D slides off slopes` |
+| Enemies or NPCs that find paths in a Godot game? | [`godot-navigation-recast`](#skill-godot-navigation-recast) | `@godot-navigation-recast make enemies chase the player around obstacles` |
+| A large open-world terrain in a Godot game? | [`godot-terrain3d`](#skill-godot-terrain3d) | `@godot-terrain3d add an open-world terrain with a heightmap and collision` |
+| A Minecraft-like or destructible voxel world in Godot? | [`godot-voxel-tools`](#skill-godot-voxel-tools) | `@godot-voxel-tools make a Minecraft-like block world that players can dig` |
 | Generating procedural 3D voxel structures and architectural math models? | [`voxel-craft-cad`](#skill-voxel-craft-cad) | `@voxel-craft-cad generate a spiral tower in voxels` |
 | Calculating Minecraft survival crafting stacks (64-item math) and chest layouts? | [`mcfunction-builder`](#skill-mcfunction-builder) | `@mcfunction-builder calculate pyramid stacks` |
 
@@ -1239,6 +1244,61 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 - **Example Prompt:**
   ```text
   @line-art-animation a hand-drawn delivery rider cycling past a row of shops, as a 10 s video
+  ```
+
+<a id="skill-godot-effekseer"></a>
+#### `godot-effekseer` — Effekseer VFX for Godot 4
+- **Source Folder:** [godot-effekseer](../config/skills/godot-effekseer)
+- **Upstream Repository:** [effekseer/EffekseerForGodot4](https://github.com/effekseer/EffekseerForGodot4) (its official docs are bundled in `references/`)
+- **What It Does:** Plays particle effects made in the free Effekseer editor (slashes, hits, spells, ultimates) in Godot 4: install, importing .efkefc effects, the EffekseerEmitter3D/2D API, triggers, pooling.
+- **How it stays reliable on small models:** look APIs up in `references/` instead of guessing, and check the project with `godot --headless --path <project> --import`.
+- **Example Prompt:**
+  ```text
+  @godot-effekseer add a slash effect when the sword hits an enemy
+  ```
+
+<a id="skill-godot-jolt-physics"></a>
+#### `godot-jolt-physics` — Jolt Physics in Godot 4
+- **Source Folder:** [godot-jolt-physics](../config/skills/godot-jolt-physics)
+- **Upstream Repository:** [godotengine/godot-docs](https://github.com/godotengine/godot-docs) (its official docs are bundled in `references/`)
+- **What It Does:** Godot's built-in Jolt 3D physics: switching engines, the settings that cause bugs (margins, joints, ghost collisions), character controllers, ragdolls, fast projectiles, queries.
+- **How it stays reliable on small models:** look APIs up in `references/` instead of guessing, and check the project with `godot --headless --path <project> --import`.
+- **Example Prompt:**
+  ```text
+  @godot-jolt-physics my CharacterBody3D slides off slopes
+  ```
+
+<a id="skill-godot-navigation-recast"></a>
+#### `godot-navigation-recast` — Godot 4 Navigation & Navmesh Baking
+- **Source Folder:** [godot-navigation-recast](../config/skills/godot-navigation-recast)
+- **Upstream Repository:** [godotengine/godot-docs](https://github.com/godotengine/godot-docs) (its official docs are bundled in `references/`)
+- **What It Does:** Pathfinding in Godot 4: navmesh baking in the editor and at runtime, NavigationAgent, avoidance, links for jumps and ladders, different agent sizes, large worlds.
+- **How it stays reliable on small models:** look APIs up in `references/` instead of guessing, and check the project with `godot --headless --path <project> --import`.
+- **Example Prompt:**
+  ```text
+  @godot-navigation-recast make enemies chase the player around obstacles
+  ```
+
+<a id="skill-godot-terrain3d"></a>
+#### `godot-terrain3d` — Terrain3D for Godot 4
+- **Source Folder:** [godot-terrain3d](../config/skills/godot-terrain3d)
+- **Upstream Repository:** [TokisanGames/Terrain3D](https://github.com/TokisanGames/Terrain3D) (its official docs are bundled in `references/`)
+- **What It Does:** Large editable terrains with the Terrain3D add-on: regions, sculpting and texture painting, heightmap import, foliage, collision and height queries, navigation baking.
+- **How it stays reliable on small models:** look APIs up in `references/` instead of guessing, and check the project with `godot --headless --path <project> --import`.
+- **Example Prompt:**
+  ```text
+  @godot-terrain3d add an open-world terrain with a heightmap and collision
+  ```
+
+<a id="skill-godot-voxel-tools"></a>
+#### `godot-voxel-tools` — Voxel Tools for Godot 4
+- **Source Folder:** [godot-voxel-tools](../config/skills/godot-voxel-tools)
+- **Upstream Repository:** [Zylann/godot_voxel](https://github.com/Zylann/godot_voxel) (its official docs are bundled in `references/`)
+- **What It Does:** Voxel terrain with Zylann's Voxel Tools: blocky (Minecraft-like) or smooth diggable terrain, generators, editing, saving, LOD and performance.
+- **How it stays reliable on small models:** look APIs up in `references/` instead of guessing, and check the project with `godot --headless --path <project> --import`.
+- **Example Prompt:**
+  ```text
+  @godot-voxel-tools make a Minecraft-like block world that players can dig
   ```
 
 <a id="skill-godot4-dev"></a>
@@ -1458,7 +1518,7 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 
 ---
 
-## Alphabetical Index of All 91 Skills
+## Alphabetical Index of All 96 Skills
 
 | Skill | Category | Quick Purpose |
 | :--- | :--- | :--- |
@@ -1509,6 +1569,11 @@ OpenCode runs in **Manual On-Demand Invocation Mode**. This ensures that skill p
 | [`geo-sleuth`](#skill-geo-sleuth) | [Web Research, Academic & Document Intelligence](#web-research-academic-document-intelligence) | Geolocates or chronolocates photos using tool-verified evidence: camera metadata (EXIF), landmarks, sun shadow math, street view, and OCR signs.. |
 | [`git-conflict-resolver`](#skill-git-conflict-resolver) | [Git, DevOps, Containers & Deployment](#git-devops-containers-deployment) | Resolves complex git merge conflicts, rebase collisions, and detached HEAD states systematically without losing code changes.. |
 | [`git-workflow`](#skill-git-workflow) | [Git, DevOps, Containers & Deployment](#git-devops-containers-deployment) | Guides clean Git practices: conventional commit messages, feature branch workflows, PR templates, and maintaining clean git history.. |
+| [`godot-effekseer`](#skill-godot-effekseer) | [Creative, Media, Gaming & 3D](#creative-media-gaming-3d) | Plays particle effects made in the free Effekseer editor (slashes, hits, spells, ultimates) in Godot 4: install, importing .efkefc effects, the EffekseerEmitter3D/2D API, triggers, pooling. |
+| [`godot-jolt-physics`](#skill-godot-jolt-physics) | [Creative, Media, Gaming & 3D](#creative-media-gaming-3d) | Godot's built-in Jolt 3D physics: switching engines, the settings that cause bugs (margins, joints, ghost collisions), character controllers, ragdolls, fast projectiles, queries. |
+| [`godot-navigation-recast`](#skill-godot-navigation-recast) | [Creative, Media, Gaming & 3D](#creative-media-gaming-3d) | Pathfinding in Godot 4: navmesh baking in the editor and at runtime, NavigationAgent, avoidance, links for jumps and ladders, different agent sizes, large worlds. |
+| [`godot-terrain3d`](#skill-godot-terrain3d) | [Creative, Media, Gaming & 3D](#creative-media-gaming-3d) | Large editable terrains with the Terrain3D add-on: regions, sculpting and texture painting, heightmap import, foliage, collision and height queries, navigation baking. |
+| [`godot-voxel-tools`](#skill-godot-voxel-tools) | [Creative, Media, Gaming & 3D](#creative-media-gaming-3d) | Voxel terrain with Zylann's Voxel Tools: blocky (Minecraft-like) or smooth diggable terrain, generators, editing, saving, LOD and performance. |
 | [`godot4-dev`](#skill-godot4-dev) | [Creative, Media, Gaming & 3D](#creative-media-gaming-3d) | Engineering guidelines and best practices for Godot 4: GDScript 2.0 static typing, scene hierarchy, state machines, physics, and shader code.. |
 | [`graphify`](#skill-graphify) | [System, Desktop, Browser & Tooling](#system-desktop-browser-tooling) | Converts an entire codebase into a persistent knowledge graph mapping all functions, classes, imports, and calls for fast architectural queries.. |
 | [`image-gen`](#skill-image-gen) | [Creative, Media, Gaming & 3D](#creative-media-gaming-3d) | Generates images from text prompts using available free backend providers (e.g., OVH AI, Pollinations, HuggingFace Flux/SD).. |
